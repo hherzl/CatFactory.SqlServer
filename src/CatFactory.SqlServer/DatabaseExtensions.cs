@@ -1,0 +1,19 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using CatFactory.Mapping;
+
+namespace CatFactory.SqlServer
+{
+    public static class DatabaseExtensions
+    {
+        public static IEnumerable<DbObject> GetTables(this Database db)
+        {
+            return db.DbObjects.Where(item => item.Type == "table");
+        }
+
+        public static IEnumerable<DbObject> GetViews(this Database db)
+        {
+            return db.DbObjects.Where(item => item.Type == "view");
+        }
+    }
+}

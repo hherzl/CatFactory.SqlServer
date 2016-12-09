@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CA24B612-0450-4522-850B-FD8D1195271D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F05DC012-3268-48AB-8EF5-DA05429B3071}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CatFactory.SqlServer", "src\CatFactory.SqlServer\CatFactory.SqlServer.xproj", "{4721EBBC-0AB2-44C0-8DC2-3123DE89337E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{EC6C7661-E325-4BC6-A9B6-C201EFF6B269}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CatFactory.SqlServer.Tests", "test\CatFactory.SqlServer.Tests\CatFactory.SqlServer.Tests.xproj", "{BB71706B-2DC3-44B2-BA9E-25BED1096626}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4721EBBC-0AB2-44C0-8DC2-3123DE89337E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4721EBBC-0AB2-44C0-8DC2-3123DE89337E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4721EBBC-0AB2-44C0-8DC2-3123DE89337E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4721EBBC-0AB2-44C0-8DC2-3123DE89337E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB71706B-2DC3-44B2-BA9E-25BED1096626}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB71706B-2DC3-44B2-BA9E-25BED1096626}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB71706B-2DC3-44B2-BA9E-25BED1096626}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB71706B-2DC3-44B2-BA9E-25BED1096626}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4721EBBC-0AB2-44C0-8DC2-3123DE89337E} = {CA24B612-0450-4522-850B-FD8D1195271D}
+		{BB71706B-2DC3-44B2-BA9E-25BED1096626} = {EC6C7661-E325-4BC6-A9B6-C201EFF6B269}
+	EndGlobalSection
+EndGlobal
