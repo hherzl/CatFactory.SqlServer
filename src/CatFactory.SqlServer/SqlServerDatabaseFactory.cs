@@ -42,6 +42,8 @@ namespace CatFactory.SqlServer
                     db.Views.Add(item);
                 }
 
+                // todo: add procedures in import process
+
                 connection.Close();
             }
 
@@ -81,13 +83,12 @@ namespace CatFactory.SqlServer
                 {
                     while (dataReader.Read())
                     {
-                        var obj = new DbObject();
-
-                        obj.Schema = dataReader.GetString(0);
-                        obj.Name = dataReader.GetString(1);
-                        obj.Type = dataReader.GetString(2);
-
-                        yield return obj;
+                        yield return new DbObject()
+                        {
+                            Schema = dataReader.GetString(0),
+                            Name = dataReader.GetString(1),
+                            Type = dataReader.GetString(2)
+                        };
                     }
                 }
             }
@@ -200,7 +201,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<View> ImportViews(Database db)
         {
-            Logger.Default.Log("Import Views");
+            Logger.Default.Log("ImportViews");
 
             using (var connection = new SqlConnection(ConnectionString))
             {
