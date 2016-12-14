@@ -27,22 +27,25 @@ namespace CatFactory.SqlServer
 
                 db.Name = connection.Database;
 
-                foreach (var item in GetDbObjecs(connection))
+                foreach (var dbObject in GetDbObjecs(connection))
                 {
-                    db.DbObjects.Add(item);
+                    db.DbObjects.Add(dbObject);
                 }
 
-                foreach (var item in ImportTables(db))
+                foreach (var table in ImportTables(db))
                 {
-                    db.Tables.Add(item);
+                    db.Tables.Add(table);
                 }
 
-                foreach (var item in ImportViews(db))
+                foreach (var view in ImportViews(db))
                 {
-                    db.Views.Add(item);
+                    db.Views.Add(view);
                 }
 
-                // todo: add procedures in import process
+                foreach (var procedure in ImportProcedures(db))
+                {
+                    db.Procedures.Add(procedure);
+                }
 
                 connection.Close();
             }
@@ -73,10 +76,14 @@ namespace CatFactory.SqlServer
                         from
                             sys.views views
                             inner join sys.schemas schemas on views.schema_id = schemas.schema_id
-                    order by
-                        schema_name,
-                        object_type,
-                        object_name
+                    union
+                        select
+                            sys.schemas.name as schema_name,
+                            procedures.name as object_name,
+                            'procedure' as object_type
+                        from
+                            sys.procedures procedures
+                            inner join sys.schemas on procedures.schema_id = sys.schemas.schema_id
                 ";
 
                 using (var dataReader = command.ExecuteReader())
@@ -187,14 +194,28 @@ namespace CatFactory.SqlServer
 
         protected void AddContraintsToTable(Table table, DbDataReader dataReader)
         {
+            Logger.Default.Log("AddContraintsToTable: {0}", table.FullName);
+
             while (dataReader.Read())
             {
-                if (String.Concat(dataReader["constraint_type"]) == "PRIMARY KEY (clustered)")
+                if (String.Concat(dataReader["constraint_type"]).Contains("PRIMARY KEY"))
                 {
                     table.PrimaryKey = new PrimaryKey
                     {
                         Key = new List<String>(dataReader["constraint_keys"].ToString().Split(','))
                     };
+                }
+                else if (String.Concat(dataReader["constraint_type"]).Contains("FOREIGN KEY"))
+                {
+                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',')));
+                }
+                else if (String.Concat(dataReader["constraint_keys"]).Contains("REFERENCES"))
+                {
+                    table.ForeignKeys[table.ForeignKeys.Count - 1].References = String.Concat(dataReader["constraint_keys"]).Replace("REFERENCES", String.Empty).Trim();
+                }
+                else if (String.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
+                {
+                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',')));
                 }
             }
         }
@@ -250,6 +271,57 @@ namespace CatFactory.SqlServer
                 connection.Close();
             }
 
+        }
+
+        protected IEnumerable<Procedure> ImportProcedures(Database db)
+        {
+            Logger.Default.Log("ImportProcedures");
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                foreach (var item in db.GetProcedures())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        Logger.Default.Log("Importing procedure: {0}", item.FullName);
+
+                        command.Connection = connection;
+                        command.CommandText = String.Format("sp_help '{0}'", item.FullName);
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                var procedure = new Procedure
+                                {
+                                    Schema = item.Schema,
+                                    Name = item.Name
+                                };
+
+                                dataReader.NextResult();
+
+                                while (dataReader.Read())
+                                {
+                                    var procedureParameter = new ProcedureParameter();
+
+                                    procedureParameter.Name = String.Concat(dataReader["Parameter_name"]);
+                                    procedureParameter.Type = String.Concat(dataReader["Type"]);
+                                    procedureParameter.Length = Int32.Parse(String.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+
+                                    procedure.Parameters.Add(procedureParameter);
+                                }
+
+                                yield return procedure;
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
         }
     }
 }

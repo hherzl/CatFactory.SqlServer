@@ -15,5 +15,10 @@ namespace CatFactory.SqlServer
         {
             return db.DbObjects.Where(item => item.Type == "view");
         }
+
+        public static IEnumerable<DbObject> GetProcedures(this Database db)
+        {
+            return db.DbObjects.Where(item => item.Type == "procedure");
+        }
     }
 }
