@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Linq;
 using CatFactory.Diagnostics;
 using CatFactory.Mapping;
 
@@ -21,19 +22,39 @@ namespace CatFactory.SqlServer
 
             var db = new Database();
 
+            var repository = new ExtendPropertyRepository();
+
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
 
                 db.Name = connection.Database;
 
-                foreach (var dbObject in GetDbObjecs(connection))
+                var dbObjects = GetDbObjecs(connection).ToList();
+
+                foreach (var dbObject in dbObjects)
                 {
                     db.DbObjects.Add(dbObject);
                 }
 
                 foreach (var table in ImportTables(db))
                 {
+                    // todo: add flag to import documentation
+                    var dbObject = dbObjects.First(item => item.FullName == table.FullName);
+
+                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                    {
+                        table.Description = String.Concat(extendProperty.Value);
+                    }
+
+                    foreach (var column in table.Columns)
+                    {
+                        foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
+                        {
+                            column.Description = String.Concat(extendProperty.Value);
+                        }
+                    }
+
                     db.Tables.Add(table);
                 }
 

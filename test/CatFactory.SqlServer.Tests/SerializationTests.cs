@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void SerializeExistingDatabaseTest()
         {
-            var connectionString = "server=(local);database=Northwind;integrated security=yes;";
+            var connectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;";
 
             var dbFactory = new SqlServerDatabaseFactory()
             {
@@ -20,7 +20,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = serializer.Serialize(db);
 
-            TextFileHelper.CreateFile("C:\\Temp\\Northwind.xml", output);
+            TextFileHelper.CreateFile("C:\\Temp\\AdventureWorks2012.xml", output);
         }
     }
 }
