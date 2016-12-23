@@ -62,13 +62,18 @@ namespace CatFactory.SqlServer
 
         public virtual String GetType(Column column)
         {
-            if (column.Length == 0)
+            switch (column.Type)
             {
-                return String.Format("{0}", column.Type);
-            }
-            else
-            {
-                return column.Prec == 0 ? String.Format("{0}({1})", column.Type, column.Length) : String.Format("{0}({1}, {2})", column.Type, column.Length, column.Prec);
+                case "char":
+                case "varchar":
+                case "nvarchar":
+                    return String.Format("{0}({1})", column.Type, column.Length);
+
+                case "decimal":
+                    return String.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
+
+                default:
+                    return String.Format("{0}", column.Type);
             }
         }
 

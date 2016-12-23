@@ -200,6 +200,7 @@ namespace CatFactory.SqlServer
                 column.Type = String.Concat(dataReader["Type"]);
                 column.Length = Int32.Parse(String.Concat(dataReader["Length"]));
                 column.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+                column.Scale = String.Concat(dataReader["Scale"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Scale"]));
                 column.Nullable = String.Compare(String.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
 
                 table.Columns.Add(column);
@@ -228,12 +229,12 @@ namespace CatFactory.SqlServer
                 {
                     table.PrimaryKey = new PrimaryKey
                     {
-                        Key = new List<String>(dataReader["constraint_keys"].ToString().Split(','))
+                        Key = new List<String>(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()))
                     };
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("FOREIGN KEY"))
                 {
-                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',')));
+                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray()));
                 }
                 else if (String.Concat(dataReader["constraint_keys"]).Contains("REFERENCES"))
                 {
@@ -241,7 +242,7 @@ namespace CatFactory.SqlServer
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
                 {
-                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',')));
+                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray()));
                 }
             }
         }
@@ -283,6 +284,7 @@ namespace CatFactory.SqlServer
                                     column.Type = String.Concat(dataReader["Type"]);
                                     column.Length = Int32.Parse(String.Concat(dataReader["Length"]));
                                     column.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+                                    column.Scale = String.Concat(dataReader["Scale"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Scale"]));
                                     column.Nullable = String.Compare(String.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
 
                                     view.Columns.Add(column);

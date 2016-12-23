@@ -114,7 +114,7 @@ namespace CatFactory.SqlServer.Tests
                                 new Column { Name = "OrderDate", Type = "datetime", Nullable = false },
                                 new Column { Name = "CustomerID", Type = "int", Nullable = false },
                                 new Column { Name = "EmployeeID", Type = "int", Nullable = false },
-                                new Column { Name = "ShipperID", Type = "datetime", Nullable = false },
+                                new Column { Name = "ShipperID", Type = "int", Nullable = false },
                                 new Column { Name = "Comments", Type = "varchar", Length = 255, Nullable = true }
                             },
                             Identity = new Identity { Name = "OrderID", Seed = 1, Increment = 1 }
