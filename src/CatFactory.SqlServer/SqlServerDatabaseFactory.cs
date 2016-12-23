@@ -12,9 +12,12 @@ namespace CatFactory.SqlServer
     {
         public SqlServerDatabaseFactory()
         {
+            ImportMSDescription = true;
         }
 
         public String ConnectionString { get; set; }
+
+        public Boolean ImportMSDescription { get; set; }
 
         public Database Import()
         {
@@ -39,19 +42,21 @@ namespace CatFactory.SqlServer
 
                 foreach (var table in ImportTables(db))
                 {
-                    // todo: add flag to import documentation
                     var dbObject = dbObjects.First(item => item.FullName == table.FullName);
 
-                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                    if (ImportMSDescription)
                     {
-                        table.Description = String.Concat(extendProperty.Value);
-                    }
-
-                    foreach (var column in table.Columns)
-                    {
-                        foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
+                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
                         {
-                            column.Description = String.Concat(extendProperty.Value);
+                            table.Description = String.Concat(extendProperty.Value);
+                        }
+
+                        foreach (var column in table.Columns)
+                        {
+                            foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
+                            {
+                                column.Description = String.Concat(extendProperty.Value);
+                            }
                         }
                     }
 
