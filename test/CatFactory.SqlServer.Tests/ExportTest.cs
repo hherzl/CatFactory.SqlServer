@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ExportScript()
         {
-            var db = Mocks.SalesDatabase;
+            var db = Mocks.StoreDatabase;
 
             var codeBuilder = new SqlCodeBuilder()
             {

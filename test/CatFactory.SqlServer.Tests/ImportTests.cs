@@ -15,6 +15,8 @@ namespace Tests
                 ConnectionString = connectionString
             };
 
+            dbFactory.Exclusions.Add("dbo.ChangeLog");
+
             var db = dbFactory.Import();
         }
 

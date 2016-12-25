@@ -6,7 +6,7 @@ namespace CatFactory.SqlServer.Tests
 {
     public static class Mocks
     {
-        public static Database SalesDatabase
+        public static Database StoreDatabase
         {
             get
             {
@@ -17,7 +17,6 @@ namespace CatFactory.SqlServer.Tests
                     {
                         new Table
                         {
-                            Schema = "",
                             Name = "EventLog",
                             Columns = new List<Column>()
                             {

@@ -19,6 +19,20 @@ namespace CatFactory.SqlServer
 
         public Boolean ImportMSDescription { get; set; }
 
+        private List<String> m_exclusions;
+
+        public List<String> Exclusions
+        {
+            get
+            {
+                return m_exclusions ?? (m_exclusions = new List<String>());
+            }
+            set
+            {
+                m_exclusions = value;
+            }
+        }
+
         public Database Import()
         {
             Logger.Default.Log("Import database");
@@ -42,6 +56,11 @@ namespace CatFactory.SqlServer
 
                 foreach (var table in ImportTables(db))
                 {
+                    if (Exclusions.Contains(table.FullName))
+                    {
+                        continue;
+                    }
+
                     var dbObject = dbObjects.First(item => item.FullName == table.FullName);
 
                     if (ImportMSDescription)
@@ -65,11 +84,21 @@ namespace CatFactory.SqlServer
 
                 foreach (var view in ImportViews(db))
                 {
+                    if (Exclusions.Contains(view.FullName))
+                    {
+                        continue;
+                    }
+
                     db.Views.Add(view);
                 }
 
                 foreach (var procedure in ImportProcedures(db))
                 {
+                    if (Exclusions.Contains(procedure.FullName))
+                    {
+                        continue;
+                    }
+
                     db.Procedures.Add(procedure);
                 }
 
