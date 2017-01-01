@@ -89,6 +89,24 @@ namespace CatFactory.SqlServer
                         continue;
                     }
 
+                    var dbObject = dbObjects.First(item => item.FullName == view.FullName);
+
+                    if (ImportMSDescription)
+                    {
+                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                        {
+                            view.Description = String.Concat(extendProperty.Value);
+                        }
+
+                        foreach (var column in view.Columns)
+                        {
+                            foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
+                            {
+                                column.Description = String.Concat(extendProperty.Value);
+                            }
+                        }
+                    }
+
                     db.Views.Add(view);
                 }
 
@@ -316,6 +334,7 @@ namespace CatFactory.SqlServer
                                     column.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
                                     column.Scale = String.Concat(dataReader["Scale"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Scale"]));
                                     column.Nullable = String.Compare(String.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
+                                    column.Collation = String.Concat(dataReader["Collation"]);
 
                                     view.Columns.Add(column);
                                 }
