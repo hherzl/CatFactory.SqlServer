@@ -231,6 +231,7 @@ namespace CatFactory.SqlServer
                 column.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
                 column.Scale = String.Concat(dataReader["Scale"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Scale"]));
                 column.Nullable = String.Compare(String.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
+                column.Collation = String.Concat(dataReader["Collation"]);
 
                 table.Columns.Add(column);
             }
