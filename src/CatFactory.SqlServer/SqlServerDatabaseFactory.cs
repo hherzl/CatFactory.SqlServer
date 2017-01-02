@@ -117,6 +117,13 @@ namespace CatFactory.SqlServer
                         continue;
                     }
 
+                    var dbObject = dbObjects.First(item => item.FullName == procedure.FullName);
+
+                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                    {
+                        procedure.Description = String.Concat(extendProperty.Value);
+                    }
+
                     db.Procedures.Add(procedure);
                 }
 
@@ -387,6 +394,8 @@ namespace CatFactory.SqlServer
                                     procedureParameter.Type = String.Concat(dataReader["Type"]);
                                     procedureParameter.Length = Int32.Parse(String.Concat(dataReader["Length"]));
                                     procedureParameter.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = String.Concat(dataReader["Param_order"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Collation = String.Concat(dataReader["Collation"]);
 
                                     procedure.Parameters.Add(procedureParameter);
                                 }
