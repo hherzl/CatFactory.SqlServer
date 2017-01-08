@@ -12,7 +12,7 @@ namespace CatFactory.SqlServer.Tests
             var codeBuilder = new SqlCodeBuilder()
             {
                 Database = db,
-                OutputDirectory = "C:\\Temp"
+                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer"
             };
 
             codeBuilder.CreateFile();

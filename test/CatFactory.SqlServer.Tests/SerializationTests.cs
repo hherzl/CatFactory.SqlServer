@@ -13,7 +13,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = serializer.Serialize(db);
 
-            TextFileHelper.CreateFile("C:\\Temp\\Store.xml", output);
+            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = serializer.Serialize(db);
 
-            TextFileHelper.CreateFile("C:\\Temp\\AdventureWorks2012.xml", output);
+            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2012.xml", output);
         }
     }
 }

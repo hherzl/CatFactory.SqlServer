@@ -12,7 +12,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 var db = new Database()
                 {
-                    Name = "Sales",
+                    Name = "Store",
                     Tables = new List<Table>()
                     {
                         new Table
@@ -127,9 +127,9 @@ namespace CatFactory.SqlServer.Tests
                                 new Column { Name = "OrderID", Type = "int", Nullable = false },
                                 new Column { Name = "ProductID", Type = "int", Nullable = false },
                                 new Column { Name = "ProductName", Type = "varchar", Length = 255, Nullable = false },
-                                new Column { Name = "UnitPrice", Type = "decimal", Length = 8, Prec = 4, Nullable = false },
+                                new Column { Name = "UnitPrice", Type = "decimal", Prec = 8, Scale = 4, Nullable = false },
                                 new Column { Name = "Quantity", Type = "int", Nullable = false },
-                                new Column { Name = "Total", Type = "decimal", Length = 8, Prec = 4, Nullable = false }
+                                new Column { Name = "Total", Type = "decimal", Prec = 8, Scale = 4, Nullable = false }
                             },
                             PrimaryKey = new PrimaryKey(new String[] { "OrderID", "ProductID" })
                         }

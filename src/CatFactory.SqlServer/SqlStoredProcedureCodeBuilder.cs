@@ -30,36 +30,6 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public virtual String GetObjectName(Table table)
-        {
-            return String.IsNullOrEmpty(table.Schema) ? String.Format("[{0}]", table.Name) : String.Format("[{0}].[{1}]", table.Schema, table.Name);
-        }
-
-        public virtual String GetObjectName(Column column)
-        {
-            return String.Format("[{0}]", column.Name);
-        }
-
-        public virtual String GetObjectName(String name)
-        {
-            return String.Format("[{0}]", name);
-        }
-
-        public virtual String GetParameterName(Column column)
-        {
-            return String.Format("@{0}", NamingConvention.GetCamelCase(column.Name));
-        }
-
-        public virtual String GetParameterName(String name)
-        {
-            return String.Format("@{0}", NamingConvention.GetCamelCase(name));
-        }
-
-        public virtual String GetProcedureName(String action)
-        {
-            return String.IsNullOrEmpty(Table.Schema) ? String.Format("[{0}]", Table.Name) : String.Format("[{0}].[{1}{2}]", Table.Schema, Table.Name, action);
-        }
-
         public virtual String GetType(Column column)
         {
             switch (column.Type)
@@ -67,7 +37,7 @@ namespace CatFactory.SqlServer
                 case "char":
                 case "varchar":
                 case "nvarchar":
-                    return String.Format("{0}({1})", column.Type, column.Length);
+                    return column.Length == 0 ? String.Format("{0}(max)", column.Type) : String.Format("{0}({1})", column.Type, column.Length);
 
                 case "decimal":
                     return String.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
@@ -116,7 +86,7 @@ namespace CatFactory.SqlServer
 
         protected virtual void GetAllProcedure(StringBuilder output)
         {
-            var procedureName = GetProcedureName("GetAll");
+            var procedureName = Table.GetProcedureName("GetAll");
 
             DropProcedure(output, procedureName);
 
@@ -135,7 +105,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), GetObjectName(column));
+                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
 
                 if (i < Table.Columns.Count - 1)
                 {
@@ -148,7 +118,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), GetObjectName(Table));
+            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
             output.AppendLine();
 
             output.AppendFormat("go");
@@ -157,7 +127,7 @@ namespace CatFactory.SqlServer
 
         protected virtual void GetProcedure(StringBuilder output)
         {
-            var procedureName = GetProcedureName("Get");
+            var procedureName = Table.GetProcedureName("Get");
 
             DropProcedure(output, procedureName);
 
@@ -174,7 +144,7 @@ namespace CatFactory.SqlServer
 
                     var column = Table.Columns.FirstOrDefault(x => x.Name == key);
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), GetParameterName(key), GetType(column));
+                    output.AppendFormat("{0}{1} {2}", Indent(1), key.GetParameterName(), GetType(column));
                 }
             }
 
@@ -190,7 +160,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), GetObjectName(column));
+                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
 
                 if (i < Table.Columns.Count - 1)
                 {
@@ -203,7 +173,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), GetObjectName(Table));
+            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
             output.AppendLine();
 
             output.AppendFormat("{0}where", Indent(1));
@@ -215,7 +185,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), GetObjectName(item), GetParameterName(item));
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                     {
@@ -232,7 +202,7 @@ namespace CatFactory.SqlServer
 
         protected virtual String InsertProcedure(StringBuilder output)
         {
-            var procedureName = GetProcedureName("Add");
+            var procedureName = Table.GetProcedureName("Add");
 
             DropProcedure(output, procedureName);
 
@@ -245,7 +215,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), GetParameterName(column), GetType(column));
+                output.AppendFormat("{0}{1} {2}", Indent(1), column.GetParameterName(), GetType(column));
 
                 if (Table.Identity != null && Table.Identity.Name == column.Name)
                 {
@@ -263,7 +233,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("as");
             output.AppendLine();
 
-            output.AppendFormat("{0}insert into {1}", Indent(1), GetObjectName(Table));
+            output.AppendFormat("{0}insert into {1}", Indent(1), Table.GetObjectName());
             output.AppendLine();
 
             output.AppendFormat("{0}(", Indent(1));
@@ -275,7 +245,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), GetObjectName(column));
+                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
 
                 if (i < columns.Count - 1)
                 {
@@ -298,7 +268,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), GetParameterName(column));
+                output.AppendFormat("{0}{1}", Indent(2), column.GetParameterName());
 
                 if (i < columns.Count - 1)
                 {
@@ -315,7 +285,7 @@ namespace CatFactory.SqlServer
             {
                 output.AppendLine();
 
-                output.AppendFormat("{0}select {1} = @@identity", Indent(1), GetParameterName(Table.Identity.Name));
+                output.AppendFormat("{0}select {1} = @@identity", Indent(1), Table.Identity.Name.GetParameterName());
                 output.AppendLine();
             }
 
@@ -327,7 +297,7 @@ namespace CatFactory.SqlServer
 
         protected virtual String UpdateProcedure(StringBuilder output)
         {
-            var procedureName = GetProcedureName("Update");
+            var procedureName = Table.GetProcedureName("Update");
 
             DropProcedure(output, procedureName);
 
@@ -340,7 +310,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), GetParameterName(column), GetType(column));
+                output.AppendFormat("{0}{1} {2}", Indent(1), column.GetParameterName(), GetType(column));
 
                 if (i < Table.Columns.Count - 1)
                 {
@@ -356,7 +326,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}update", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), GetObjectName(Table));
+            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
             output.AppendLine();
 
             output.AppendFormat("{0}set", Indent(1));
@@ -368,7 +338,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1} = {2}", Indent(2), GetObjectName(column), GetParameterName(column));
+                output.AppendFormat("{0}{1} = {2}", Indent(2), column.GetObjectName(), column.GetParameterName());
 
                 if (i < columns.Count - 1)
                 {
@@ -387,7 +357,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), GetObjectName(item), GetParameterName(item));
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                     {
@@ -406,7 +376,7 @@ namespace CatFactory.SqlServer
 
         protected virtual String DeleteProcedure(StringBuilder output)
         {
-            var procedureName = GetProcedureName("Delete");
+            var procedureName = Table.GetProcedureName("Delete");
 
             DropProcedure(output, procedureName);
 
@@ -423,7 +393,7 @@ namespace CatFactory.SqlServer
 
                     var column = Table.Columns.FirstOrDefault(x => x.Name == key);
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), GetParameterName(key), GetType(column));
+                    output.AppendFormat("{0}{1} {2}", Indent(1), key.GetParameterName(), GetType(column));
                 }
             }
 
@@ -435,7 +405,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}delete from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), GetObjectName(Table));
+            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
             output.AppendLine();
 
             output.AppendFormat("{0}where", Indent(1));
@@ -447,7 +417,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), GetObjectName(item), GetParameterName(item));
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                     {

@@ -12,7 +12,7 @@ namespace CatFactory.SqlServer.Tests
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\StoredProceduresMockingDatabase"
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresMockingDatabase"
                 };
 
                 codeBuilder.CreateFile();
@@ -36,7 +36,7 @@ namespace CatFactory.SqlServer.Tests
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\StoredProceduresExistingDatabase"
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresExistingDatabase"
                 };
 
                 codeBuilder.CreateFile();
