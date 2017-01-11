@@ -13,6 +13,31 @@ namespace CatFactory.SqlServer
         public SqlServerDatabaseFactory()
         {
             ImportMSDescription = true;
+            ImportCommandText = @"
+                    select
+                        schemas.name as schema_name,
+                        tables.name as object_name,
+                        'table' as object_type
+                    from
+                        sys.tables tables
+                        inner join sys.schemas schemas on tables.schema_id = schemas.schema_id
+                    union
+                        select
+                            schemas.name as schema_name,
+                            views.name as object_name,
+                            'view' as object_type
+                        from
+                            sys.views views
+                            inner join sys.schemas schemas on views.schema_id = schemas.schema_id
+                    union
+                        select
+                            sys.schemas.name as schema_name,
+                            procedures.name as object_name,
+                            'procedure' as object_type
+                        from
+                            sys.procedures procedures
+                            inner join sys.schemas on procedures.schema_id = sys.schemas.schema_id
+                ";
         }
 
         public String ConnectionString { get; set; }
@@ -33,9 +58,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        public String ImportCommandText { get; set; }
+
         public Database Import()
         {
-            Logger.Default.Log("Import database");
+            Logger.Default.Log("Import");
 
             var db = new Database();
 
@@ -51,6 +78,11 @@ namespace CatFactory.SqlServer
 
                 foreach (var dbObject in dbObjects)
                 {
+                    if (Exclusions.Contains(dbObject.FullName))
+                    {
+                        continue;
+                    }
+
                     db.DbObjects.Add(dbObject);
                 }
 
@@ -110,7 +142,7 @@ namespace CatFactory.SqlServer
                     db.Views.Add(view);
                 }
 
-                foreach (var procedure in ImportProcedures(db))
+                foreach (var procedure in ImportStoredProcedures(db))
                 {
                     if (Exclusions.Contains(procedure.FullName))
                     {
@@ -124,7 +156,7 @@ namespace CatFactory.SqlServer
                         procedure.Description = String.Concat(extendProperty.Value);
                     }
 
-                    db.Procedures.Add(procedure);
+                    db.StoredProcedures.Add(procedure);
                 }
 
                 connection.Close();
@@ -135,36 +167,12 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<DbObject> GetDbObjecs(DbConnection connection)
         {
-            Logger.Default.Log("Get DbObjecs");
+            Logger.Default.Log("GetDbObjecs");
 
             using (var command = connection.CreateCommand())
             {
                 command.Connection = connection;
-                command.CommandText = @"
-                    select
-                        schemas.name as schema_name,
-                        tables.name as object_name,
-                        'table' as object_type
-                    from
-                        sys.tables tables
-                        inner join sys.schemas schemas on tables.schema_id = schemas.schema_id
-                    union
-                        select
-                            schemas.name as schema_name,
-                            views.name as object_name,
-                            'view' as object_type
-                        from
-                            sys.views views
-                            inner join sys.schemas schemas on views.schema_id = schemas.schema_id
-                    union
-                        select
-                            sys.schemas.name as schema_name,
-                            procedures.name as object_name,
-                            'procedure' as object_type
-                        from
-                            sys.procedures procedures
-                            inner join sys.schemas on procedures.schema_id = sys.schemas.schema_id
-                ";
+                command.CommandText = ImportCommandText;
 
                 using (var dataReader = command.ExecuteReader())
                 {
@@ -357,7 +365,7 @@ namespace CatFactory.SqlServer
 
         }
 
-        protected IEnumerable<Procedure> ImportProcedures(Database db)
+        protected IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
         {
             Logger.Default.Log("ImportProcedures");
 
@@ -378,7 +386,7 @@ namespace CatFactory.SqlServer
                         {
                             while (dataReader.Read())
                             {
-                                var procedure = new Procedure
+                                var procedure = new StoredProcedure
                                 {
                                     Schema = item.Schema,
                                     Name = item.Name
@@ -388,7 +396,7 @@ namespace CatFactory.SqlServer
 
                                 while (dataReader.Read())
                                 {
-                                    var procedureParameter = new ProcedureParameter();
+                                    var procedureParameter = new Parameter();
 
                                     procedureParameter.Name = String.Concat(dataReader["Parameter_name"]);
                                     procedureParameter.Type = String.Concat(dataReader["Type"]);
