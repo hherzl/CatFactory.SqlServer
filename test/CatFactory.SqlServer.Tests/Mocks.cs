@@ -165,6 +165,12 @@ namespace CatFactory.SqlServer.Tests
 
                 db.AddPrimaryKeyToTables();
 
+                db.AddColumnForAllTables(new Column { Name = "CreationUser", Type = "varchar", Length = 50, Nullable = false });
+                db.AddColumnForAllTables(new Column { Name = "CreationDate", Type = "datetime", Nullable = false });
+                db.AddColumnForAllTables(new Column { Name = "LastUpdateUser", Type = "varchar", Length = 50, Nullable = true });
+                db.AddColumnForAllTables(new Column { Name = "LastUpdateDate", Type = "datetime", Nullable = true });
+                db.AddColumnForAllTables(new Column { Name = "RowVersionID", Type = "uniqueidentifier", Nullable = true });
+
                 db.LinkTables();
 
                 return db;

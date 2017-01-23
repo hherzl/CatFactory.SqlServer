@@ -14,21 +14,9 @@ namespace CatFactory.SqlServer
 
         public Database Database { get; set; }
 
-        public override String FileName
-        {
-            get
-            {
-                return Database.Name;
-            }
-        }
+        public override String FileName => Database.Name;
 
-        public override String FileExtension
-        {
-            get
-            {
-                return "sql";
-            }
-        }
+        public override String FileExtension => "sql";
 
         public override String Code
         {
@@ -69,7 +57,7 @@ namespace CatFactory.SqlServer
 
                         if (column.Length > 0)
                         {
-                            output.AppendFormat("({0})", column.Prec > 0 ? String.Format("{0}, {1}", column.Length, column.Prec) : column.Length.ToString());
+                            output.AppendFormat("({0})", column.Prec > 0 ? String.Format("{0}, {1}", column.Prec, column.Scale) : column.Length.ToString());
                         }
 
                         output.AppendFormat(" {0}", column.Nullable ? "null" : "not null");

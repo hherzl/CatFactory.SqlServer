@@ -7,18 +7,12 @@ namespace CatFactory.SqlServer
     public static class DatabaseExtensions
     {
         public static IEnumerable<DbObject> GetTables(this Database db)
-        {
-            return db.DbObjects.Where(item => item.Type == "table");
-        }
+            => db.DbObjects.Where(item => item.Type == "table");
 
         public static IEnumerable<DbObject> GetViews(this Database db)
-        {
-            return db.DbObjects.Where(item => item.Type == "view");
-        }
+            => db.DbObjects.Where(item => item.Type == "view");
 
         public static IEnumerable<DbObject> GetProcedures(this Database db)
-        {
-            return db.DbObjects.Where(item => item.Type == "procedure");
-        }
+            => db.DbObjects.Where(item => item.Type == "procedure");
     }
 }

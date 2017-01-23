@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha-build13",
+  "version": "1.0.0-alpha-build14",
   "authors": [
     "C. Herzl"
   ],
@@ -8,7 +8,7 @@
     "NETStandard.Library": "1.6.0",
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
-    "CatFactory": "1.0.0-alpha-build16",
+    "CatFactory": "1.0.0-alpha-build17",
     "System.Dynamic.Runtime": "4.3.0"
   },
 
