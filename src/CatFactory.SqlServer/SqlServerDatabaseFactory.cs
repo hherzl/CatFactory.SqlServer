@@ -3,41 +3,24 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using CatFactory.Diagnostics;
 using CatFactory.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace CatFactory.SqlServer
 {
-    public class SqlServerDatabaseFactory : IDatabaseFactory
+    public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
+        protected ILogger Logger;
+
         public SqlServerDatabaseFactory()
         {
-            ImportMSDescription = true;
-            ImportCommandText = @"
-                    select
-                        schemas.name as schema_name,
-                        tables.name as object_name,
-                        'table' as object_type
-                    from
-                        sys.tables tables
-                        inner join sys.schemas schemas on tables.schema_id = schemas.schema_id
-                    union
-                        select
-                            schemas.name as schema_name,
-                            views.name as object_name,
-                            'view' as object_type
-                        from
-                            sys.views views
-                            inner join sys.schemas schemas on views.schema_id = schemas.schema_id
-                    union
-                        select
-                            sys.schemas.name as schema_name,
-                            procedures.name as object_name,
-                            'procedure' as object_type
-                        from
-                            sys.procedures procedures
-                            inner join sys.schemas on procedures.schema_id = sys.schemas.schema_id
-                ";
+            Init();
+        }
+
+        public SqlServerDatabaseFactory(ILogger logger)
+        {
+            Logger = logger;
+            Init();
         }
 
         public String ConnectionString { get; set; }
@@ -62,7 +45,7 @@ namespace CatFactory.SqlServer
 
         public Database Import()
         {
-            Logger.Default.Log("Import");
+            Logger?.LogInformation("Import");
 
             var db = new Database();
 
@@ -142,21 +125,55 @@ namespace CatFactory.SqlServer
                     db.Views.Add(view);
                 }
 
-                foreach (var procedure in ImportStoredProcedures(db))
+                foreach (var storedProcedure in ImportStoredProcedures(db))
                 {
-                    if (Exclusions.Contains(procedure.FullName))
+                    if (Exclusions.Contains(storedProcedure.FullName))
                     {
                         continue;
                     }
 
-                    var dbObject = dbObjects.First(item => item.FullName == procedure.FullName);
+                    var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
 
                     foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
                     {
-                        procedure.Description = String.Concat(extendProperty.Value);
+                        storedProcedure.Description = String.Concat(extendProperty.Value);
                     }
 
-                    db.StoredProcedures.Add(procedure);
+                    db.StoredProcedures.Add(storedProcedure);
+                }
+
+                foreach (var scalarFunction in ImportScalarFunctions(db))
+                {
+                    if (Exclusions.Contains(scalarFunction.FullName))
+                    {
+                        continue;
+                    }
+
+                    var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
+
+                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                    {
+                        scalarFunction.Description = String.Concat(extendProperty.Value);
+                    }
+
+                    db.ScalarFunctions.Add(scalarFunction);
+                }
+
+                foreach (var tableFunction in ImportTableFunctions(db))
+                {
+                    if (Exclusions.Contains(tableFunction.FullName))
+                    {
+                        continue;
+                    }
+
+                    var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
+
+                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                    {
+                        tableFunction.Description = String.Concat(extendProperty.Value);
+                    }
+
+                    db.TableFunctions.Add(tableFunction);
                 }
 
                 connection.Close();
@@ -167,7 +184,7 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<DbObject> GetDbObjecs(DbConnection connection)
         {
-            Logger.Default.Log("GetDbObjecs");
+            Logger?.LogInformation("GetDbObjecs");
 
             using (var command = connection.CreateCommand())
             {
@@ -191,7 +208,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<Table> ImportTables(Database db)
         {
-            Logger.Default.Log("ImportTables");
+            Logger?.LogInformation("ImportTables");
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -201,7 +218,7 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger.Default.Log("Importing table: {0}", item.FullName);
+                        Logger?.LogInformation("Importing table: {0}", item.FullName);
 
                         var table = new Table
                         {
@@ -252,7 +269,7 @@ namespace CatFactory.SqlServer
 
         protected void AddColumnsToTable(Table table, DbDataReader dataReader)
         {
-            Logger.Default.Log("AddColumnsToTable: {0}", table.FullName);
+            Logger?.LogInformation("AddColumnsToTable: {0}", table.FullName);
 
             while (dataReader.Read())
             {
@@ -272,7 +289,7 @@ namespace CatFactory.SqlServer
 
         protected void SetIdentityToTable(Table table, DbDataReader dataReader)
         {
-            Logger.Default.Log("SetIdentityToTable: {0}", table.FullName);
+            Logger?.LogInformation("SetIdentityToTable: {0}", table.FullName);
 
             var identity = String.Concat(dataReader["Identity"]);
 
@@ -284,7 +301,7 @@ namespace CatFactory.SqlServer
 
         protected void AddContraintsToTable(Table table, DbDataReader dataReader)
         {
-            Logger.Default.Log("AddContraintsToTable: {0}", table.FullName);
+            Logger?.LogInformation("AddContraintsToTable: {0}", table.FullName);
 
             while (dataReader.Read())
             {
@@ -312,7 +329,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<View> ImportViews(Database db)
         {
-            Logger.Default.Log("ImportViews");
+            Logger?.LogInformation("ImportViews");
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -322,7 +339,7 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger.Default.Log("Importing view: {0}", item.FullName);
+                        Logger?.LogInformation("Importing view: {0}", item.FullName);
 
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
@@ -367,7 +384,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
         {
-            Logger.Default.Log("ImportProcedures");
+            Logger?.LogInformation("ImportStoredProcedures");
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -377,7 +394,7 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger.Default.Log("Importing procedure: {0}", item.FullName);
+                        Logger?.LogInformation("Importing stored procedure: {0}", item.FullName);
 
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
@@ -386,7 +403,7 @@ namespace CatFactory.SqlServer
                         {
                             while (dataReader.Read())
                             {
-                                var procedure = new StoredProcedure
+                                var storedProcedure = new StoredProcedure
                                 {
                                     Schema = item.Schema,
                                     Name = item.Name
@@ -405,10 +422,116 @@ namespace CatFactory.SqlServer
                                     procedureParameter.ParamOrder = String.Concat(dataReader["Param_order"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Param_order"]));
                                     procedureParameter.Collation = String.Concat(dataReader["Collation"]);
 
-                                    procedure.Parameters.Add(procedureParameter);
+                                    storedProcedure.Parameters.Add(procedureParameter);
                                 }
 
-                                yield return procedure;
+                                yield return storedProcedure;
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+
+        protected IEnumerable<ScalarFunction> ImportScalarFunctions(Database db)
+        {
+            Logger?.LogInformation("ImportScalarFunctions");
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                foreach (var item in db.GetProcedures())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        Logger?.LogInformation("Importing scalar function: {0}", item.FullName);
+
+                        command.Connection = connection;
+                        command.CommandText = String.Format("sp_help '{0}'", item.FullName);
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                var scalarFunction = new ScalarFunction
+                                {
+                                    Schema = item.Schema,
+                                    Name = item.Name
+                                };
+
+                                dataReader.NextResult();
+
+                                while (dataReader.Read())
+                                {
+                                    var procedureParameter = new Parameter();
+
+                                    procedureParameter.Name = String.Concat(dataReader["Parameter_name"]);
+                                    procedureParameter.Type = String.Concat(dataReader["Type"]);
+                                    procedureParameter.Length = Int32.Parse(String.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = String.Concat(dataReader["Param_order"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Collation = String.Concat(dataReader["Collation"]);
+
+                                    scalarFunction.Parameters.Add(procedureParameter);
+                                }
+
+                                yield return scalarFunction;
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+
+        protected IEnumerable<TableFunction> ImportTableFunctions(Database db)
+        {
+            Logger?.LogInformation("ImportTableFunctions");
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                foreach (var item in db.GetProcedures())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        Logger?.LogInformation("Importing table function: {0}", item.FullName);
+
+                        command.Connection = connection;
+                        command.CommandText = String.Format("sp_help '{0}'", item.FullName);
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                var tableFunction = new TableFunction
+                                {
+                                    Schema = item.Schema,
+                                    Name = item.Name
+                                };
+
+                                dataReader.NextResult();
+
+                                while (dataReader.Read())
+                                {
+                                    var procedureParameter = new Parameter();
+
+                                    procedureParameter.Name = String.Concat(dataReader["Parameter_name"]);
+                                    procedureParameter.Type = String.Concat(dataReader["Type"]);
+                                    procedureParameter.Length = Int32.Parse(String.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = String.Concat(dataReader["Prec"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = String.Concat(dataReader["Param_order"]).Trim().Length == 0 ? (Int16)0 : Int16.Parse(String.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Collation = String.Concat(dataReader["Collation"]);
+
+                                    tableFunction.Parameters.Add(procedureParameter);
+                                }
+
+                                yield return tableFunction;
                             }
                         }
                     }

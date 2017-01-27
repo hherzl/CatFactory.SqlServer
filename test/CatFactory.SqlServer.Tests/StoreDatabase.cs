@@ -4,9 +4,9 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public static class Mocks
+    public static class StoreDatabase
     {
-        public static Database StoreDatabase
+        public static Database Mock
         {
             get
             {

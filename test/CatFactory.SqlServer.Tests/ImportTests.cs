@@ -1,7 +1,6 @@
-﻿using CatFactory.SqlServer;
-using Xunit;
+﻿using Xunit;
 
-namespace Tests
+namespace CatFactory.SqlServer.Tests
 {
     public class Tests
     {
@@ -10,7 +9,9 @@ namespace Tests
         {
             var connectionString = "server=(local);database=Northwind;integrated security=yes;";
 
-            var dbFactory = new SqlServerDatabaseFactory()
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            var dbFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString
             };
@@ -25,7 +26,9 @@ namespace Tests
         {
             var connectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;";
 
-            var dbFactory = new SqlServerDatabaseFactory()
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            var dbFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString
             };
