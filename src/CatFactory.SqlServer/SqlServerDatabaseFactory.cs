@@ -49,7 +49,7 @@ namespace CatFactory.SqlServer
 
             var db = new Database();
 
-            var repository = new ExtendPropertyRepository();
+            var extendPropertyRepository = new ExtendPropertyRepository();
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -318,7 +318,9 @@ namespace CatFactory.SqlServer
                 }
                 else if (String.Concat(dataReader["constraint_keys"]).Contains("REFERENCES"))
                 {
-                    table.ForeignKeys[table.ForeignKeys.Count - 1].References = String.Concat(dataReader["constraint_keys"]).Replace("REFERENCES", String.Empty).Trim();
+                    var value = String.Concat(dataReader["constraint_keys"]).Replace("REFERENCES", String.Empty);
+
+                    table.ForeignKeys[table.ForeignKeys.Count - 1].References = value.Substring(0, value.IndexOf("(")).Trim();
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
                 {

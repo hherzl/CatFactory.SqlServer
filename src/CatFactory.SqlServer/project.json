@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha-build14",
+  "version": "1.0.0-alpha-build15",
   "authors": [
     "C. Herzl"
   ],
@@ -8,7 +8,7 @@
     "NETStandard.Library": "1.6.0",
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
-    "CatFactory": "1.0.0-alpha-build19",
+    "CatFactory": "1.0.0-alpha-build20",
     "System.Dynamic.Runtime": "4.3.0",
     "Microsoft.Extensions.Logging.Abstractions": "1.1.0"
   },
