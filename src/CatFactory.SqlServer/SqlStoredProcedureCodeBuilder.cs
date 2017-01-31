@@ -14,21 +14,9 @@ namespace CatFactory.SqlServer
 
         public Table Table { get; set; }
 
-        public override String FileName
-        {
-            get
-            {
-                return Table.FullName;
-            }
-        }
+        public override String FileName => Table.FullName;
 
-        public override String FileExtension
-        {
-            get
-            {
-                return "sql";
-            }
-        }
+        public override String FileExtension => "sql";
 
         public virtual String GetType(Column column)
         {

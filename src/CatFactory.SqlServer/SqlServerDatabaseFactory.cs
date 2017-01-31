@@ -307,14 +307,17 @@ namespace CatFactory.SqlServer
             {
                 if (String.Concat(dataReader["constraint_type"]).Contains("PRIMARY KEY"))
                 {
-                    table.PrimaryKey = new PrimaryKey
+                    table.PrimaryKey = new PrimaryKey(String.Concat(dataReader["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray())
                     {
-                        Key = new List<String>(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()))
+                        ConstraintName = String.Concat(dataReader["constraint_name"])
                     };
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("FOREIGN KEY"))
                 {
-                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray()));
+                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray())
+                    {
+                        ConstraintName = String.Concat(dataReader["constraint_name"])
+                    });
                 }
                 else if (String.Concat(dataReader["constraint_keys"]).Contains("REFERENCES"))
                 {
@@ -324,7 +327,10 @@ namespace CatFactory.SqlServer
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
                 {
-                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray()));
+                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray())
+                    {
+                        ConstraintName = String.Concat(dataReader["constraint_name"])
+                    });
                 }
             }
         }

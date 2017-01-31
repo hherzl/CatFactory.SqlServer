@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace CatFactory.SqlServer
 {
+    [DebuggerDisplay("ObjType={ObjType}, ObjName={ObjName}, Name={Name}")]
     public class ExtendProperty
     {
         public ExtendProperty()
