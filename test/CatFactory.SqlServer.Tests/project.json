@@ -9,7 +9,7 @@
     "dotnet-test-xunit": "1.0.0-rc2-build10015",
     "CatFactory.SqlServer": "1.0.0-*",
     "Microsoft.Extensions.DependencyInjection": "1.1.0",
-    "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
+    "Microsoft.Extensions.Logging.Abstractions": "1.1.1",
     "Microsoft.Extensions.Logging": "1.1.0",
     "Microsoft.Extensions.Logging.Console": "1.1.0"
   },

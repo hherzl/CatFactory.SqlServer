@@ -1,15 +1,15 @@
 {
-  "version": "1.0.0-alpha-build25",
+  "version": "1.0.0-alpha-build26",
   "authors": [
     "C. Herzl"
   ],
 
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
+    "NETStandard.Library": "1.6.1",
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
     "System.Dynamic.Runtime": "4.3.0",
-      "CatFactory":  "1.0.0-alpha-build32"
+      "CatFactory":  "1.0.0-alpha-build33"
   },
 
   "frameworks": {
