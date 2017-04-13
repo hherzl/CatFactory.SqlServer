@@ -5,6 +5,14 @@ namespace CatFactory.SqlServer.Tests
     public class Tests
     {
         [Fact]
+        public void ImportStoreDatabaseTest()
+        {
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            var db = SqlServerDatabaseFactory.Import(logger, "server=(local);database=Store;integrated security=yes;");
+        }
+
+        [Fact]
         public void ImportNorthwindDatabaseTest()
         {
             var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
