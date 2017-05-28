@@ -28,6 +28,7 @@ namespace CatFactory.SqlServer
         public Boolean ImportMSDescription { get; set; }
 
         private List<String> m_exclusions;
+        private List<String> m_exclusionTypes;
 
         public List<String> Exclusions
         {
@@ -41,11 +42,23 @@ namespace CatFactory.SqlServer
             }
         }
 
+        public List<String> ExclusionTypes
+        {
+            get
+            {
+                return m_exclusionTypes ?? (m_exclusionTypes = new List<String>());
+            }
+            set
+            {
+                m_exclusionTypes = value;
+            }
+        }
+
         public String ImportCommandText { get; set; }
 
         public Database Import()
         {
-            Logger?.LogInformation("Import");
+            Logger?.LogInformation("{0}", nameof(Import));
 
             var db = new Database();
 
@@ -184,7 +197,7 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<DbObject> GetDbObjecs(DbConnection connection)
         {
-            Logger?.LogInformation("GetDbObjecs");
+            Logger?.LogInformation("{0}", nameof(GetDbObjecs));
 
             using (var command = connection.CreateCommand())
             {
@@ -208,7 +221,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<Table> ImportTables(Database db)
         {
-            Logger?.LogInformation("ImportTables");
+            Logger?.LogInformation("{0}", nameof(ImportTables));
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -269,7 +282,7 @@ namespace CatFactory.SqlServer
 
         protected void AddColumnsToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("AddColumnsToTable: {0}", table.FullName);
+            Logger?.LogInformation("{0}: {1}", nameof(AddColumnsToTable), table.FullName);
 
             while (dataReader.Read())
             {
@@ -283,13 +296,18 @@ namespace CatFactory.SqlServer
                 column.Nullable = String.Compare(String.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
                 column.Collation = String.Concat(dataReader["Collation"]);
 
+                if (ExclusionTypes.Contains(column.Type))
+                {
+                    continue;
+                }
+
                 table.Columns.Add(column);
             }
         }
 
         protected void SetIdentityToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("SetIdentityToTable: {0}", table.FullName);
+            Logger?.LogInformation("{0}: {1}", nameof(SetIdentityToTable), table.FullName);
 
             var identity = String.Concat(dataReader["Identity"]);
 
@@ -301,7 +319,7 @@ namespace CatFactory.SqlServer
 
         protected void AddContraintsToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("AddContraintsToTable: {0}", table.FullName);
+            Logger?.LogInformation("{0}: {1}", nameof(AddContraintsToTable), table.FullName);
 
             while (dataReader.Read())
             {
@@ -337,7 +355,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<View> ImportViews(Database db)
         {
-            Logger?.LogInformation("ImportViews");
+            Logger?.LogInformation("{0}", nameof(ImportViews));
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -392,7 +410,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
         {
-            Logger?.LogInformation("ImportStoredProcedures");
+            Logger?.LogInformation("{0}", nameof(ImportStoredProcedures));
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -445,7 +463,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<ScalarFunction> ImportScalarFunctions(Database db)
         {
-            Logger?.LogInformation("ImportScalarFunctions");
+            Logger?.LogInformation("{0}", nameof(ImportScalarFunctions));
 
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -498,7 +516,7 @@ namespace CatFactory.SqlServer
 
         protected IEnumerable<TableFunction> ImportTableFunctions(Database db)
         {
-            Logger?.LogInformation("ImportTableFunctions");
+            Logger?.LogInformation("{0}", nameof(ImportTableFunctions));
 
             using (var connection = new SqlConnection(ConnectionString))
             {
