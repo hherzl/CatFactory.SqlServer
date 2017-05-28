@@ -21,7 +21,7 @@ namespace CatFactory.SqlServer.Tests
         {
             var connectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;";
 
-            var dbFactory = new SqlServerDatabaseFactory()
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = connectionString
             };

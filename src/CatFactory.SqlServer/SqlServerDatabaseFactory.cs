@@ -56,7 +56,7 @@ namespace CatFactory.SqlServer
 
         public String ImportCommandText { get; set; }
 
-        public Database Import()
+        public virtual Database Import()
         {
             Logger?.LogInformation("{0}", nameof(Import));
 
@@ -189,6 +189,11 @@ namespace CatFactory.SqlServer
                     db.TableFunctions.Add(tableFunction);
                 }
 
+                foreach (var dbType in ImportDbTypes(db))
+                {
+                    db.DbTypes.Add(dbType);
+                }
+
                 connection.Close();
             }
 
@@ -219,7 +224,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected IEnumerable<Table> ImportTables(Database db)
+        protected virtual IEnumerable<Table> ImportTables(Database db)
         {
             Logger?.LogInformation("{0}", nameof(ImportTables));
 
@@ -280,7 +285,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected void AddColumnsToTable(Table table, DbDataReader dataReader)
+        protected virtual void AddColumnsToTable(Table table, DbDataReader dataReader)
         {
             Logger?.LogInformation("{0}: {1}", nameof(AddColumnsToTable), table.FullName);
 
@@ -305,7 +310,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected void SetIdentityToTable(Table table, DbDataReader dataReader)
+        protected virtual void SetIdentityToTable(Table table, DbDataReader dataReader)
         {
             Logger?.LogInformation("{0}: {1}", nameof(SetIdentityToTable), table.FullName);
 
@@ -317,7 +322,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected void AddContraintsToTable(Table table, DbDataReader dataReader)
+        protected virtual void AddContraintsToTable(Table table, DbDataReader dataReader)
         {
             Logger?.LogInformation("{0}: {1}", nameof(AddContraintsToTable), table.FullName);
 
@@ -353,7 +358,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected IEnumerable<View> ImportViews(Database db)
+        protected virtual IEnumerable<View> ImportViews(Database db)
         {
             Logger?.LogInformation("{0}", nameof(ImportViews));
 
@@ -408,7 +413,7 @@ namespace CatFactory.SqlServer
 
         }
 
-        protected IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
+        protected virtual IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
         {
             Logger?.LogInformation("{0}", nameof(ImportStoredProcedures));
 
@@ -461,7 +466,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected IEnumerable<ScalarFunction> ImportScalarFunctions(Database db)
+        protected virtual IEnumerable<ScalarFunction> ImportScalarFunctions(Database db)
         {
             Logger?.LogInformation("{0}", nameof(ImportScalarFunctions));
 
@@ -514,7 +519,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected IEnumerable<TableFunction> ImportTableFunctions(Database db)
+        protected virtual IEnumerable<TableFunction> ImportTableFunctions(Database db)
         {
             Logger?.LogInformation("{0}", nameof(ImportTableFunctions));
 
@@ -558,6 +563,41 @@ namespace CatFactory.SqlServer
                                 }
 
                                 yield return tableFunction;
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+        }
+
+        protected virtual IEnumerable<DbType> ImportDbTypes(Database db)
+        {
+            Logger?.LogInformation("{0}", nameof(ImportDbTypes));
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+
+                foreach (var item in db.GetProcedures())
+                {
+                    using (var command = connection.CreateCommand())
+                    {
+                        Logger?.LogInformation("Importing table function: {0}", item.FullName);
+
+                        command.Connection = connection;
+                        command.CommandText = "select name, is_user_defined from sys.types";
+
+                        using (var dataReader = command.ExecuteReader())
+                        {
+                            while (dataReader.Read())
+                            {
+                                yield return new DbType
+                                {
+                                    Name = dataReader.GetString(0),
+                                    IsUserDefined = dataReader.GetBoolean(1)
+                                };
                             }
                         }
                     }
