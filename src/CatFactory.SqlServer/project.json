@@ -1,5 +1,12 @@
 {
-  "version": "1.0.0-alpha-build29",
+  "version": "1.0.0-alpha-build30",
+  "title": "CatFactory.SqlServer",
+  "description": "CatFactory SqlServer",
+  "packOptions": {
+    "repository": {
+      "url": "https://github.com/hherzl/CatFactory.SqlServer"
+    }
+  },
   "authors": [
     "C. Herzl"
   ],
@@ -9,7 +16,7 @@
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
     "System.Dynamic.Runtime": "4.3.0",
-    "CatFactory": "1.0.0-alpha-build37"
+    "CatFactory": "1.0.0-alpha-build38"
   },
 
   "frameworks": {
