@@ -165,7 +165,7 @@ namespace CatFactory.SqlServer.Tests
 
                 db.AddPrimaryKeyToTables();
 
-                db.AddColumnsForAllTables(new Column[]
+                db.AddColumnsForTables(new Column[]
                 {
                     new Column { Name = "CreationUser", Type = "varchar", Length = 50, Nullable = false },
                     new Column { Name = "CreationDate", Type = "datetime", Nullable = false },

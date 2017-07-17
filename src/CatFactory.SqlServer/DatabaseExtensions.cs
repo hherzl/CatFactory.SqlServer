@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CatFactory.Mapping;
 
@@ -20,5 +21,8 @@ namespace CatFactory.SqlServer
 
         public static IEnumerable<DbObject> GetTableFunctions(this Database db)
             => db.DbObjects.Where(item => item.Type == "SQL_TABLE_VALUED_FUNCTION");
+
+        public static Boolean IsPrimaryKeyGuid(this Table table)
+            => table.PrimaryKey != null && table.PrimaryKey.Key.Count == 1 && table.Columns[0].Type == "uniqueidentifier" ? true : false;
     }
 }
