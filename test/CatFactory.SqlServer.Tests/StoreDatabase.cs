@@ -163,7 +163,7 @@ namespace CatFactory.SqlServer.Tests
                     db.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "view" });
                 }
 
-                db.AddPrimaryKeyToTables();
+                db.SetPrimaryKeyToTables();
 
                 db.AddColumnsForTables(new Column[]
                 {

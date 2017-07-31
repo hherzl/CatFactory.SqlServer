@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ExportScript()
         {
-            var codeBuilder = new SqlCodeBuilder()
+            var codeBuilder = new SqlCodeBuilder
             {
                 Database = StoreDatabase.Mock,
                 OutputDirectory = "C:\\Temp\\CatFactory.SqlServer"
