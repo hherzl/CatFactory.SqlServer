@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0-alpha-build02",
+  "version": "2.0.0-alpha-build03",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SqlServer code generation",
   "packOptions": {
@@ -16,7 +16,7 @@
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
     "System.Dynamic.Runtime": "4.3.0",
-    "CatFactory": "2.0.0-alpha-build02"
+    "CatFactory": "2.0.0-alpha-build03"
   },
 
   "frameworks": {
