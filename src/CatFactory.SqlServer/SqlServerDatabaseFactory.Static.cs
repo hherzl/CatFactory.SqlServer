@@ -6,7 +6,7 @@ namespace CatFactory.SqlServer
 {
     public partial class SqlServerDatabaseFactory
     {
-        public static Database Import(ILogger logger, String connectionString, params String[] exclusions)
+        public static Database Import(ILogger<SqlServerDatabaseFactory> logger, String connectionString, params String[] exclusions)
         {
             var dbFactory = new SqlServerDatabaseFactory(logger)
             {

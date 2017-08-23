@@ -14,9 +14,11 @@ namespace CatFactory.SqlServer
 
         public Database Database { get; set; }
 
-        public override String FileName => Database.Name;
+        public override String FileName
+            => Database.Name;
 
-        public override String FileExtension => "sql";
+        public override String FileExtension
+            => "sql";
 
         public override String Code
         {

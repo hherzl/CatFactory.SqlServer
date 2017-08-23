@@ -11,26 +11,21 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportStoreDatabaseTest()
         {
-            var db = SqlServerDatabaseFactory.Import(
-                LoggerMocker.GetLogger<SqlServerDatabaseFactory>(),
-                "server=(local);database=Store;integrated security=yes;"
-            );
+            var db = SqlServerDatabaseFactory
+                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;");
         }
 
         [Fact]
         public void ImportNorthwindDatabaseTest()
         {
-            var db = SqlServerDatabaseFactory.Import(
-                LoggerMocker.GetLogger<SqlServerDatabaseFactory>(),
-                "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog"
-            );
+            var db = SqlServerDatabaseFactory
+                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
         }
 
         [Fact]
         public void ImportAdventureWorksDatabase()
         {
             // todo: add mapping for custom types
-
             var factory = new SqlServerDatabaseFactory(LoggerMocker.GetLogger<SqlServerDatabaseFactory>())
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",

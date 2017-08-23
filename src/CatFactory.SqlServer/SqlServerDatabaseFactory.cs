@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using CatFactory.Mapping;
 using Microsoft.Extensions.Logging;
@@ -17,9 +18,10 @@ namespace CatFactory.SqlServer
             Init();
         }
 
-        public SqlServerDatabaseFactory(ILogger logger)
+        public SqlServerDatabaseFactory(ILogger<SqlServerDatabaseFactory> logger)
         {
             Logger = logger;
+
             Init();
         }
 
@@ -27,8 +29,8 @@ namespace CatFactory.SqlServer
 
         public Boolean ImportMSDescription { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<String> m_exclusions;
-        private List<String> m_exclusionTypes;
 
         public List<String> Exclusions
         {
@@ -41,6 +43,9 @@ namespace CatFactory.SqlServer
                 m_exclusions = value;
             }
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<String> m_exclusionTypes;
 
         public List<String> ExclusionTypes
         {
@@ -93,6 +98,8 @@ namespace CatFactory.SqlServer
 
                     if (ImportMSDescription)
                     {
+                        dbObject.Type = "table";
+
                         foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
                         {
                             table.Description = String.Concat(extendProperty.Value);
@@ -330,14 +337,18 @@ namespace CatFactory.SqlServer
             {
                 if (String.Concat(dataReader["constraint_type"]).Contains("PRIMARY KEY"))
                 {
-                    table.PrimaryKey = new PrimaryKey(String.Concat(dataReader["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray())
+                    var key = String.Concat(dataReader["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray();
+
+                    table.PrimaryKey = new PrimaryKey(key)
                     {
                         ConstraintName = String.Concat(dataReader["constraint_name"])
                     };
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("FOREIGN KEY"))
                 {
-                    table.ForeignKeys.Add(new ForeignKey(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray())
+                    var key = dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+
+                    table.ForeignKeys.Add(new ForeignKey(key)
                     {
                         ConstraintName = String.Concat(dataReader["constraint_name"])
                     });
@@ -350,7 +361,18 @@ namespace CatFactory.SqlServer
                 }
                 else if (String.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
                 {
-                    table.Uniques.Add(new Unique(dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray())
+                    var key = dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+
+                    table.Uniques.Add(new Unique(key)
+                    {
+                        ConstraintName = String.Concat(dataReader["constraint_name"])
+                    });
+                }
+                else if (String.Concat(dataReader["constraint_type"]).Contains("CHECK"))
+                {
+                    var key = dataReader["constraint_keys"].ToString();
+
+                    table.Checks.Add(new Check(key)
                     {
                         ConstraintName = String.Concat(dataReader["constraint_name"])
                     });

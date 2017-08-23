@@ -3,19 +3,22 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
-    public static class Extensions
+    public static class DbObjectExtensions
     {
         public static String GetObjectName(this Table table)
             => String.IsNullOrEmpty(table.Schema) ? String.Format("[{0}]", table.Name) : String.Format("[{0}].[{1}]", table.Schema, table.Name);
 
+        public static String GetObjectName(this View view)
+            => String.IsNullOrEmpty(view.Schema) ? String.Format("[{0}]", view.Name) : String.Format("[{0}].[{1}]", view.Schema, view.Name);
+
         public static String GetObjectName(this Column column)
             => String.Format("[{0}]", column.Name);
 
-        public static String GetObjectName(this String value)
-            => String.Format("[{0}]", value);
-
         public static String GetParameterName(this Column column)
             => String.Format("@{0}", NamingConvention.GetCamelCase(column.Name));
+
+        public static String GetObjectName(this String value)
+            => String.Format("[{0}]", value);
 
         public static String GetParameterName(this String name)
             => String.Format("@{0}", NamingConvention.GetCamelCase(name));

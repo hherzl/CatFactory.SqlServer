@@ -17,6 +17,7 @@ namespace CatFactory.SqlServer.Tests
                     {
                         new Table
                         {
+                            Schema = "dbo",
                             Name = "EventLog",
                             Columns = new List<Column>()
                             {

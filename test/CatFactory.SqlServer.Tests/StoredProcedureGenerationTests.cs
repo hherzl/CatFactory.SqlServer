@@ -22,11 +22,9 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void GenerateProcedureFromExistingDatabaseTest()
         {
-            var connectionString = "server=(local);database=Store;integrated security=yes;";
-
-            var dbFactory = new SqlServerDatabaseFactory()
+            var dbFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = connectionString
+                ConnectionString = "server=(local);database=Store;integrated security=yes;"
             };
 
             var db = dbFactory.Import();
