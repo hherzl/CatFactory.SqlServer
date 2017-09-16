@@ -85,6 +85,26 @@ namespace CatFactory.SqlServer
             output.AppendFormat("create procedure {0}", procedureName);
             output.AppendLine();
 
+            var constraints = Table.ForeignKeys.Where(constraint => constraint.Key != null && constraint.Key.Count == 1).ToList();
+
+            for (var i = 0; i < constraints.Count; i++)
+            {
+                var foreignKey = constraints[i];
+                var columns = foreignKey.GetColumns(Table).ToList();
+
+                if (columns.Count == 1)
+                {
+                    output.AppendFormat("{0}{1} {2} = null", Indent(1), columns.First().GetParameterName(), columns.First().Type);
+
+                    if (i < constraints.Count - 1)
+                    {
+                        output.Append(",");
+                    }
+
+                    output.AppendLine();
+                }
+            }
+
             output.AppendFormat("as");
             output.AppendLine();
 
@@ -110,6 +130,30 @@ namespace CatFactory.SqlServer
 
             output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
             output.AppendLine();
+
+            if (constraints .Count > 0)
+            {
+                output.AppendFormat("{0}where", Indent(1));
+                output.AppendLine();
+
+                for (var i = 0; i < constraints.Count; i++)
+                {
+                    var foreignKey = constraints[i];
+                    var columns = foreignKey.GetColumns(Table).ToList();
+
+                    if (columns.Count == 1)
+                    {
+                        output.AppendFormat("{0}({1} is null or {2} = {1})", Indent(2), columns.First().GetParameterName(), columns.First().GetObjectName());
+
+                        if (i < constraints.Count - 1)
+                        {
+                            output.Append(" and");
+                        }
+
+                        output.AppendLine();
+                    }
+                }
+            }
 
             output.AppendFormat("go");
             output.AppendLine();
