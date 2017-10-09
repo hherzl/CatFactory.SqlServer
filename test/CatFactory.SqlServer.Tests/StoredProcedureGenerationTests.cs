@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void GenerateProcedureFromMockDatabaseTest()
         {
-            foreach (var table in StoreDatabase.Mock.Tables)
+            foreach (var table in StoreMockDatabase.Db.Tables)
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {

@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0-alpha-build07",
+  "version": "2.0.0-alpha-build08",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SqlServer code generation",
   "packOptions": {

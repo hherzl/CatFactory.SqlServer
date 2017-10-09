@@ -11,7 +11,7 @@ namespace CatFactory.SqlServer.Tests
         public void TestGetMsDescriptionTest()
         {
             // Arrange
-            var factory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
                 ImportMSDescription = true,
@@ -22,7 +22,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = factory.Import();
+            var database = databaseFactory.Import();
 
             var table = database.FindTableBySchemaAndName("Production.Product");
 
@@ -40,26 +40,26 @@ namespace CatFactory.SqlServer.Tests
         public void TestAddMsDescriptionTest()
         {
             // Arrange
-            var factory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
                 ImportMSDescription = true
             };
 
             // Act
-            var database = factory.Import();
+            var database = databaseFactory.Import();
 
             var table = database.FindTableBySchemaAndName("dbo.Products");
 
-            factory.DropMsDescription(table);
+            databaseFactory.DropMsDescription(table);
 
-            factory.AddMsDescription(table, "Test description");
+            databaseFactory.AddMsDescription(table, "Test description");
 
             var column = table.Columns.FirstOrDefault();
 
-            factory.DropMsDescription(table, column);
+            databaseFactory.DropMsDescription(table, column);
 
-            factory.AddMsDescription(table, column, "Primary key");
+            databaseFactory.AddMsDescription(table, column, "Primary key");
 
             // Assert
             Assert.True(table.Description == "Test description");
@@ -70,22 +70,22 @@ namespace CatFactory.SqlServer.Tests
         public void TestUpdateMsDescriptionTest()
         {
             // Arrange
-            var factory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
                 ImportMSDescription = true
             };
 
             // Act
-            var database = factory.Import();
+            var database = databaseFactory.Import();
 
             var table = database.FindTableBySchemaAndName("dbo.Products");
 
-            factory.UpdateMsDescription(table, "Test update description");
+            databaseFactory.UpdateMsDescription(table, "Test update description");
 
             var column = table.Columns.FirstOrDefault();
 
-            factory.UpdateMsDescription(table, column, "PK (updated)");
+            databaseFactory.UpdateMsDescription(table, column, "PK (updated)");
 
             // Assert
             Assert.True(table.Description == "Test update description");

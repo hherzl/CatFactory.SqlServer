@@ -63,9 +63,7 @@ namespace CatFactory.SqlServer
 
         public virtual Database Import()
         {
-            Logger?.LogInformation("{0}", nameof(Import));
-
-            var db = new Database();
+            var database = new Database();
 
             var extendPropertyRepository = new ExtendPropertyRepository();
 
@@ -73,7 +71,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                db.Name = connection.Database;
+                database.Name = connection.Database;
 
                 var dbObjects = GetDbObjecs(connection).ToList();
 
@@ -84,10 +82,12 @@ namespace CatFactory.SqlServer
                         continue;
                     }
 
-                    db.DbObjects.Add(dbObject);
+                    database.DbObjects.Add(dbObject);
                 }
 
-                foreach (var table in ImportTables(db))
+                Logger?.LogInformation("Importing tables for '{0}'...", database.Name);
+
+                foreach (var table in ImportTables(database))
                 {
                     if (Exclusions.Contains(table.FullName))
                     {
@@ -114,10 +114,12 @@ namespace CatFactory.SqlServer
                         }
                     }
 
-                    db.Tables.Add(table);
+                    database.Tables.Add(table);
                 }
 
-                foreach (var view in ImportViews(db))
+                Logger?.LogInformation("Importing views for '{0}'...", database.Name);
+
+                foreach (var view in ImportViews(database))
                 {
                     if (Exclusions.Contains(view.FullName))
                     {
@@ -142,10 +144,12 @@ namespace CatFactory.SqlServer
                         }
                     }
 
-                    db.Views.Add(view);
+                    database.Views.Add(view);
                 }
 
-                foreach (var storedProcedure in ImportStoredProcedures(db))
+                Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
+
+                foreach (var storedProcedure in ImportStoredProcedures(database))
                 {
                     if (Exclusions.Contains(storedProcedure.FullName))
                     {
@@ -159,10 +163,12 @@ namespace CatFactory.SqlServer
                         storedProcedure.Description = String.Concat(extendProperty.Value);
                     }
 
-                    db.StoredProcedures.Add(storedProcedure);
+                    database.StoredProcedures.Add(storedProcedure);
                 }
 
-                foreach (var scalarFunction in ImportScalarFunctions(db))
+                Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
+
+                foreach (var scalarFunction in ImportScalarFunctions(database))
                 {
                     if (Exclusions.Contains(scalarFunction.FullName))
                     {
@@ -176,10 +182,12 @@ namespace CatFactory.SqlServer
                         scalarFunction.Description = String.Concat(extendProperty.Value);
                     }
 
-                    db.ScalarFunctions.Add(scalarFunction);
+                    database.ScalarFunctions.Add(scalarFunction);
                 }
 
-                foreach (var tableFunction in ImportTableFunctions(db))
+                Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
+
+                foreach (var tableFunction in ImportTableFunctions(database))
                 {
                     if (Exclusions.Contains(tableFunction.FullName))
                     {
@@ -193,24 +201,15 @@ namespace CatFactory.SqlServer
                         tableFunction.Description = String.Concat(extendProperty.Value);
                     }
 
-                    db.TableFunctions.Add(tableFunction);
+                    database.TableFunctions.Add(tableFunction);
                 }
-
-                foreach (var dbType in ImportDbTypes(db))
-                {
-                    db.DbTypes.Add(dbType);
-                }
-
-                connection.Close();
             }
 
-            return db;
+            return database;
         }
 
         protected virtual IEnumerable<DbObject> GetDbObjecs(DbConnection connection)
         {
-            Logger?.LogInformation("{0}", nameof(GetDbObjecs));
-
             using (var command = connection.CreateCommand())
             {
                 command.Connection = connection;
@@ -220,7 +219,7 @@ namespace CatFactory.SqlServer
                 {
                     while (dataReader.Read())
                     {
-                        yield return new DbObject()
+                        yield return new DbObject
                         {
                             Schema = dataReader.GetString(0),
                             Name = dataReader.GetString(1),
@@ -233,8 +232,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<Table> ImportTables(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportTables));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -243,8 +240,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing table: {0}", item.FullName);
-
                         var table = new Table
                         {
                             Schema = item.Schema,
@@ -294,8 +289,6 @@ namespace CatFactory.SqlServer
 
         protected virtual void AddColumnsToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("{0}: {1}", nameof(AddColumnsToTable), table.FullName);
-
             while (dataReader.Read())
             {
                 var column = new Column();
@@ -319,8 +312,6 @@ namespace CatFactory.SqlServer
 
         protected virtual void SetIdentityToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("{0}: {1}", nameof(SetIdentityToTable), table.FullName);
-
             var identity = String.Concat(dataReader["Identity"]);
 
             if (String.Compare(identity, "No identity column defined.", true) != 0)
@@ -331,8 +322,6 @@ namespace CatFactory.SqlServer
 
         protected virtual void AddContraintsToTable(Table table, DbDataReader dataReader)
         {
-            Logger?.LogInformation("{0}: {1}", nameof(AddContraintsToTable), table.FullName);
-
             while (dataReader.Read())
             {
                 if (String.Concat(dataReader["constraint_type"]).Contains("PRIMARY KEY"))
@@ -382,8 +371,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<View> ImportViews(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportViews));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -392,8 +379,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing view: {0}", item.FullName);
-
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
 
@@ -437,8 +422,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<StoredProcedure> ImportStoredProcedures(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportStoredProcedures));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -447,8 +430,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing stored procedure: {0}", item.FullName);
-
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
 
@@ -490,8 +471,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<ScalarFunction> ImportScalarFunctions(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportScalarFunctions));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -500,8 +479,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing scalar function: {0}", item.FullName);
-
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
 
@@ -543,8 +520,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<TableFunction> ImportTableFunctions(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportTableFunctions));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -553,8 +528,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing table function: {0}", item.FullName);
-
                         command.Connection = connection;
                         command.CommandText = String.Format("sp_help '{0}'", item.FullName);
 
@@ -596,8 +569,6 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<DbType> ImportDbTypes(Database db)
         {
-            Logger?.LogInformation("{0}", nameof(ImportDbTypes));
-
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -606,8 +577,6 @@ namespace CatFactory.SqlServer
                 {
                     using (var command = connection.CreateCommand())
                     {
-                        Logger?.LogInformation("Importing table function: {0}", item.FullName);
-
                         command.Connection = connection;
                         command.CommandText = "select name, is_user_defined from sys.types";
 

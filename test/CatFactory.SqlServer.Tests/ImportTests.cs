@@ -11,22 +11,26 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportStoreDatabaseTest()
         {
-            var db = SqlServerDatabaseFactory
-                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Store;integrated security=yes;");
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            var db = SqlServerDatabaseFactory.Import(logger, "server=(local);database=Store;integrated security=yes;");
         }
 
         [Fact]
         public void ImportNorthwindDatabaseTest()
         {
-            var db = SqlServerDatabaseFactory
-                .Import(LoggerMocker.GetLogger<SqlServerDatabaseFactory>(), "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            var db = SqlServerDatabaseFactory.Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
         }
 
         [Fact]
         public void ImportAdventureWorksDatabase()
         {
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
             // todo: add mapping for custom types
-            var factory = new SqlServerDatabaseFactory(LoggerMocker.GetLogger<SqlServerDatabaseFactory>())
+            var databaseFactory = new SqlServerDatabaseFactory()
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
                 ExclusionTypes = new List<String>()
@@ -35,9 +39,9 @@ namespace CatFactory.SqlServer.Tests
                 }
             };
 
-            var db = factory.Import();
+            var database = databaseFactory.Import();
 
-            var table = db.Tables.FirstOrDefault(item => item.FullName == "Person.Address");
+            var table = database.Tables.FirstOrDefault(item => item.FullName == "Person.Address");
 
             Assert.False(table == null);
 

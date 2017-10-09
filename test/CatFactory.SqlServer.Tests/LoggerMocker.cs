@@ -20,7 +20,9 @@ namespace CatFactory.SqlServer.Tests
                 .AddConsole(LogLevel.Error)
                 .AddConsole(LogLevel.Critical);
 
-            return serviceProvider.GetService<ILoggerFactory>().CreateLogger<T>();
+            return serviceProvider
+                .GetService<ILoggerFactory>()
+                .CreateLogger<T>();
         }
     }
 }

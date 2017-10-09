@@ -4,15 +4,15 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public static class StoreDatabase
+    public static class StoreMockDatabase
     {
-        public static Database Mock
+        public static Database Db
         {
             get
             {
-                var db = new Database()
+                var database = new Database()
                 {
-                    Name = "Store",
+                    Name = "StoreMock",
                     Tables = new List<Table>()
                     {
                         new Table
@@ -154,19 +154,19 @@ namespace CatFactory.SqlServer.Tests
                     }
                 };
 
-                foreach (var item in db.Tables)
+                foreach (var item in database.Tables)
                 {
-                    db.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "table" });
+                    database.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "table" });
                 }
 
-                foreach (var item in db.Views)
+                foreach (var item in database.Views)
                 {
-                    db.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "view" });
+                    database.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "view" });
                 }
 
-                db.SetPrimaryKeyToTables();
+                database.SetPrimaryKeyToTables();
 
-                db.AddColumnsForTables(new Column[]
+                database.AddColumnsForTables(new Column[]
                 {
                     new Column { Name = "CreationUser", Type = "varchar", Length = 50, Nullable = false },
                     new Column { Name = "CreationDate", Type = "datetime", Nullable = false },
@@ -175,9 +175,9 @@ namespace CatFactory.SqlServer.Tests
                     new Column { Name = "RowVersionID", Type = "uniqueidentifier", Nullable = true }
                 });
 
-                db.LinkTables();
+                database.LinkTables();
 
-                return db;
+                return database;
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using System;
+using System.Collections.Generic;
+using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
@@ -7,11 +9,11 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void SerializeMockDatabaseTest()
         {
-            var db = StoreDatabase.Mock;
+            var database = StoreMockDatabase.Db;
 
-            var serializer = new Serializer() as ISerializer;
+            var serializer = new Serializer();
 
-            var output = serializer.Serialize(db);
+            var output = serializer.Serialize(database);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
         }
@@ -19,20 +21,20 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void SerializeExistingDatabaseTest()
         {
-            var connectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;";
-
-            var dbFactory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = connectionString
+                ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
+                Exclusions = new List<String>()
+                {
+                    "EventLog"
+                }
             };
 
-            dbFactory.Exclusions.Add("EventLog");
-
-            var db = dbFactory.Import();
+            var database = databaseFactory.Import();
 
             var serializer = new Serializer() as ISerializer;
 
-            var output = serializer.Serialize(db);
+            var output = serializer.Serialize(database);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2012.xml", output);
         }
