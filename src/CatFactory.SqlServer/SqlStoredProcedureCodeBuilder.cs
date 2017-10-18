@@ -366,7 +366,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}set", Indent(1));
             output.AppendLine();
 
-            var columns = Table.GetColumnsWithOutKey().ToList();
+            var columns = Table.GetColumnsWithOutPrimaryKey().ToList();
 
             for (var i = 0; i < columns.Count; i++)
             {

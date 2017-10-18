@@ -154,16 +154,8 @@ namespace CatFactory.SqlServer.Tests
                     }
                 };
 
-                foreach (var item in database.Tables)
-                {
-                    database.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "table" });
-                }
-
-                foreach (var item in database.Views)
-                {
-                    database.DbObjects.Add(new DbObject { Schema = item.Schema, Name = item.Name, Type = "view" });
-                }
-
+                database.AddDbObjectsFromTables();
+                database.AddDbObjectsFromViews();
                 database.SetPrimaryKeyToTables();
 
                 database.AddColumnsForTables(new Column[]

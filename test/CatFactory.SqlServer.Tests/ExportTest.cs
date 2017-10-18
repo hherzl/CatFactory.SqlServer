@@ -10,7 +10,8 @@ namespace CatFactory.SqlServer.Tests
             var codeBuilder = new SqlCodeBuilder
             {
                 Database = StoreMockDatabase.Db,
-                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer"
+                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer",
+                ForceOverwrite = true
             };
 
             codeBuilder.CreateFile();

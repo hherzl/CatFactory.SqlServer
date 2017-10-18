@@ -12,7 +12,8 @@ namespace CatFactory.SqlServer.Tests
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresMockingDatabase"
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresMockingDatabase",
+                    ForceOverwrite = true
                 };
 
                 codeBuilder.CreateFile();
@@ -27,14 +28,15 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=Store;integrated security=yes;"
             };
 
-            var db = dbFactory.Import();
+            var database = dbFactory.Import();
 
-            foreach (var table in db.Tables)
+            foreach (var table in database.Tables)
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresExistingDatabase"
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresExistingDatabase",
+                    ForceOverwrite = true
                 };
 
                 codeBuilder.CreateFile();
