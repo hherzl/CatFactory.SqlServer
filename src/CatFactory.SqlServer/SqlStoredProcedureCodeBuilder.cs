@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.Mapping;
@@ -12,32 +11,32 @@ namespace CatFactory.SqlServer
         {
         }
 
-        public Table Table { get; set; }
+        public ITable Table { get; set; }
 
-        public override String FileName
+        public override string FileName
             => Table.FullName;
 
-        public override String FileExtension
+        public override string FileExtension
             => "sql";
 
-        public virtual String GetType(Column column)
+        public virtual string GetType(Column column)
         {
             switch (column.Type)
             {
                 case "char":
                 case "varchar":
                 case "nvarchar":
-                    return column.Length == 0 ? String.Format("{0}(max)", column.Type) : String.Format("{0}({1})", column.Type, column.Length);
+                    return column.Length == 0 ? string.Format("{0}(max)", column.Type) : string.Format("{0}({1})", column.Type, column.Length);
 
                 case "decimal":
-                    return String.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
+                    return string.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
 
                 default:
-                    return String.Format("{0}", column.Type);
+                    return string.Format("{0}", column.Type);
             }
         }
 
-        public override String Code
+        public override string Code
         {
             get
             {
@@ -62,9 +61,9 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected virtual void DropProcedure(StringBuilder output, String procedureName)
+        protected virtual void DropProcedure(StringBuilder output, string procedureName)
         {
-            output.AppendFormat("if object_id('{0}', 'P') is not null", procedureName.Replace("[", String.Empty).Replace("]", String.Empty));
+            output.AppendFormat("if object_id('{0}', 'P') is not null", procedureName.Replace("[", string.Empty).Replace("]", string.Empty));
             output.AppendLine();
 
             output.AppendFormat("{0}drop procedure {1}", Indent(1), procedureName);
@@ -234,7 +233,7 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
-        protected virtual String InsertProcedure(StringBuilder output)
+        protected virtual string InsertProcedure(StringBuilder output)
         {
             var procedureName = Table.GetProcedureName("Add");
 
@@ -329,7 +328,7 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
-        protected virtual String UpdateProcedure(StringBuilder output)
+        protected virtual string UpdateProcedure(StringBuilder output)
         {
             var procedureName = Table.GetProcedureName("Update");
 
@@ -408,7 +407,7 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
-        protected virtual String DeleteProcedure(StringBuilder output)
+        protected virtual string DeleteProcedure(StringBuilder output)
         {
             var procedureName = Table.GetProcedureName("Delete");
 

@@ -7,7 +7,11 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void GenerateProcedureFromMockDatabaseTest()
         {
-            foreach (var table in StoreMockDatabase.Db.Tables)
+            // Arrange
+            var database = Databases.Store;
+
+            // Act
+            foreach (var table in database.Tables)
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
@@ -18,16 +22,20 @@ namespace CatFactory.SqlServer.Tests
 
                 codeBuilder.CreateFile();
             }
+
+            // Assert
         }
 
         [Fact]
         public void GenerateProcedureFromExistingDatabaseTest()
         {
+            // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=Store;integrated security=yes;"
             };
 
+            // Act
             var database = dbFactory.Import();
 
             foreach (var table in database.Tables)
@@ -41,6 +49,8 @@ namespace CatFactory.SqlServer.Tests
 
                 codeBuilder.CreateFile();
             }
+
+            // Assert
         }
     }
 }

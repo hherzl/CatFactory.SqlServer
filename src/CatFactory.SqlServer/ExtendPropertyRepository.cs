@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
+using CatFactory.Collections;
 
 namespace CatFactory.SqlServer
 {
-    public class ExtendPropertyRepository
+    public class ExtendPropertyRepository : IExtendPropertyRepository
     {
-        public IEnumerable<ExtendProperty> GetExtendProperties(SqlConnection connection, String name, String level0type, String level0name, String level1type, String level1name, String level2type, String level2name)
+        public IEnumerable<ExtendProperty> GetExtendProperties(SqlConnection connection, string name, string level0type, string level0name, string level1type, string level1name, string level2type, string level2name)
         {
             using (var command = connection.CreateCommand())
             {
                 var commandText = new StringBuilder();
 
-                var parameters = new List<String>()
+                var parameters = new List<string>()
                 {
-                    String.IsNullOrEmpty(name) ? "default" : name, level0type, level0name, level1type, level1name, level2type, level2name
+                    string.IsNullOrEmpty(name) ? "default" : name, level0type, level0name, level1type, level1name, level2type, level2name
                 };
 
-                commandText.AppendFormat("select objtype, objname, name, value from fn_listextendedproperty ({0})", String.Join(",", parameters));
+                commandText.AppendFormat("select objtype, objname, name, value from fn_listextendedproperty ({0})", string.Join(",", parameters));
 
                 command.Connection = connection;
                 command.CommandText = commandText.ToString();
@@ -39,49 +39,26 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public void AddExtendedProperty(SqlConnection connection, String name, String value, String level0type, String level0name, String level1type, String level1name, String level2type, String level2name)
+        public void AddExtendedProperty(SqlConnection connection, string name, string value, string level0type, string level0name, string level1type, string level1name, string level2type, string level2name)
         {
             using (var command = connection.CreateCommand())
             {
                 var commandText = new StringBuilder();
 
-                var parameters = new List<String>()
+                var parameters = new List<string>()
                 {
-                    String.Format("@name = N'{0}'", name),
-                    String.Format("@value = N'{0}'", value)
+                    string.Format("@name = N'{0}'", name),
+                    string.Format("@value = N'{0}'", value)
                 };
 
-                if (!String.IsNullOrEmpty(level0type))
-                {
-                    parameters.Add(String.Format("@level0type = N'{0}'", level0type));
-                }
+                parameters.Add(!string.IsNullOrEmpty(level0type), string.Format("@level0type = N'{0}'", level0type));
+                parameters.Add(!string.IsNullOrEmpty(level0name), string.Format("@level0name = N'{0}'", level0name));
+                parameters.Add(!string.IsNullOrEmpty(level1type), string.Format("@level1type = N'{0}'", level1type));
+                parameters.Add(!string.IsNullOrEmpty(level1name), string.Format("@level1name = N'{0}'", level1name));
+                parameters.Add(!string.IsNullOrEmpty(level2type), string.Format("@level2type = N'{0}'", level2type));
+                parameters.Add(!string.IsNullOrEmpty(level2name), string.Format("@level2name = N'{0}'", level2name));
 
-                if (!String.IsNullOrEmpty(level0name))
-                {
-                    parameters.Add(String.Format("@level0name = N'{0}'", level0name));
-                }
-
-                if (!String.IsNullOrEmpty(level1type))
-                {
-                    parameters.Add(String.Format("@level1type = N'{0}'", level1type));
-                }
-
-                if (!String.IsNullOrEmpty(level1name))
-                {
-                    parameters.Add(String.Format("@level1name = N'{0}'", level1name));
-                }
-
-                if (!String.IsNullOrEmpty(level2type))
-                {
-                    parameters.Add(String.Format("@level2type = N'{0}'", level2type));
-                }
-
-                if (!String.IsNullOrEmpty(level2name))
-                {
-                    parameters.Add(String.Format("@level2name = N'{0}'", level2name));
-                }
-
-                commandText.AppendFormat("exec sys.sp_addextendedproperty {0} ", String.Join(", ", parameters));
+                commandText.AppendFormat("exec sys.sp_addextendedproperty {0} ", string.Join(", ", parameters));
 
                 command.Connection = connection;
                 command.CommandText = commandText.ToString();
@@ -90,49 +67,26 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public void UpdateExtendedProperty(SqlConnection connection, String name, String value, String level0type, String level0name, String level1type, String level1name, String level2type, String level2name)
+        public void UpdateExtendedProperty(SqlConnection connection, string name, string value, string level0type, string level0name, string level1type, string level1name, string level2type, string level2name)
         {
             using (var command = connection.CreateCommand())
             {
                 var commandText = new StringBuilder();
 
-                var parameters = new List<String>()
+                var parameters = new List<string>()
                 {
-                    String.Format("@name = N'{0}'", name),
-                    String.Format("@value = N'{0}'", value)
+                    string.Format("@name = N'{0}'", name),
+                    string.Format("@value = N'{0}'", value)
                 };
 
-                if (!String.IsNullOrEmpty(level0type))
-                {
-                    parameters.Add(String.Format("@level0type = N'{0}'", level0type));
-                }
+                parameters.Add(!string.IsNullOrEmpty(level0type), string.Format("@level0type = N'{0}'", level0type));
+                parameters.Add(!string.IsNullOrEmpty(level0name), string.Format("@level0name = N'{0}'", level0name));
+                parameters.Add(!string.IsNullOrEmpty(level1type), string.Format("@level1type = N'{0}'", level1type));
+                parameters.Add(!string.IsNullOrEmpty(level1name), string.Format("@level1name = N'{0}'", level1name));
+                parameters.Add(!string.IsNullOrEmpty(level2type), string.Format("@level2type = N'{0}'", level2type));
+                parameters.Add(!string.IsNullOrEmpty(level2name), string.Format("@level2name = N'{0}'", level2name));
 
-                if (!String.IsNullOrEmpty(level0name))
-                {
-                    parameters.Add(String.Format("@level0name = N'{0}'", level0name));
-                }
-
-                if (!String.IsNullOrEmpty(level1type))
-                {
-                    parameters.Add(String.Format("@level1type = N'{0}'", level1type));
-                }
-
-                if (!String.IsNullOrEmpty(level1name))
-                {
-                    parameters.Add(String.Format("@level1name = N'{0}'", level1name));
-                }
-
-                if (!String.IsNullOrEmpty(level2type))
-                {
-                    parameters.Add(String.Format("@level2type = N'{0}'", level2type));
-                }
-
-                if (!String.IsNullOrEmpty(level2name))
-                {
-                    parameters.Add(String.Format("@level2name = N'{0}'", level2name));
-                }
-
-                commandText.AppendFormat("exec sys.sp_updateextendedproperty {0} ", String.Join(", ", parameters));
+                commandText.AppendFormat("exec sys.sp_updateextendedproperty {0} ", string.Join(", ", parameters));
 
                 command.Connection = connection;
                 command.CommandText = commandText.ToString();
@@ -141,48 +95,25 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public void DropExtendedProperty(SqlConnection connection, String name, String level0type, String level0name, String level1type, String level1name, String level2type, String level2name)
+        public void DropExtendedProperty(SqlConnection connection, string name, string level0type, string level0name, string level1type, string level1name, string level2type, string level2name)
         {
             using (var command = connection.CreateCommand())
             {
                 var commandText = new StringBuilder();
 
-                var parameters = new List<String>()
+                var parameters = new List<string>()
                 {
-                    String.Format("@name = N'{0}'", name)
+                    string.Format("@name = N'{0}'", name)
                 };
 
-                if (!String.IsNullOrEmpty(level0type))
-                {
-                    parameters.Add(String.Format("@level0type = N'{0}'", level0type));
-                }
+                parameters.Add(!string.IsNullOrEmpty(level0type), string.Format("@level0type = N'{0}'", level0type));
+                parameters.Add(!string.IsNullOrEmpty(level0name), string.Format("@level0name = N'{0}'", level0name));
+                parameters.Add(!string.IsNullOrEmpty(level1type), string.Format("@level1type = N'{0}'", level1type));
+                parameters.Add(!string.IsNullOrEmpty(level1name), string.Format("@level1name = N'{0}'", level1name));
+                parameters.Add(!string.IsNullOrEmpty(level2type), string.Format("@level2type = N'{0}'", level2type));
+                parameters.Add(!string.IsNullOrEmpty(level2name), string.Format("@level2name = N'{0}'", level2name));
 
-                if (!String.IsNullOrEmpty(level0name))
-                {
-                    parameters.Add(String.Format("@level0name = N'{0}'", level0name));
-                }
-
-                if (!String.IsNullOrEmpty(level1type))
-                {
-                    parameters.Add(String.Format("@level1type = N'{0}'", level1type));
-                }
-
-                if (!String.IsNullOrEmpty(level1name))
-                {
-                    parameters.Add(String.Format("@level1name = N'{0}'", level1name));
-                }
-
-                if (!String.IsNullOrEmpty(level2type))
-                {
-                    parameters.Add(String.Format("@level2type = N'{0}'", level2type));
-                }
-
-                if (!String.IsNullOrEmpty(level2name))
-                {
-                    parameters.Add(String.Format("@level2name = N'{0}'", level2name));
-                }
-
-                commandText.AppendFormat("exec sys.sp_dropextendedproperty {0} ", String.Join(", ", parameters));
+                commandText.AppendFormat("exec sys.sp_dropextendedproperty {0} ", string.Join(", ", parameters));
 
                 command.Connection = connection;
                 command.CommandText = commandText.ToString();

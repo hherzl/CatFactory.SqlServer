@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace CatFactory.SqlServer
 {
@@ -10,12 +9,12 @@ namespace CatFactory.SqlServer
         {
         }
 
-        public String ObjType { get; set; }
+        public string ObjType { get; set; }
 
-        public String ObjName { get; set; }
+        public string ObjName { get; set; }
 
-        public String Name { get; set; }
+        public string Name { get; set; }
 
-        public Object Value { get; set; }
+        public object Value { get; set; }
     }
 }

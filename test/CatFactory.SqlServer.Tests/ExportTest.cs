@@ -7,14 +7,20 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ExportScript()
         {
+            // Arrange
+            var database = Databases.Store;
+
+            // Act
             var codeBuilder = new SqlCodeBuilder
             {
-                Database = StoreMockDatabase.Db,
+                Database = database,
                 OutputDirectory = "C:\\Temp\\CatFactory.SqlServer",
                 ForceOverwrite = true
             };
 
             codeBuilder.CreateFile();
+
+            // Assert
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -8,14 +7,14 @@ namespace CatFactory.SqlServer.Tests
     public class DocumentationTests
     {
         [Fact]
-        public void TestGetMsDescriptionTest()
+        public void TestGetTableAndViewMsDescriptionTest()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
                 ImportMSDescription = true,
-                ExclusionTypes = new List<String>()
+                ExclusionTypes = new List<string>
                 {
                     "geography"
                 }
@@ -37,7 +36,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestAddMsDescriptionTest()
+        public void TestAddTableMsDescriptionTest()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
@@ -67,7 +66,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestUpdateMsDescriptionTest()
+        public void TestUpdateTableMsDescriptionTest()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory

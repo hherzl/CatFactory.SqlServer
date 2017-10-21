@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.Mapping;
@@ -14,13 +13,13 @@ namespace CatFactory.SqlServer
 
         public Database Database { get; set; }
 
-        public override String FileName
+        public override string FileName
             => Database.Name;
 
-        public override String FileExtension
+        public override string FileExtension
             => "sql";
 
-        public override String Code
+        public override string Code
         {
             get
             {
@@ -30,7 +29,7 @@ namespace CatFactory.SqlServer
 
                 foreach (var schema in schemas)
                 {
-                    if (String.IsNullOrEmpty(schema))
+                    if (string.IsNullOrEmpty(schema))
                     {
                         continue;
                     }
@@ -59,7 +58,7 @@ namespace CatFactory.SqlServer
 
                         if (column.Length > 0)
                         {
-                            output.AppendFormat("({0})", column.Prec > 0 ? String.Format("{0}, {1}", column.Prec, column.Scale) : column.Length.ToString());
+                            output.AppendFormat("({0})", column.Prec > 0 ? string.Format("{0}, {1}", column.Prec, column.Scale) : column.Length.ToString());
                         }
 
                         output.AppendFormat(" {0}", column.Nullable ? "null" : "not null");
@@ -85,9 +84,9 @@ namespace CatFactory.SqlServer
                 {
                     if (table.PrimaryKey != null)
                     {
-                        var constraintName = String.Format("{0}_PK", table.FullName.Replace(".", "_"));
+                        var constraintName = Database.NamingConvention.GetPrimaryKeyConstraintName(table, table.PrimaryKey.Key.ToArray());
 
-                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", table.GetObjectName(), constraintName, String.Join(", ", table.PrimaryKey.Key));
+                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", table.GetObjectName(), constraintName, string.Join(", ", table.PrimaryKey.Key));
                         output.AppendLine();
 
                         output.AppendFormat("go");
@@ -98,9 +97,9 @@ namespace CatFactory.SqlServer
 
                     foreach (var unique in table.Uniques)
                     {
-                        var constraintName = String.Format("{0}_{1}_U", table.FullName.Replace(".", "_"), String.Join("_", unique.Key));
+                        var constraintName = Database.NamingConvention.GetUniqueConstraintName(table, unique.Key.ToArray());
 
-                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", table.GetObjectName(), constraintName, String.Join(", ", unique.Key));
+                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", table.GetObjectName(), constraintName, string.Join(", ", unique.Key));
                         output.AppendLine();
 
                         output.AppendFormat("go");
