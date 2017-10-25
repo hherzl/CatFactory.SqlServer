@@ -43,7 +43,10 @@ namespace CatFactory.SqlServer.Tests
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
-                ExclusionTypes = new List<string> { "geography" }
+                ImportSettings = new DatabaseImportSettings
+                {
+                    ExclusionTypes = new List<string> { "geography" }
+                }
             };
 
             // Act

@@ -27,9 +27,11 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
-                Exclusions = new List<string> { "dbo.EventLog" }
+                ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;"
             };
+
+            databaseFactory.ImportSettings.ImportMSDescription = true;
+            databaseFactory.ImportSettings.Exclusions = new List<string> { "dbo.EventLog" };
 
             // Act
             var database = databaseFactory.Import();

@@ -13,13 +13,13 @@ namespace CatFactory.SqlServer.Tests
             var databaseFactory = new SqlServerDatabaseFactory
             {
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
-                ImportMSDescription = true,
-                ExclusionTypes = new List<string>
+                ImportSettings = new DatabaseImportSettings
                 {
-                    "geography"
+                    ImportMSDescription = true,
+                    ExclusionTypes = new List<string> { "geography" }
                 }
             };
-
+            
             // Act
             var database = databaseFactory.Import();
 
@@ -41,9 +41,10 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
-                ImportMSDescription = true
+                ConnectionString = "server=(local);database=Northwind;integrated security=yes;"
             };
+
+            databaseFactory.ImportSettings.ImportMSDescription = true;
 
             // Act
             var database = databaseFactory.Import();
@@ -71,9 +72,10 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
-                ImportMSDescription = true
+                ConnectionString = "server=(local);database=Northwind;integrated security=yes;"
             };
+
+            databaseFactory.ImportSettings.ImportMSDescription = true;
 
             // Act
             var database = databaseFactory.Import();
