@@ -45,6 +45,7 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
+                    ImportStoredProcedures = true,
                     ExclusionTypes = new List<string> { "geography" }
                 }
             };

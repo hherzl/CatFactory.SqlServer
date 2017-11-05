@@ -30,6 +30,12 @@ namespace CatFactory.SqlServer
 
         public bool ImportViews { get; set; } = true;
 
+        public bool ImportStoredProcedures { get; set; }
+
+        public bool ImportScalarFunctions { get; set; }
+
+        public bool ImportTableFunctions { get; set; }
+
         public bool ImportMSDescription { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

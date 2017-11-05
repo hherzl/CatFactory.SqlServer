@@ -132,61 +132,70 @@ namespace CatFactory.SqlServer
                     }
                 }
 
-                Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
-
-                foreach (var storedProcedure in ImportStoredProcedures(database))
+                if (ImportSettings.ImportStoredProcedures)
                 {
-                    if (ImportSettings.Exclusions.Contains(storedProcedure.FullName))
+                    Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
+
+                    foreach (var storedProcedure in ImportStoredProcedures(database))
                     {
-                        continue;
+                        if (ImportSettings.Exclusions.Contains(storedProcedure.FullName))
+                        {
+                            continue;
+                        }
+
+                        var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
+
+                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                        {
+                            storedProcedure.Description = string.Concat(extendProperty.Value);
+                        }
+
+                        database.StoredProcedures.Add(storedProcedure);
                     }
-
-                    var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
-
-                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                    {
-                        storedProcedure.Description = string.Concat(extendProperty.Value);
-                    }
-
-                    database.StoredProcedures.Add(storedProcedure);
                 }
 
-                Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
-
-                foreach (var scalarFunction in ImportScalarFunctions(database))
+                if (ImportSettings.ImportScalarFunctions)
                 {
-                    if (ImportSettings.Exclusions.Contains(scalarFunction.FullName))
+                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
+
+                    foreach (var scalarFunction in ImportScalarFunctions(database))
                     {
-                        continue;
+                        if (ImportSettings.Exclusions.Contains(scalarFunction.FullName))
+                        {
+                            continue;
+                        }
+
+                        var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
+
+                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                        {
+                            scalarFunction.Description = string.Concat(extendProperty.Value);
+                        }
+
+                        database.ScalarFunctions.Add(scalarFunction);
                     }
-
-                    var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
-
-                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                    {
-                        scalarFunction.Description = string.Concat(extendProperty.Value);
-                    }
-
-                    database.ScalarFunctions.Add(scalarFunction);
                 }
 
-                Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
-
-                foreach (var tableFunction in ImportTableFunctions(database))
+                if (ImportSettings.ImportTableFunctions)
                 {
-                    if (ImportSettings.Exclusions.Contains(tableFunction.FullName))
+                    Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
+
+                    foreach (var tableFunction in ImportTableFunctions(database))
                     {
-                        continue;
+                        if (ImportSettings.Exclusions.Contains(tableFunction.FullName))
+                        {
+                            continue;
+                        }
+
+                        var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
+
+                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                        {
+                            tableFunction.Description = string.Concat(extendProperty.Value);
+                        }
+
+                        database.TableFunctions.Add(tableFunction);
                     }
-
-                    var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
-
-                    foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                    {
-                        tableFunction.Description = string.Concat(extendProperty.Value);
-                    }
-
-                    database.TableFunctions.Add(tableFunction);
                 }
             }
 
@@ -436,9 +445,9 @@ namespace CatFactory.SqlServer
 
                                     procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
                                     procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
                                     procedureParameter.Collation = string.Concat(dataReader["Collation"]);
 
                                     storedProcedure.Parameters.Add(procedureParameter);
@@ -485,9 +494,9 @@ namespace CatFactory.SqlServer
 
                                     procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
                                     procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
                                     procedureParameter.Collation = string.Concat(dataReader["Collation"]);
 
                                     scalarFunction.Parameters.Add(procedureParameter);
@@ -534,9 +543,9 @@ namespace CatFactory.SqlServer
 
                                     procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
                                     procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Param_order"]));
+                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
                                     procedureParameter.Collation = string.Concat(dataReader["Collation"]);
 
                                     tableFunction.Parameters.Add(procedureParameter);
