@@ -12,18 +12,92 @@ namespace CatFactory.SqlServer
     {
         public static Database Import(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] exclusions)
         {
-            var dbFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString
             };
 
-            dbFactory.ImportSettings.Exclusions.AddRange(exclusions);
+            databaseFactory.ImportSettings.Exclusions.AddRange(exclusions);
 
-            return dbFactory.Import();
+            return databaseFactory.Import();
         }
 
         public static Database Import(string connectionString, params string[] exclusions)
             => Import(null, connectionString, exclusions);
+
+        public static Database ImportTables(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] tables)
+        {
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                ConnectionString = connectionString,
+                ImportSettings = new DatabaseImportSettings
+                {
+                    ImportViews = false
+                }
+            };
+
+            var database = new Database();
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                database.Name = connection.Database;
+
+                if (tables.Length == 0)
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                }
+                else
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => tables.Contains(item.FullName)).ToList());
+                }
+
+                database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
+            }
+
+            return database;
+        }
+
+        public static Database ImportTables(string connectionString, params string[] tables)
+            => ImportTables(null, connectionString, tables);
+
+        public static Database ImportViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] views)
+        {
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                ConnectionString = connectionString,
+                ImportSettings = new DatabaseImportSettings
+                {
+                    ImportTables = false
+                }
+            };
+
+            var database = new Database();
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                database.Name = connection.Database;
+
+                if (views.Length == 0)
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                }
+                else
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => views.Contains(item.FullName)).ToList());
+                }
+
+                database.Views.AddRange(databaseFactory.GetViews(connection, database.GetViews()).ToList());
+            }
+
+            return database;
+        }
+
+        public static Database ImportViews(string connectionString, params string[] views)
+            => ImportViews(null, connectionString, views);
 
         protected ILogger Logger;
 
@@ -38,6 +112,9 @@ namespace CatFactory.SqlServer
 
         public string ConnectionString { get; set; }
 
+        public DbConnection GetConnection()
+            => new SqlConnection(ConnectionString);
+
         public DatabaseImportSettings ImportSettings { get; set; } = new DatabaseImportSettings();
 
         public virtual Database Import()
@@ -46,13 +123,13 @@ namespace CatFactory.SqlServer
 
             var extendPropertyRepository = new ExtendPropertyRepository();
 
-            using (var connection = new SqlConnection(ConnectionString))
+            using (var connection = GetConnection())
             {
                 connection.Open();
 
                 database.Name = connection.Database;
 
-                var dbObjects = GetDbObjecs(connection).ToList();
+                var dbObjects = GetDbObjects(connection).ToList();
 
                 foreach (var dbObject in dbObjects)
                 {
@@ -68,7 +145,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing tables for '{0}'...", database.Name);
 
-                    foreach (var table in ImportTables(database))
+                    foreach (var table in GetTables(connection, database.GetTables()))
                     {
                         if (ImportSettings.Exclusions.Contains(table.FullName))
                         {
@@ -103,7 +180,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing views for '{0}'...", database.Name);
 
-                    foreach (var view in ImportViews(database))
+                    foreach (var view in GetViews(connection, database.GetViews()))
                     {
                         if (ImportSettings.Exclusions.Contains(view.FullName))
                         {
@@ -136,7 +213,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
 
-                    foreach (var storedProcedure in ImportStoredProcedures(database))
+                    foreach (var storedProcedure in GetStoredProcedures(connection, database.GetStoredProcedures()))
                     {
                         if (ImportSettings.Exclusions.Contains(storedProcedure.FullName))
                         {
@@ -158,7 +235,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
 
-                    foreach (var scalarFunction in ImportScalarFunctions(database))
+                    foreach (var scalarFunction in GetScalarFunctions(connection, database.GetScalarFunctions()))
                     {
                         if (ImportSettings.Exclusions.Contains(scalarFunction.FullName))
                         {
@@ -180,7 +257,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
 
-                    foreach (var tableFunction in ImportTableFunctions(database))
+                    foreach (var tableFunction in GetTableFunctions(connection, database.GetTableFunctions()))
                     {
                         if (ImportSettings.Exclusions.Contains(tableFunction.FullName))
                         {
@@ -202,7 +279,7 @@ namespace CatFactory.SqlServer
             return database;
         }
 
-        protected virtual IEnumerable<DbObject> GetDbObjecs(DbConnection connection)
+        protected virtual IEnumerable<DbObject> GetDbObjects(DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -213,71 +290,66 @@ namespace CatFactory.SqlServer
                 {
                     while (dataReader.Read())
                     {
-                        yield return new DbObject
+                        var dbObj = new DbObject
                         {
                             Schema = dataReader.GetString(0),
                             Name = dataReader.GetString(1),
                             Type = dataReader.GetString(2)
                         };
+
+                        yield return dbObj;
                     }
                 }
             }
         }
 
-        protected virtual IEnumerable<Table> ImportTables(Database database)
+        protected virtual IEnumerable<Table> GetTables(DbConnection connection, IEnumerable<DbObject> tables)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            foreach (var item in tables)
             {
-                connection.Open();
-
-                foreach (var item in database.GetTables())
+                using (var command = connection.CreateCommand())
                 {
-                    using (var command = connection.CreateCommand())
+                    var table = new Table
                     {
-                        var table = new Table
-                        {
-                            Schema = item.Schema,
-                            Name = item.Name
-                        };
+                        Schema = item.Schema,
+                        Name = item.Name
+                    };
 
-                        command.Connection = connection;
-                        command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
 
-                        using (var dataReader = command.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
                         {
-                            while (dataReader.Read())
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
                             {
-                                dataReader.NextResult();
-
-                                if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
-                                {
-                                    AddColumnsToTable(table, dataReader);
-                                }
-
-                                dataReader.NextResult();
-
-                                if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
-                                {
-                                    dataReader.Read();
-
-                                    SetIdentityToTable(table, dataReader);
-                                }
-
-                                dataReader.NextResult();
-
-                                if (dataReader.HasRows && dataReader.GetName(0) == "constraint_type")
-                                {
-                                    AddContraintsToTable(table, dataReader);
-                                }
-
+                                AddColumnsToTable(table, dataReader);
                             }
 
-                            yield return table;
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
+                            {
+                                dataReader.Read();
+
+                                SetIdentityToTable(table, dataReader);
+                            }
+
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "constraint_type")
+                            {
+                                AddContraintsToTable(table, dataReader);
+                            }
+
                         }
+
+                        yield return table;
                     }
                 }
-
-                connection.Close();
             }
         }
 
@@ -363,201 +435,183 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected virtual IEnumerable<View> ImportViews(Database database)
+        protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            foreach (var item in views)
             {
-                connection.Open();
-
-                foreach (var item in database.GetViews())
+                using (var command = connection.CreateCommand())
                 {
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.Connection = connection;
-                        command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
 
-                        using (var dataReader = command.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
                         {
+                            var view = new View
+                            {
+                                Schema = item.Schema,
+                                Name = item.Name
+                            };
+
+                            dataReader.NextResult();
+
                             while (dataReader.Read())
                             {
-                                var view = new View
+                                var column = new Column();
+
+                                column.Name = string.Concat(dataReader["Column_name"]);
+                                column.Type = string.Concat(dataReader["Type"]);
+                                column.Length = int.Parse(string.Concat(dataReader["Length"]));
+                                column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
+                                column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
+                                column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
+                                column.Collation = string.Concat(dataReader["Collation"]);
+
+                                if (ImportSettings.ExclusionTypes.Contains(column.Type))
                                 {
-                                    Schema = item.Schema,
-                                    Name = item.Name
-                                };
-
-                                dataReader.NextResult();
-
-                                while (dataReader.Read())
-                                {
-                                    var column = new Column();
-
-                                    column.Name = string.Concat(dataReader["Column_name"]);
-                                    column.Type = string.Concat(dataReader["Type"]);
-                                    column.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                    column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                    column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
-                                    column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
-                                    column.Collation = string.Concat(dataReader["Collation"]);
-
-                                    view.Columns.Add(column);
+                                    continue;
                                 }
 
-                                yield return view;
+                                view.Columns.Add(column);
                             }
+
+                            yield return view;
                         }
                     }
                 }
-
-                connection.Close();
-            }
-
-        }
-
-        protected virtual IEnumerable<StoredProcedure> ImportStoredProcedures(Database database)
-        {
-            using (var connection = new SqlConnection(ConnectionString))
-            {
-                connection.Open();
-
-                foreach (var item in database.GetProcedures())
-                {
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.Connection = connection;
-                        command.CommandText = string.Format("sp_help '{0}'", item.FullName);
-
-                        using (var dataReader = command.ExecuteReader())
-                        {
-                            while (dataReader.Read())
-                            {
-                                var storedProcedure = new StoredProcedure
-                                {
-                                    Schema = item.Schema,
-                                    Name = item.Name
-                                };
-
-                                dataReader.NextResult();
-
-                                while (dataReader.Read())
-                                {
-                                    var procedureParameter = new Parameter();
-
-                                    procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
-                                    procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                    procedureParameter.Collation = string.Concat(dataReader["Collation"]);
-
-                                    storedProcedure.Parameters.Add(procedureParameter);
-                                }
-
-                                yield return storedProcedure;
-                            }
-                        }
-                    }
-                }
-
-                connection.Close();
             }
         }
 
-        protected virtual IEnumerable<ScalarFunction> ImportScalarFunctions(Database database)
+        protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            foreach (var item in storedProcedures)
             {
-                connection.Open();
-
-                foreach (var item in database.GetProcedures())
+                using (var command = connection.CreateCommand())
                 {
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.Connection = connection;
-                        command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
 
-                        using (var dataReader = command.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
                         {
+                            var storedProcedure = new StoredProcedure
+                            {
+                                Schema = item.Schema,
+                                Name = item.Name
+                            };
+
+                            dataReader.NextResult();
+
                             while (dataReader.Read())
                             {
-                                var scalarFunction = new ScalarFunction
-                                {
-                                    Schema = item.Schema,
-                                    Name = item.Name
-                                };
+                                var procedureParameter = new Parameter();
 
-                                dataReader.NextResult();
+                                procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
+                                procedureParameter.Type = string.Concat(dataReader["Type"]);
+                                procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
+                                procedureParameter.Collation = string.Concat(dataReader["Collation"]);
 
-                                while (dataReader.Read())
-                                {
-                                    var procedureParameter = new Parameter();
-
-                                    procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
-                                    procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                    procedureParameter.Collation = string.Concat(dataReader["Collation"]);
-
-                                    scalarFunction.Parameters.Add(procedureParameter);
-                                }
-
-                                yield return scalarFunction;
+                                storedProcedure.Parameters.Add(procedureParameter);
                             }
+
+                            yield return storedProcedure;
                         }
                     }
                 }
-
-                connection.Close();
             }
         }
 
-        protected virtual IEnumerable<TableFunction> ImportTableFunctions(Database database)
+        protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
-            using (var connection = new SqlConnection(ConnectionString))
+            foreach (var item in scalarFunctions)
             {
-                connection.Open();
-
-                foreach (var item in database.GetProcedures())
+                using (var command = connection.CreateCommand())
                 {
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.Connection = connection;
-                        command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
 
-                        using (var dataReader = command.ExecuteReader())
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
                         {
+                            var scalarFunction = new ScalarFunction
+                            {
+                                Schema = item.Schema,
+                                Name = item.Name
+                            };
+
+                            dataReader.NextResult();
+
                             while (dataReader.Read())
                             {
-                                var tableFunction = new TableFunction
-                                {
-                                    Schema = item.Schema,
-                                    Name = item.Name
-                                };
+                                var procedureParameter = new Parameter();
 
-                                dataReader.NextResult();
+                                procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
+                                procedureParameter.Type = string.Concat(dataReader["Type"]);
+                                procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
+                                procedureParameter.Collation = string.Concat(dataReader["Collation"]);
 
-                                while (dataReader.Read())
-                                {
-                                    var procedureParameter = new Parameter();
-
-                                    procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
-                                    procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                    procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                    procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                    procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                    procedureParameter.Collation = string.Concat(dataReader["Collation"]);
-
-                                    tableFunction.Parameters.Add(procedureParameter);
-                                }
-
-                                yield return tableFunction;
+                                scalarFunction.Parameters.Add(procedureParameter);
                             }
+
+                            yield return scalarFunction;
                         }
                     }
                 }
+            }
+        }
 
-                connection.Close();
+        protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
+        {
+            foreach (var item in tableFunctions)
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            var tableFunction = new TableFunction
+                            {
+                                Schema = item.Schema,
+                                Name = item.Name
+                            };
+
+                            dataReader.NextResult();
+
+                            while (dataReader.Read())
+                            {
+                                var column = new Column();
+
+                                column.Name = string.Concat(dataReader["Column_name"]);
+                                column.Type = string.Concat(dataReader["Type"]);
+                                column.Length = int.Parse(string.Concat(dataReader["Length"]));
+                                column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
+                                column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
+                                column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
+                                column.Collation = string.Concat(dataReader["Collation"]);
+
+                                if (ImportSettings.ExclusionTypes.Contains(column.Type))
+                                {
+                                    continue;
+                                }
+
+                                tableFunction.Columns.Add(column);
+                            }
+
+                            yield return tableFunction;
+                        }
+                    }
+                }
             }
         }
     }

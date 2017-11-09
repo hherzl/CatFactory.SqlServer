@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
 using CatFactory.Mapping;
 
@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer
 {
     public static class ExtendPropertyExtensions
     {
-        public static IEnumerable<ExtendProperty> GetMsDescriptionForDbObject(this SqlConnection connection, IDbObject dbObject)
+        public static IEnumerable<ExtendProperty> GetMsDescriptionForDbObject(this DbConnection connection, IDbObject dbObject)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -22,7 +22,7 @@ namespace CatFactory.SqlServer
             return repository.GetExtendProperties(connection, name, level0type, level0name, level1type, level1name, level2type, level2name).ToList();
         }
 
-        public static IEnumerable<ExtendProperty> GetMsDescriptionForColumn(this SqlConnection connection, IDbObject dbObject, Column column)
+        public static IEnumerable<ExtendProperty> GetMsDescriptionForColumn(this DbConnection connection, IDbObject dbObject, Column column)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -37,7 +37,7 @@ namespace CatFactory.SqlServer
             return repository.GetExtendProperties(connection, name, level0type, level0name, level1type, level1name, level2type, level2name).ToList();
         }
 
-        public static void AddMsDescription(this SqlServerDatabaseFactory factory, ITable table, string description)
+        public static void AddMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table, string description)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -49,7 +49,7 @@ namespace CatFactory.SqlServer
             var level2type = string.Empty;
             var level2name = string.Empty;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
@@ -59,7 +59,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public static void AddMsDescription(this SqlServerDatabaseFactory factory, ITable table, Column column, string description)
+        public static void AddMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string description)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -71,7 +71,7 @@ namespace CatFactory.SqlServer
             var level2type = "column";
             var level2name = column.Name;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
@@ -81,7 +81,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public static void UpdateMsDescription(this SqlServerDatabaseFactory factory, ITable table, string description)
+        public static void UpdateMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table, string description)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -93,7 +93,7 @@ namespace CatFactory.SqlServer
             var level2type = string.Empty;
             var level2name = string.Empty;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
@@ -103,7 +103,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public static void UpdateMsDescription(this SqlServerDatabaseFactory factory, ITable table, Column column, string description)
+        public static void UpdateMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string description)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -115,7 +115,7 @@ namespace CatFactory.SqlServer
             var level2type = "column";
             var level2name = column.Name;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
@@ -125,7 +125,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public static void DropMsDescription(this SqlServerDatabaseFactory factory, ITable table)
+        public static void DropMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -137,7 +137,7 @@ namespace CatFactory.SqlServer
             var level2type = string.Empty;
             var level2name = string.Empty;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
@@ -145,7 +145,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public static void DropMsDescription(this SqlServerDatabaseFactory factory, ITable table, Column column)
+        public static void DropMsDescription(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column)
         {
             var repository = new ExtendPropertyRepository();
 
@@ -157,7 +157,7 @@ namespace CatFactory.SqlServer
             var level2type = "column";
             var level2name = column.Name;
 
-            using (var connection = new SqlConnection(factory.ConnectionString))
+            using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 

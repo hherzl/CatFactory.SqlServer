@@ -12,7 +12,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
+                ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;MultipleActiveResultSets=true;",
                 ImportSettings = new DatabaseImportSettings
                 {
                     ImportMSDescription = true,
@@ -41,7 +41,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=Northwind;integrated security=yes;"
+                ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
             };
 
             databaseFactory.ImportSettings.ImportMSDescription = true;
@@ -72,7 +72,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=Northwind;integrated security=yes;"
+                ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
             };
 
             databaseFactory.ImportSettings.ImportMSDescription = true;
