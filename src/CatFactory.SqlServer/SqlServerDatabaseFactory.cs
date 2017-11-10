@@ -99,6 +99,41 @@ namespace CatFactory.SqlServer
         public static Database ImportViews(string connectionString, params string[] views)
             => ImportViews(null, connectionString, views);
 
+        public static Database ImportTablesAndViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] names)
+        {
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                ConnectionString = connectionString
+            };
+
+            var database = new Database();
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                database.Name = connection.Database;
+
+                if (names.Length == 0)
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                }
+                else
+                {
+                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => names.Contains(item.FullName)).ToList());
+                }
+
+                database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
+
+                database.Views.AddRange(databaseFactory.GetViews(connection, database.GetViews()).ToList());
+            }
+
+            return database;
+        }
+
+        public static Database ImportTablesAndViews(string connectionString, params string[] names)
+            => ImportTablesAndViews(null, connectionString, names);
+
         protected ILogger Logger;
 
         public SqlServerDatabaseFactory()

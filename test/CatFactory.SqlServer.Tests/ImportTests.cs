@@ -7,65 +7,14 @@ namespace CatFactory.SqlServer.Tests
     public class Tests
     {
         [Fact]
-        public void ImportWithLoggerStoreTablesTest()
-        {
-            // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
-
-            // Act
-            var database = SqlServerDatabaseFactory.ImportTables(logger, "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
-
-            // Assert
-            Assert.True(database.Tables.Count == 2);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
-        public void ImportWithoutLoggerStoreTablesTest()
-        {
-            // Arrange
-            // Act
-            var database = SqlServerDatabaseFactory.ImportTables("server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
-
-            // Assert
-            Assert.True(database.Tables.Count == 2);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
-        public void ImportNorthwindTables()
-        {
-            // Arrange
-
-            // Act
-            var database = SqlServerDatabaseFactory.ImportTables("server=(local);database=Northwind;integrated security=yes;");
-
-            // Assert
-            Assert.True(database.Tables.Count > 0);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
-        public void ImportNorthwindViews()
-        {
-            // Arrange
-
-            // Act
-            var database = SqlServerDatabaseFactory.ImportViews("server=(local);database=Northwind;integrated security=yes;");
-
-            // Assert
-            Assert.True(database.Tables.Count == 0);
-            Assert.True(database.Views.Count > 0);
-        }
-
-        [Fact]
         public void ImportStoreDatabaseTest()
         {
             // Arrange
             var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
 
             // Act
-            var database = SqlServerDatabaseFactory.Import(logger, "server=(local);database=Store;integrated security=yes;");
+            var database = SqlServerDatabaseFactory
+                .Import(logger, "server=(local);database=Store;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -78,7 +27,8 @@ namespace CatFactory.SqlServer.Tests
             var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
 
             // Act
-            var database = SqlServerDatabaseFactory.Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+            var database = SqlServerDatabaseFactory
+                .Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -169,6 +119,86 @@ namespace CatFactory.SqlServer.Tests
             {
                 Assert.False(table.Columns.Contains(new Column { Name = "SpatialLocation" }));
             }
+        }
+
+        [Fact]
+        public void ImportWithLoggerStoreTablesTest()
+        {
+            // Arrange
+            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+
+            // Act
+            var database = SqlServerDatabaseFactory
+                .ImportTables(
+                logger,
+                "server=(local);database=Store;integrated security=yes;",
+                "Sales.Order",
+                "Sales.OrderDetail");
+
+            // Assert
+            Assert.True(database.Tables.Count == 2);
+            Assert.True(database.Views.Count == 0);
+        }
+
+        [Fact]
+        public void ImportWithoutLoggerStoreTablesTest()
+        {
+            // Arrange
+            // Act
+            var database = SqlServerDatabaseFactory
+                .ImportTables("server=(local);database=Store;integrated security=yes;",
+                "Sales.Order",
+                "Sales.OrderDetail");
+
+            // Assert
+            Assert.True(database.Tables.Count == 2);
+            Assert.True(database.Views.Count == 0);
+        }
+
+        [Fact]
+        public void ImportNorthwindTables()
+        {
+            // Arrange
+
+            // Act
+            var database = SqlServerDatabaseFactory
+                .ImportTables("server=(local);database=Northwind;integrated security=yes;");
+
+            // Assert
+            Assert.True(database.Tables.Count > 0);
+            Assert.True(database.Views.Count == 0);
+        }
+
+        [Fact]
+        public void ImportNorthwindViews()
+        {
+            // Arrange
+
+            // Act
+            var database = SqlServerDatabaseFactory
+                .ImportViews("server=(local);database=Northwind;integrated security=yes;");
+
+            // Assert
+            Assert.True(database.Tables.Count == 0);
+            Assert.True(database.Views.Count > 0);
+        }
+
+        [Fact]
+        public void ImportNorthwindTablesAndViews()
+        {
+            // Arrange
+
+            // Act
+            var database = SqlServerDatabaseFactory
+                .ImportTablesAndViews("server=(local);database=Northwind;integrated security=yes;",
+                "dbo.Orders",
+                "dbo.Order Details",
+                "dbo.Category Sales for 1997",
+                "dbo.Product Sales for 1997");
+
+            // Assert
+            Assert.True(database.Tables.Count == 2);
+            Assert.True(database.Views.Count == 2);
         }
     }
 }
