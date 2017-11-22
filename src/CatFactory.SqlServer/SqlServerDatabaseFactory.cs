@@ -187,25 +187,7 @@ namespace CatFactory.SqlServer
                             continue;
                         }
 
-                        var dbObject = dbObjects.First(item => item.FullName == table.FullName);
-
-                        if (ImportSettings.ImportMSDescription)
-                        {
-                            dbObject.Type = "table";
-
-                            foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                            {
-                                table.Description = string.Concat(extendProperty.Value);
-                            }
-
-                            foreach (var column in table.Columns)
-                            {
-                                foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
-                                {
-                                    column.Description = string.Concat(extendProperty.Value);
-                                }
-                            }
-                        }
+                        ImportDescription(connection, table);
 
                         database.Tables.Add(table);
                     }
@@ -222,23 +204,7 @@ namespace CatFactory.SqlServer
                             continue;
                         }
 
-                        var dbObject = dbObjects.First(item => item.FullName == view.FullName);
-
-                        if (ImportSettings.ImportMSDescription)
-                        {
-                            foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                            {
-                                view.Description = string.Concat(extendProperty.Value);
-                            }
-
-                            foreach (var column in view.Columns)
-                            {
-                                foreach (var extendProperty in connection.GetMsDescriptionForColumn(dbObject, column))
-                                {
-                                    column.Description = string.Concat(extendProperty.Value);
-                                }
-                            }
-                        }
+                        ImportDescription(connection, view);
 
                         database.Views.Add(view);
                     }
@@ -255,12 +221,7 @@ namespace CatFactory.SqlServer
                             continue;
                         }
 
-                        var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
-
-                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                        {
-                            storedProcedure.Description = string.Concat(extendProperty.Value);
-                        }
+                        ImportDescription(connection, storedProcedure);
 
                         database.StoredProcedures.Add(storedProcedure);
                     }
@@ -277,12 +238,7 @@ namespace CatFactory.SqlServer
                             continue;
                         }
 
-                        var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
-
-                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                        {
-                            scalarFunction.Description = string.Concat(extendProperty.Value);
-                        }
+                        ImportDescription(connection, scalarFunction);
 
                         database.ScalarFunctions.Add(scalarFunction);
                     }
@@ -299,12 +255,7 @@ namespace CatFactory.SqlServer
                             continue;
                         }
 
-                        var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
-
-                        foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                        {
-                            tableFunction.Description = string.Concat(extendProperty.Value);
-                        }
+                        ImportDescription(connection, tableFunction);
 
                         database.TableFunctions.Add(tableFunction);
                     }
@@ -467,6 +418,93 @@ namespace CatFactory.SqlServer
                         ConstraintName = string.Concat(dataReader["constraint_name"])
                     });
                 }
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, ITable table)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                table.Type = "table";
+
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(table))
+                {
+                    table.Description = string.Concat(extendProperty.Value);
+                }
+
+                foreach (var column in table.Columns)
+                {
+                    foreach (var extendProperty in connection.GetMsDescriptionForColumn(table, column))
+                    {
+                        column.Description = string.Concat(extendProperty.Value);
+                    }
+                }
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, IView view)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                view.Type = "view";
+
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(view))
+                {
+                    view.Description = string.Concat(extendProperty.Value);
+                }
+
+                foreach (var column in view.Columns)
+                {
+                    foreach (var extendProperty in connection.GetMsDescriptionForColumn(view, column))
+                    {
+                        column.Description = string.Concat(extendProperty.Value);
+                    }
+                }
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, StoredProcedure storedProcedure)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                // todo: add interface for stored procedure
+
+                //var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
+
+                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                //{
+                //    storedProcedure.Description = string.Concat(extendProperty.Value);
+                //}
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, ScalarFunction scalarFuntion)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                // todo: add interface for scalar function
+
+                //var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
+
+                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                //{
+                //    scalarFunction.Description = string.Concat(extendProperty.Value);
+                //}
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, TableFunction tableFunction)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                // todo: add interface for table function
+
+                //var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
+
+                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
+                //{
+                //    tableFunction.Description = string.Concat(extendProperty.Value);
+                //}
             }
         }
 
