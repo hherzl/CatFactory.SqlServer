@@ -467,29 +467,21 @@ namespace CatFactory.SqlServer
         {
             if (ImportSettings.ImportMSDescription)
             {
-                // todo: add interface for stored procedure
-
-                //var dbObject = dbObjects.First(item => item.FullName == storedProcedure.FullName);
-
-                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                //{
-                //    storedProcedure.Description = string.Concat(extendProperty.Value);
-                //}
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(storedProcedure))
+                {
+                    storedProcedure.Description = string.Concat(extendProperty.Value);
+                }
             }
         }
 
-        private void ImportDescription(DbConnection connection, ScalarFunction scalarFuntion)
+        private void ImportDescription(DbConnection connection, ScalarFunction scalarFunction)
         {
             if (ImportSettings.ImportMSDescription)
             {
-                // todo: add interface for scalar function
-
-                //var dbObject = dbObjects.First(item => item.FullName == scalarFunction.FullName);
-
-                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                //{
-                //    scalarFunction.Description = string.Concat(extendProperty.Value);
-                //}
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(scalarFunction))
+                {
+                    scalarFunction.Description = string.Concat(extendProperty.Value);
+                }
             }
         }
 
@@ -497,14 +489,10 @@ namespace CatFactory.SqlServer
         {
             if (ImportSettings.ImportMSDescription)
             {
-                // todo: add interface for table function
-
-                //var dbObject = dbObjects.First(item => item.FullName == tableFunction.FullName);
-
-                //foreach (var extendProperty in connection.GetMsDescriptionForDbObject(dbObject))
-                //{
-                //    tableFunction.Description = string.Concat(extendProperty.Value);
-                //}
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(tableFunction))
+                {
+                    tableFunction.Description = string.Concat(extendProperty.Value);
+                }
             }
         }
 
