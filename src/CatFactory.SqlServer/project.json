@@ -1,11 +1,11 @@
 {
-  "version": "3.0.0-alpha-build09",
+  "version": "3.0.0-alpha-build10",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SQL Server",
   "packOptions": {
     "summary": "CatFactory package for SQL Server",
     "tags": [ "SQL Server" ],
-    "releaseNotes": "3.0.0-alpha-build09 version: Package update",
+    "releaseNotes": "3.0.0-alpha-build10 version: Core package update",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
@@ -21,7 +21,7 @@
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
     "System.Dynamic.Runtime": "4.3.0",
-    "CatFactory": "3.0.0-alpha-build07"
+    "CatFactory": "3.0.0-alpha-build10"
   },
 
   "frameworks": {
