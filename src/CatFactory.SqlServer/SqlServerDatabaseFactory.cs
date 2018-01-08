@@ -156,6 +156,8 @@ namespace CatFactory.SqlServer
         {
             var database = new Database();
 
+            database.Mappings = DatabaseTypeMapList.Definition;
+
             var extendPropertyRepository = new ExtendPropertyRepository();
 
             using (var connection = GetConnection())
