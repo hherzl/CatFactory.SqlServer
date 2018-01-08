@@ -23,7 +23,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var table = database.FindTableBySchemaAndName("Production.Product");
+            var table = database.FindTable("Production.Product");
 
             var view = database.Views.First(item => item.FullName == "HumanResources.vEmployee");
 
@@ -49,7 +49,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var table = database.FindTableBySchemaAndName("dbo.Products");
+            var table = database.FindTable("dbo.Products");
 
             databaseFactory.DropMsDescription(table);
 
@@ -80,7 +80,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var table = database.FindTableBySchemaAndName("dbo.Products");
+            var table = database.FindTable("dbo.Products");
 
             databaseFactory.UpdateMsDescription(table, "Test update description");
 

@@ -32,7 +32,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count > 0);
-            Assert.True(database.FindTableBySchemaAndName("dbo.ChangeLog") == null);
+            Assert.True(database.FindTable("dbo.ChangeLog") == null);
         }
 
         [Fact]

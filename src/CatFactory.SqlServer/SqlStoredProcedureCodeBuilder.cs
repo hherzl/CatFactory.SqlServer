@@ -89,7 +89,7 @@ namespace CatFactory.SqlServer
             for (var i = 0; i < constraints.Count; i++)
             {
                 var foreignKey = constraints[i];
-                var columns = foreignKey.GetColumns(Table).ToList();
+                var columns = Table.GetColumnsFromConstraint(foreignKey).ToList();
 
                 if (columns.Count == 1)
                 {
@@ -138,7 +138,7 @@ namespace CatFactory.SqlServer
                 for (var i = 0; i < constraints.Count; i++)
                 {
                     var foreignKey = constraints[i];
-                    var columns = foreignKey.GetColumns(Table).ToList();
+                    var columns = Table.GetColumnsFromConstraint(foreignKey).ToList();
 
                     if (columns.Count == 1)
                     {
@@ -272,7 +272,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}(", Indent(1));
             output.AppendLine();
 
-            var columns = Table.GetColumnsWithOutIdentity().ToList();
+            var columns = Table.GetColumnsWithNoIdentity().ToList();
 
             for (var i = 0; i < columns.Count; i++)
             {
@@ -365,7 +365,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}set", Indent(1));
             output.AppendLine();
 
-            var columns = Table.GetColumnsWithOutPrimaryKey().ToList();
+            var columns = Table.GetColumnsFromConstraint(Table.PrimaryKey).ToList();
 
             for (var i = 0; i < columns.Count; i++)
             {
