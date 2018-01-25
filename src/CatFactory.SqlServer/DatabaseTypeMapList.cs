@@ -229,6 +229,7 @@ namespace CatFactory.SqlServer
                 {
                     DatabaseType = "uniqueidentifier",
                     ClrFullNameType = typeof(Guid).FullName,
+                    AllowClrNullable = true,
                     DbTypeEnum = DbType.Guid
                 },
                 new DatabaseTypeMap

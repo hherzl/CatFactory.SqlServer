@@ -1,11 +1,11 @@
 {
-  "version": "3.0.0-alpha-build12",
+  "version": "3.0.0-alpha-build13",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SQL Server",
   "packOptions": {
     "summary": "CatFactory package for SQL Server",
     "tags": [ "SQL Server" ],
-    "releaseNotes": "3.0.0-alpha-build12 version: Addition of DatabaseTypeMap for database in Import feature",
+    "releaseNotes": "3.0.0-alpha-build13 version: Enable AllowClrNullable for uniqueidentifier DatabaseTypeMap",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
