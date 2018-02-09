@@ -1,11 +1,11 @@
 {
-  "version": "3.0.0-alpha-build13",
+  "version": "3.0.0-alpha-build14",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SQL Server",
   "packOptions": {
     "summary": "CatFactory package for SQL Server",
     "tags": [ "SQL Server" ],
-    "releaseNotes": "3.0.0-alpha-build13 version: Enable AllowClrNullable for uniqueidentifier DatabaseTypeMap",
+    "releaseNotes": "3.0.0-alpha-build14 version: Core package update",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",
@@ -21,7 +21,7 @@
     "System.Data.Common": "4.3.0",
     "System.Data.SqlClient": "4.3.0",
     "System.Dynamic.Runtime": "4.3.0",
-    "CatFactory": "3.0.0-alpha-build11"
+    "CatFactory": "3.0.0-alpha-build12"
   },
 
   "frameworks": {
