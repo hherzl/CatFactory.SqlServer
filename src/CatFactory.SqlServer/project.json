@@ -1,11 +1,11 @@
 {
-  "version": "3.0.0-alpha-build14",
+  "version": "3.0.0-alpha-build15",
   "title": "CatFactory.SqlServer",
   "description": "CatFactory package for SQL Server",
   "packOptions": {
     "summary": "CatFactory package for SQL Server",
     "tags": [ "SQL Server" ],
-    "releaseNotes": "3.0.0-alpha-build14 version: Core package update",
+    "releaseNotes": "3.0.0-alpha-build15 version: Core package update",
     "requireLicenseAcceptance": false,
     "repository": {
       "type": "git",

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CatFactory.Mapping;
 using Xunit;
 
@@ -72,10 +73,7 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=AdventureWorks2012;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
-                    ExclusionTypes = new List<string>
-                    {
-                        "geography"
-                    }
+                    ExclusionTypes = new List<string> { "geography" }
                 }
             };
 
@@ -104,10 +102,7 @@ namespace CatFactory.SqlServer.Tests
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true,
-                    ExclusionTypes = new List<string>
-                    {
-                        "geography"
-                    }
+                    ExclusionTypes = new List<string> { "geography" }
                 }
             };
 
@@ -119,6 +114,8 @@ namespace CatFactory.SqlServer.Tests
             {
                 Assert.False(table.Columns.Contains(new Column { Name = "SpatialLocation" }));
             }
+
+            Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
         }
 
         [Fact]
@@ -129,11 +126,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
             var database = SqlServerDatabaseFactory
-                .ImportTables(
-                logger,
-                "server=(local);database=Store;integrated security=yes;",
-                "Sales.Order",
-                "Sales.OrderDetail");
+                .ImportTables(logger, "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -146,9 +139,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             // Act
             var database = SqlServerDatabaseFactory
-                .ImportTables("server=(local);database=Store;integrated security=yes;",
-                "Sales.Order",
-                "Sales.OrderDetail");
+                .ImportTables("server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);

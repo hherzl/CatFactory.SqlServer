@@ -45,13 +45,9 @@ namespace CatFactory.SqlServer
                 database.Name = connection.Database;
 
                 if (tables.Length == 0)
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
-                }
                 else
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => tables.Contains(item.FullName)).ToList());
-                }
 
                 database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
             }
@@ -82,13 +78,9 @@ namespace CatFactory.SqlServer
                 database.Name = connection.Database;
 
                 if (views.Length == 0)
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
-                }
                 else
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => views.Contains(item.FullName)).ToList());
-                }
 
                 database.Views.AddRange(databaseFactory.GetViews(connection, database.GetViews()).ToList());
             }
@@ -115,13 +107,9 @@ namespace CatFactory.SqlServer
                 database.Name = connection.Database;
 
                 if (names.Length == 0)
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
-                }
                 else
-                {
                     database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => names.Contains(item.FullName)).ToList());
-                }
 
                 database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
 
@@ -171,9 +159,7 @@ namespace CatFactory.SqlServer
                 foreach (var dbObject in dbObjects)
                 {
                     if (ImportSettings.Exclusions.Contains(dbObject.FullName))
-                    {
                         continue;
-                    }
 
                     database.DbObjects.Add(dbObject);
                 }
@@ -185,9 +171,7 @@ namespace CatFactory.SqlServer
                     foreach (var table in GetTables(connection, database.GetTables()))
                     {
                         if (ImportSettings.Exclusions.Contains(table.FullName))
-                        {
                             continue;
-                        }
 
                         ImportDescription(connection, table);
 
@@ -202,9 +186,7 @@ namespace CatFactory.SqlServer
                     foreach (var view in GetViews(connection, database.GetViews()))
                     {
                         if (ImportSettings.Exclusions.Contains(view.FullName))
-                        {
                             continue;
-                        }
 
                         ImportDescription(connection, view);
 
@@ -219,30 +201,11 @@ namespace CatFactory.SqlServer
                     foreach (var storedProcedure in GetStoredProcedures(connection, database.GetStoredProcedures()))
                     {
                         if (ImportSettings.Exclusions.Contains(storedProcedure.FullName))
-                        {
                             continue;
-                        }
 
                         ImportDescription(connection, storedProcedure);
 
                         database.StoredProcedures.Add(storedProcedure);
-                    }
-                }
-
-                if (ImportSettings.ImportScalarFunctions)
-                {
-                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
-
-                    foreach (var scalarFunction in GetScalarFunctions(connection, database.GetScalarFunctions()))
-                    {
-                        if (ImportSettings.Exclusions.Contains(scalarFunction.FullName))
-                        {
-                            continue;
-                        }
-
-                        ImportDescription(connection, scalarFunction);
-
-                        database.ScalarFunctions.Add(scalarFunction);
                     }
                 }
 
@@ -253,13 +216,26 @@ namespace CatFactory.SqlServer
                     foreach (var tableFunction in GetTableFunctions(connection, database.GetTableFunctions()))
                     {
                         if (ImportSettings.Exclusions.Contains(tableFunction.FullName))
-                        {
                             continue;
-                        }
 
                         ImportDescription(connection, tableFunction);
 
                         database.TableFunctions.Add(tableFunction);
+                    }
+                }
+
+                if (ImportSettings.ImportScalarFunctions)
+                {
+                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
+
+                    foreach (var scalarFunction in GetScalarFunctions(connection, database.GetScalarFunctions()))
+                    {
+                        if (ImportSettings.Exclusions.Contains(scalarFunction.FullName))
+                            continue;
+
+                        ImportDescription(connection, scalarFunction);
+
+                        database.ScalarFunctions.Add(scalarFunction);
                     }
                 }
             }
@@ -313,26 +289,20 @@ namespace CatFactory.SqlServer
                             dataReader.NextResult();
 
                             if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
-                            {
                                 AddColumnsToTable(table, dataReader);
-                            }
 
                             dataReader.NextResult();
 
                             if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
                             {
                                 dataReader.Read();
-
                                 SetIdentityToTable(table, dataReader);
                             }
 
                             dataReader.NextResult();
 
                             if (dataReader.HasRows && dataReader.GetName(0) == "constraint_type")
-                            {
                                 AddContraintsToTable(table, dataReader);
-                            }
-
                         }
 
                         yield return table;
@@ -356,9 +326,7 @@ namespace CatFactory.SqlServer
                 column.Collation = string.Concat(dataReader["Collation"]);
 
                 if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                {
                     continue;
-                }
 
                 table.Columns.Add(column);
             }
@@ -444,60 +412,6 @@ namespace CatFactory.SqlServer
             }
         }
 
-        private void ImportDescription(DbConnection connection, IView view)
-        {
-            if (ImportSettings.ImportMSDescription)
-            {
-                view.Type = "view";
-
-                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(view))
-                {
-                    view.Description = string.Concat(extendProperty.Value);
-                }
-
-                foreach (var column in view.Columns)
-                {
-                    foreach (var extendProperty in connection.GetMsDescriptionForColumn(view, column))
-                    {
-                        column.Description = string.Concat(extendProperty.Value);
-                    }
-                }
-            }
-        }
-
-        private void ImportDescription(DbConnection connection, StoredProcedure storedProcedure)
-        {
-            if (ImportSettings.ImportMSDescription)
-            {
-                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(storedProcedure))
-                {
-                    storedProcedure.Description = string.Concat(extendProperty.Value);
-                }
-            }
-        }
-
-        private void ImportDescription(DbConnection connection, ScalarFunction scalarFunction)
-        {
-            if (ImportSettings.ImportMSDescription)
-            {
-                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(scalarFunction))
-                {
-                    scalarFunction.Description = string.Concat(extendProperty.Value);
-                }
-            }
-        }
-
-        private void ImportDescription(DbConnection connection, TableFunction tableFunction)
-        {
-            if (ImportSettings.ImportMSDescription)
-            {
-                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(tableFunction))
-                {
-                    tableFunction.Description = string.Concat(extendProperty.Value);
-                }
-            }
-        }
-
         protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
         {
             foreach (var item in views)
@@ -532,15 +446,34 @@ namespace CatFactory.SqlServer
                                 column.Collation = string.Concat(dataReader["Collation"]);
 
                                 if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                                {
                                     continue;
-                                }
 
                                 view.Columns.Add(column);
                             }
 
                             yield return view;
                         }
+                    }
+                }
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, IView view)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                view.Type = "view";
+
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(view))
+                {
+                    view.Description = string.Concat(extendProperty.Value);
+                }
+
+                foreach (var column in view.Columns)
+                {
+                    foreach (var extendProperty in connection.GetMsDescriptionForColumn(view, column))
+                    {
+                        column.Description = string.Concat(extendProperty.Value);
                     }
                 }
             }
@@ -588,6 +521,110 @@ namespace CatFactory.SqlServer
             }
         }
 
+        private void ImportDescription(DbConnection connection, StoredProcedure storedProcedure)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(storedProcedure))
+                {
+                    storedProcedure.Description = string.Concat(extendProperty.Value);
+                }
+            }
+        }
+
+        protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
+        {
+            foreach (var item in tableFunctions)
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+
+                    using (var dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            var tableFunction = new TableFunction
+                            {
+                                Schema = item.Schema,
+                                Name = item.Name
+                            };
+
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
+                            {
+                                while (dataReader.Read())
+                                {
+                                    var column = new Column();
+
+                                    column.Name = string.Concat(dataReader["Column_name"]);
+                                    column.Type = string.Concat(dataReader["Type"]);
+                                    column.Length = int.Parse(string.Concat(dataReader["Length"]));
+                                    column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
+                                    column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
+                                    column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
+                                    column.Collation = string.Concat(dataReader["Collation"]);
+
+                                    if (ImportSettings.ExclusionTypes.Contains(column.Type))
+                                        continue;
+
+                                    tableFunction.Columns.Add(column);
+                                }
+                            }
+
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
+                            {
+                                // todo: Add code to set identity
+                            }
+
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "RowGuidCol")
+                            {
+                                // todo: Add code to set row guid col
+                            }
+
+                            dataReader.NextResult();
+
+                            if (dataReader.HasRows && dataReader.GetName(0) == "Parameter_name")
+                            {
+                                while (dataReader.Read())
+                                {
+                                    var parameter = new Parameter();
+
+                                    parameter.Name = string.Concat(dataReader["Parameter_name"]);
+                                    parameter.Type = string.Concat(dataReader["Type"]);
+                                    parameter.Length = short.Parse(string.Concat(dataReader["Length"]));
+                                    parameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
+                                    parameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
+                                    parameter.Collation = string.Concat(dataReader["Collation"]);
+
+                                    tableFunction.Parameters.Add(parameter);
+                                }
+                            }
+
+                            yield return tableFunction;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ImportDescription(DbConnection connection, TableFunction tableFunction)
+        {
+            if (ImportSettings.ImportMSDescription)
+            {
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(tableFunction))
+                {
+                    tableFunction.Description = string.Concat(extendProperty.Value);
+                }
+            }
+        }
+
         protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
             foreach (var item in scalarFunctions)
@@ -630,50 +667,13 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
+        private void ImportDescription(DbConnection connection, ScalarFunction scalarFunction)
         {
-            foreach (var item in tableFunctions)
+            if (ImportSettings.ImportMSDescription)
             {
-                using (var command = connection.CreateCommand())
+                foreach (var extendProperty in connection.GetMsDescriptionForDbObject(scalarFunction))
                 {
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
-
-                    using (var dataReader = command.ExecuteReader())
-                    {
-                        while (dataReader.Read())
-                        {
-                            var tableFunction = new TableFunction
-                            {
-                                Schema = item.Schema,
-                                Name = item.Name
-                            };
-
-                            dataReader.NextResult();
-
-                            while (dataReader.Read())
-                            {
-                                var column = new Column();
-
-                                column.Name = string.Concat(dataReader["Column_name"]);
-                                column.Type = string.Concat(dataReader["Type"]);
-                                column.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
-                                column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
-                                column.Collation = string.Concat(dataReader["Collation"]);
-
-                                if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                                {
-                                    continue;
-                                }
-
-                                tableFunction.Columns.Add(column);
-                            }
-
-                            yield return tableFunction;
-                        }
-                    }
+                    scalarFunction.Description = string.Concat(extendProperty.Value);
                 }
             }
         }
