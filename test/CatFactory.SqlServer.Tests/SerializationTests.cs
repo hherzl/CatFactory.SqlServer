@@ -12,9 +12,7 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Store;
 
             // Act
-            var serializer = new Serializer();
-
-            var output = serializer.Serialize(database);
+            var output = XmlSerializerHelper.Serialize(database);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
 
@@ -38,9 +36,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var serializer = new Serializer();
-
-            var output = serializer.Serialize(database);
+            var output = XmlSerializerHelper.Serialize(database);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2012.xml", output);
 
