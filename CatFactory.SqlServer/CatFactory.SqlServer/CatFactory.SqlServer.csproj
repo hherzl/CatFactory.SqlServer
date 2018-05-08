@@ -2,18 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build00</Version>
+    <Version>1.0.0-beta-sun-build01</Version>
     <Authors>H. Herzl</Authors>
     <Company />
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build00 Version: Upgrade for .NET Core 2.0</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0-beta-sun-build01 Version: Core package update</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build00" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build01" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>
 

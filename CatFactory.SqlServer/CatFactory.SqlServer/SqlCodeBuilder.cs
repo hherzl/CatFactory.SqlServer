@@ -19,7 +19,7 @@ namespace CatFactory.SqlServer
         public override string FileExtension
             => "sql";
 
-        public override string Code
+        public string Code
         {
             get
             {

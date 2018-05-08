@@ -36,7 +36,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        public override string Code
+        public string Code
         {
             get
             {
