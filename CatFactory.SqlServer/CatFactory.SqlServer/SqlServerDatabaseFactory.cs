@@ -142,7 +142,10 @@ namespace CatFactory.SqlServer
 
         public virtual Database Import()
         {
-            var database = new Database();
+            var database = new Database
+            {
+                SupportTransactions = true
+            };
 
             database.Mappings = DatabaseTypeMapList.Definition;
 
@@ -315,9 +318,11 @@ namespace CatFactory.SqlServer
         {
             while (dataReader.Read())
             {
-                var column = new Column();
+                var column = new Column
+                {
+                    Name = string.Concat(dataReader["Column_name"])
+                };
 
-                column.Name = string.Concat(dataReader["Column_name"]);
                 column.Type = string.Concat(dataReader["Type"]);
                 column.Length = int.Parse(string.Concat(dataReader["Length"]));
                 column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
@@ -435,9 +440,11 @@ namespace CatFactory.SqlServer
 
                             while (dataReader.Read())
                             {
-                                var column = new Column();
+                                var column = new Column
+                                {
+                                    Name = string.Concat(dataReader["Column_name"])
+                                };
 
-                                column.Name = string.Concat(dataReader["Column_name"]);
                                 column.Type = string.Concat(dataReader["Type"]);
                                 column.Length = int.Parse(string.Concat(dataReader["Length"]));
                                 column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
@@ -502,9 +509,11 @@ namespace CatFactory.SqlServer
 
                             while (dataReader.Read())
                             {
-                                var procedureParameter = new Parameter();
+                                var procedureParameter = new Parameter
+                                {
+                                    Name = string.Concat(dataReader["Parameter_name"])
+                                };
 
-                                procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
                                 procedureParameter.Type = string.Concat(dataReader["Type"]);
                                 procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
                                 procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
@@ -557,9 +566,11 @@ namespace CatFactory.SqlServer
                             {
                                 while (dataReader.Read())
                                 {
-                                    var column = new Column();
+                                    var column = new Column
+                                    {
+                                        Name = string.Concat(dataReader["Column_name"])
+                                    };
 
-                                    column.Name = string.Concat(dataReader["Column_name"]);
                                     column.Type = string.Concat(dataReader["Type"]);
                                     column.Length = int.Parse(string.Concat(dataReader["Length"]));
                                     column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
@@ -594,9 +605,11 @@ namespace CatFactory.SqlServer
                             {
                                 while (dataReader.Read())
                                 {
-                                    var parameter = new Parameter();
+                                    var parameter = new Parameter
+                                    {
+                                        Name = string.Concat(dataReader["Parameter_name"])
+                                    };
 
-                                    parameter.Name = string.Concat(dataReader["Parameter_name"]);
                                     parameter.Type = string.Concat(dataReader["Type"]);
                                     parameter.Length = short.Parse(string.Concat(dataReader["Length"]));
                                     parameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
@@ -648,9 +661,11 @@ namespace CatFactory.SqlServer
 
                             while (dataReader.Read())
                             {
-                                var procedureParameter = new Parameter();
+                                var procedureParameter = new Parameter
+                                {
+                                    Name = string.Concat(dataReader["Parameter_name"])
+                                };
 
-                                procedureParameter.Name = string.Concat(dataReader["Parameter_name"]);
                                 procedureParameter.Type = string.Concat(dataReader["Type"]);
                                 procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
                                 procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
