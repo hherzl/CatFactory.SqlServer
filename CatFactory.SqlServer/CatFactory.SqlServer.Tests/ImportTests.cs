@@ -34,6 +34,8 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             Assert.True(database.Tables.Count > 0);
             Assert.True(database.FindTable("dbo.ChangeLog") == null);
+            Assert.True(database.Views.Count > 0);
+            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
         }
 
         [Fact]
@@ -58,6 +60,7 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             Assert.True(database.Tables.Count > 0);
             Assert.True(database.Views.Count > 0);
+            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
             Assert.True(database.StoredProcedures.Count > 0);
         }
 
@@ -83,7 +86,9 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             foreach (var table in database.Tables)
             {
-                Assert.False(table.Columns.Contains(new Column { Name = "SpatialLocation" }));
+                var flag = table.Columns.Contains(new Column { Name = "SpatialLocation" });
+
+                Assert.False(flag);
             }
         }
 
@@ -112,7 +117,9 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             foreach (var table in database.Tables)
             {
-                Assert.False(table.Columns.Contains(new Column { Name = "SpatialLocation" }));
+                var flag = table.Columns.Contains(new Column { Name = "SpatialLocation" });
+
+                Assert.False(flag);
             }
 
             Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
@@ -136,8 +143,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportWithoutLoggerStoreTablesTest()
         {
-            // Arrange
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
                 .ImportTables("server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
 
@@ -149,9 +155,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportNorthwindTables()
         {
-            // Arrange
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
                 .ImportTables("server=(local);database=Northwind;integrated security=yes;");
 
@@ -163,9 +167,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportNorthwindViews()
         {
-            // Arrange
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
                 .ImportViews("server=(local);database=Northwind;integrated security=yes;");
 
@@ -177,9 +179,7 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportNorthwindTablesAndViews()
         {
-            // Arrange
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
                 .ImportTablesAndViews("server=(local);database=Northwind;integrated security=yes;",
                 "dbo.Orders",

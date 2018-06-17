@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using CatFactory.Mapping;
 using Microsoft.Extensions.Logging;
 
 namespace CatFactory.SqlServer
 {
-    public class SqlServerDatabaseFactory : IDatabaseFactory
+    public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
         public static Database Import(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] exclusions)
         {
@@ -27,7 +28,7 @@ namespace CatFactory.SqlServer
 
         public static Database ImportTables(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] tables)
         {
-            var databaseFactory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString,
                 ImportSettings = new DatabaseImportSettings
@@ -60,7 +61,7 @@ namespace CatFactory.SqlServer
 
         public static Database ImportViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] views)
         {
-            var databaseFactory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString,
                 ImportSettings = new DatabaseImportSettings
@@ -93,7 +94,7 @@ namespace CatFactory.SqlServer
 
         public static Database ImportTablesAndViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] names)
         {
-            var databaseFactory = new SqlServerDatabaseFactory
+            var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = connectionString
             };
@@ -138,7 +139,20 @@ namespace CatFactory.SqlServer
         public DbConnection GetConnection()
             => new SqlConnection(ConnectionString);
 
-        public DatabaseImportSettings ImportSettings { get; set; } = new DatabaseImportSettings();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private DatabaseImportSettings m_importSettings;
+
+        public DatabaseImportSettings ImportSettings
+        {
+            get
+            {
+                return m_importSettings ?? (m_importSettings = new DatabaseImportSettings());
+            }
+            set
+            {
+                m_importSettings = value;
+            }
+        }
 
         public virtual Database Import()
         {
@@ -257,14 +271,12 @@ namespace CatFactory.SqlServer
                 {
                     while (dataReader.Read())
                     {
-                        var dbObj = new DbObject
+                        yield return new DbObject
                         {
                             Schema = dataReader.GetString(0),
                             Name = dataReader.GetString(1),
                             Type = dataReader.GetString(2)
                         };
-
-                        yield return dbObj;
                     }
                 }
             }
@@ -272,40 +284,57 @@ namespace CatFactory.SqlServer
 
         protected virtual IEnumerable<Table> GetTables(DbConnection connection, IEnumerable<DbObject> tables)
         {
-            foreach (var item in tables)
+            foreach (var dbObject in tables)
             {
                 using (var command = connection.CreateCommand())
                 {
                     var table = new Table
                     {
-                        Schema = item.Schema,
-                        Name = item.Name
+                        Schema = dbObject.Schema,
+                        Name = dbObject.Name
                     };
 
                     command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                    var queryResults = new List<QueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
-                        while (dataReader.Read())
+                        while (dataReader.NextResult())
                         {
-                            dataReader.NextResult();
+                            var queryResult = new QueryResult();
 
-                            if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
-                                AddColumnsToTable(table, dataReader);
-
-                            dataReader.NextResult();
-
-                            if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
+                            while (dataReader.Read())
                             {
-                                dataReader.Read();
-                                SetIdentityToTable(table, dataReader);
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
+
+                                var row = new Dictionary<string, object>();
+
+                                for (var i = 0; i < names.Count; i++)
+                                    row.Add(names[i], dataReader.GetValue(i));
+
+                                queryResult.Items.Add(row);
                             }
 
-                            dataReader.NextResult();
+                            queryResults.Add(queryResult);
+                        }
 
-                            if (dataReader.HasRows && dataReader.GetName(0) == "constraint_type")
-                                AddContraintsToTable(table, dataReader);
+                        foreach (var result in queryResults)
+                        {
+                            foreach (var item in result.Items)
+                            {
+                                if (item.ContainsKey("Column_name"))
+                                    AddColumn(table, item);
+                                else if (item.ContainsKey("Identity"))
+                                    SetIdentity(table, item);
+                                else if (item.ContainsKey("RowGuidCol"))
+                                    SetRowGuidCol(table, item);
+                                else if (item.ContainsKey("index_name"))
+                                    AddIndexToTable(table, item);
+                                else if (item.ContainsKey("constraint_type"))
+                                    AddContraintToTable(table, item);
+                            }
                         }
 
                         yield return table;
@@ -314,85 +343,138 @@ namespace CatFactory.SqlServer
             }
         }
 
-        protected virtual void AddColumnsToTable(Table table, DbDataReader dataReader)
+        protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
         {
-            while (dataReader.Read())
-            {
-                var column = new Column
-                {
-                    Name = string.Concat(dataReader["Column_name"])
-                };
-
-                column.Type = string.Concat(dataReader["Type"]);
-                column.Length = int.Parse(string.Concat(dataReader["Length"]));
-                column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
-                column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
-                column.Collation = string.Concat(dataReader["Collation"]);
-
-                if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                    continue;
-
-                table.Columns.Add(column);
-            }
+            storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
-        protected virtual void SetIdentityToTable(Table table, DbDataReader dataReader)
+        protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
         {
-            var identity = string.Concat(dataReader["Identity"]);
+            scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
+        {
+            tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        protected virtual void AddColumn(Table table, IDictionary<string, object> dictionary)
+        {
+            var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
+
+            if (!ImportSettings.ExclusionTypes.Contains(column.Type))
+                table.Columns.Add(column);
+        }
+
+        protected virtual void AddColumn(View view, IDictionary<string, object> dictionary)
+        {
+            var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
+
+            if (!ImportSettings.ExclusionTypes.Contains(column.Type))
+                view.Columns.Add(column);
+        }
+
+        protected virtual void AddColumn(TableFunction tableFunction, IDictionary<string, object> dictionary)
+        {
+            var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
+
+            if (!ImportSettings.ExclusionTypes.Contains(column.Type))
+                tableFunction.Columns.Add(column);
+        }
+
+        protected virtual void SetIdentity(Table table, IDictionary<string, object> dictionary)
+        {
+            var identity = string.Concat(dictionary["Identity"]);
 
             if (string.Compare(identity, "No identity column defined.", true) != 0)
-            {
-                table.Identity = new Identity(identity, Convert.ToInt32(dataReader["Seed"]), Convert.ToInt32(dataReader["Increment"]));
-            }
+                table.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
         }
 
-        protected virtual void AddContraintsToTable(Table table, DbDataReader dataReader)
+        protected virtual void SetIdentity(View view, IDictionary<string, object> dictionary)
         {
-            while (dataReader.Read())
+            var identity = string.Concat(dictionary["Identity"]);
+
+            if (string.Compare(identity, "No identity column defined.", true) != 0)
+                view.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+        }
+
+        protected virtual void SetIdentity(TableFunction tableFunction, IDictionary<string, object> dictionary)
+        {
+            var identity = string.Concat(dictionary["Identity"]);
+
+            if (string.Compare(identity, "No identity column defined.", true) != 0)
+                tableFunction.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+        }
+
+        protected virtual void SetRowGuidCol(Table table, IDictionary<string, object> dictionary)
+        {
+            table.RowGuidCol = new RowGuidCol
             {
-                if (string.Concat(dataReader["constraint_type"]).Contains("PRIMARY KEY"))
-                {
-                    var key = string.Concat(dataReader["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray();
+                Name = string.Concat(dictionary["RowGuidCol"])
+            };
+        }
 
-                    table.PrimaryKey = new PrimaryKey(key)
-                    {
-                        ConstraintName = string.Concat(dataReader["constraint_name"])
-                    };
-                }
-                else if (string.Concat(dataReader["constraint_type"]).Contains("FOREIGN KEY"))
-                {
-                    var key = dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+        protected virtual void SetRowGuidCol(View view, IDictionary<string, object> dictionary)
+        {
+            view.RowGuidCol = new RowGuidCol
+            {
+                Name = string.Concat(dictionary["RowGuidCol"])
+            };
+        }
 
-                    table.ForeignKeys.Add(new ForeignKey(key)
-                    {
-                        ConstraintName = string.Concat(dataReader["constraint_name"])
-                    });
-                }
-                else if (string.Concat(dataReader["constraint_keys"]).Contains("REFERENCES"))
-                {
-                    var value = string.Concat(dataReader["constraint_keys"]).Replace("REFERENCES", string.Empty);
+        protected virtual void AddIndexToTable(Table table, IDictionary<string, object> dictionary)
+        {
+            table.Indexes.Add(new Index
+            {
+                IndexName = string.Concat(dictionary["index_name"]),
+                IndexDescription = string.Concat(dictionary["index_description"]),
+                IndexKeys = string.Concat(dictionary["index_keys"])
+            });
+        }
 
-                    table.ForeignKeys[table.ForeignKeys.Count - 1].References = value.Substring(0, value.IndexOf("(")).Trim();
-                }
-                else if (string.Concat(dataReader["constraint_type"]).Contains("UNIQUE"))
-                {
-                    var key = dataReader["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+        protected virtual void AddContraintToTable(Table table, IDictionary<string, object> dictionary)
+        {
+            if (string.Concat(dictionary["constraint_type"]).Contains("PRIMARY KEY"))
+            {
+                var key = string.Concat(dictionary["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray();
 
-                    table.Uniques.Add(new Unique(key)
-                    {
-                        ConstraintName = string.Concat(dataReader["constraint_name"])
-                    });
-                }
-                else if (string.Concat(dataReader["constraint_type"]).Contains("CHECK"))
+                table.PrimaryKey = new PrimaryKey(key)
                 {
-                    var key = dataReader["constraint_keys"].ToString();
+                    ConstraintName = string.Concat(dictionary["constraint_name"])
+                };
+            }
+            else if (string.Concat(dictionary["constraint_type"]).Contains("FOREIGN KEY"))
+            {
+                var key = dictionary["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
 
-                    table.Checks.Add(new Check(key)
-                    {
-                        ConstraintName = string.Concat(dataReader["constraint_name"])
-                    });
-                }
+                table.ForeignKeys.Add(new ForeignKey(key)
+                {
+                    ConstraintName = string.Concat(dictionary["constraint_name"])
+                });
+            }
+            else if (string.Concat(dictionary["constraint_keys"]).Contains("REFERENCES"))
+            {
+                var value = string.Concat(dictionary["constraint_keys"]).Replace("REFERENCES", string.Empty);
+
+                table.ForeignKeys[table.ForeignKeys.Count - 1].References = value.Substring(0, value.IndexOf("(")).Trim();
+            }
+            else if (string.Concat(dictionary["constraint_type"]).Contains("UNIQUE"))
+            {
+                var key = dictionary["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+
+                table.Uniques.Add(new Unique(key)
+                {
+                    ConstraintName = string.Concat(dictionary["constraint_name"])
+                });
+            }
+            else if (string.Concat(dictionary["constraint_type"]).Contains("CHECK"))
+            {
+                var key = dictionary["constraint_keys"].ToString();
+
+                table.Checks.Add(new Check(key)
+                {
+                    ConstraintName = string.Concat(dictionary["constraint_name"])
+                });
             }
         }
 
@@ -403,63 +485,68 @@ namespace CatFactory.SqlServer
                 table.Type = "table";
 
                 foreach (var extendProperty in connection.GetMsDescriptionForDbObject(table))
-                {
                     table.Description = string.Concat(extendProperty.Value);
-                }
 
                 foreach (var column in table.Columns)
                 {
                     foreach (var extendProperty in connection.GetMsDescriptionForColumn(table, column))
-                    {
                         column.Description = string.Concat(extendProperty.Value);
-                    }
                 }
             }
         }
 
         protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
         {
-            foreach (var item in views)
+            foreach (var dbObject in views)
             {
                 using (var command = connection.CreateCommand())
                 {
+                    var view = new View
+                    {
+                        Schema = dbObject.Schema,
+                        Name = dbObject.Name
+                    };
+
                     command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                    var queryResults = new List<QueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
-                        while (dataReader.Read())
+                        while (dataReader.NextResult())
                         {
-                            var view = new View
-                            {
-                                Schema = item.Schema,
-                                Name = item.Name
-                            };
-
-                            dataReader.NextResult();
+                            var queryResult = new QueryResult();
 
                             while (dataReader.Read())
                             {
-                                var column = new Column
-                                {
-                                    Name = string.Concat(dataReader["Column_name"])
-                                };
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                                column.Type = string.Concat(dataReader["Type"]);
-                                column.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
-                                column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
-                                column.Collation = string.Concat(dataReader["Collation"]);
+                                var row = new Dictionary<string, object>();
 
-                                if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                                    continue;
+                                for (var i = 0; i < names.Count; i++)
+                                    row.Add(names[i], dataReader.GetValue(i));
 
-                                view.Columns.Add(column);
+                                queryResult.Items.Add(row);
                             }
 
-                            yield return view;
+                            queryResults.Add(queryResult);
                         }
+
+                        foreach (var result in queryResults)
+                        {
+                            foreach (var item in result.Items)
+                            {
+                                if (item.ContainsKey("Column_name"))
+                                    AddColumn(view, item);
+                                else if (item.ContainsKey("Identity"))
+                                    SetIdentity(view, item);
+                                else if (item.ContainsKey("RowGuidCol"))
+                                    SetRowGuidCol(view, item);
+                            }
+                        }
+
+                        yield return view;
                     }
                 }
             }
@@ -472,59 +559,64 @@ namespace CatFactory.SqlServer
                 view.Type = "view";
 
                 foreach (var extendProperty in connection.GetMsDescriptionForDbObject(view))
-                {
                     view.Description = string.Concat(extendProperty.Value);
-                }
 
                 foreach (var column in view.Columns)
                 {
                     foreach (var extendProperty in connection.GetMsDescriptionForColumn(view, column))
-                    {
                         column.Description = string.Concat(extendProperty.Value);
-                    }
                 }
             }
         }
 
         protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
         {
-            foreach (var item in storedProcedures)
+            foreach (var dbObject in storedProcedures)
             {
                 using (var command = connection.CreateCommand())
                 {
+                    var storedProcedure = new StoredProcedure
+                    {
+                        Schema = dbObject.Schema,
+                        Name = dbObject.Name
+                    };
+
                     command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                    var queryResults = new List<QueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
-                        while (dataReader.Read())
+                        while (dataReader.NextResult())
                         {
-                            var storedProcedure = new StoredProcedure
-                            {
-                                Schema = item.Schema,
-                                Name = item.Name
-                            };
-
-                            dataReader.NextResult();
+                            var queryResult = new QueryResult();
 
                             while (dataReader.Read())
                             {
-                                var procedureParameter = new Parameter
-                                {
-                                    Name = string.Concat(dataReader["Parameter_name"])
-                                };
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                                procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                procedureParameter.Collation = string.Concat(dataReader["Collation"]);
+                                var row = new Dictionary<string, object>();
 
-                                storedProcedure.Parameters.Add(procedureParameter);
+                                for (var i = 0; i < names.Count; i++)
+                                    row.Add(names[i], dataReader.GetValue(i));
+
+                                queryResult.Items.Add(row);
                             }
 
-                            yield return storedProcedure;
+                            queryResults.Add(queryResult);
                         }
+
+                        foreach (var result in queryResults)
+                        {
+                            foreach (var item in result.Items)
+                            {
+                                if (item.ContainsKey("Parameter_name"))
+                                    AddParameter(storedProcedure, item);
+                            }
+                        }
+
+                        yield return storedProcedure;
                     }
                 }
             }
@@ -535,93 +627,62 @@ namespace CatFactory.SqlServer
             if (ImportSettings.ImportMSDescription)
             {
                 foreach (var extendProperty in connection.GetMsDescriptionForDbObject(storedProcedure))
-                {
                     storedProcedure.Description = string.Concat(extendProperty.Value);
-                }
             }
         }
 
         protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
         {
-            foreach (var item in tableFunctions)
+            foreach (var dbObject in tableFunctions)
             {
                 using (var command = connection.CreateCommand())
                 {
+                    var tableFunction = new TableFunction
+                    {
+                        Schema = dbObject.Schema,
+                        Name = dbObject.Name
+                    };
+
                     command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                    var queryResults = new List<QueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
-                        while (dataReader.Read())
+                        while (dataReader.NextResult())
                         {
-                            var tableFunction = new TableFunction
+                            var queryResult = new QueryResult();
+
+                            while (dataReader.Read())
                             {
-                                Schema = item.Schema,
-                                Name = item.Name
-                            };
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                            dataReader.NextResult();
+                                var row = new Dictionary<string, object>();
 
-                            if (dataReader.HasRows && dataReader.GetName(0) == "Column_name")
-                            {
-                                while (dataReader.Read())
-                                {
-                                    var column = new Column
-                                    {
-                                        Name = string.Concat(dataReader["Column_name"])
-                                    };
+                                for (var i = 0; i < names.Count; i++)
+                                    row.Add(names[i], dataReader.GetValue(i));
 
-                                    column.Type = string.Concat(dataReader["Type"]);
-                                    column.Length = int.Parse(string.Concat(dataReader["Length"]));
-                                    column.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Prec"]));
-                                    column.Scale = string.Concat(dataReader["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dataReader["Scale"]));
-                                    column.Nullable = string.Compare(string.Concat(dataReader["Nullable"]), "yes", true) == 0 ? true : false;
-                                    column.Collation = string.Concat(dataReader["Collation"]);
-
-                                    if (ImportSettings.ExclusionTypes.Contains(column.Type))
-                                        continue;
-
-                                    tableFunction.Columns.Add(column);
-                                }
+                                queryResult.Items.Add(row);
                             }
 
-                            dataReader.NextResult();
-
-                            if (dataReader.HasRows && dataReader.GetName(0) == "Identity")
-                            {
-                                // todo: Add code to set identity
-                            }
-
-                            dataReader.NextResult();
-
-                            if (dataReader.HasRows && dataReader.GetName(0) == "RowGuidCol")
-                            {
-                                // todo: Add code to set row guid col
-                            }
-
-                            dataReader.NextResult();
-
-                            if (dataReader.HasRows && dataReader.GetName(0) == "Parameter_name")
-                            {
-                                while (dataReader.Read())
-                                {
-                                    var parameter = new Parameter
-                                    {
-                                        Name = string.Concat(dataReader["Parameter_name"])
-                                    };
-
-                                    parameter.Type = string.Concat(dataReader["Type"]);
-                                    parameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                    parameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                    parameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                    parameter.Collation = string.Concat(dataReader["Collation"]);
-
-                                    tableFunction.Parameters.Add(parameter);
-                                }
-                            }
-
-                            yield return tableFunction;
+                            queryResults.Add(queryResult);
                         }
+
+                        foreach (var result in queryResults)
+                        {
+                            foreach (var item in result.Items)
+                            {
+                                if (item.ContainsKey("Column_name"))
+                                    AddColumn(tableFunction, item);
+                                else if (item.ContainsKey("Identity"))
+                                    SetIdentity(tableFunction, item);
+                                else if (item.ContainsKey("Parameter_name"))
+                                    AddParameter(tableFunction, item);
+                            }
+                        }
+
+                        yield return tableFunction;
                     }
                 }
             }
@@ -632,51 +693,58 @@ namespace CatFactory.SqlServer
             if (ImportSettings.ImportMSDescription)
             {
                 foreach (var extendProperty in connection.GetMsDescriptionForDbObject(tableFunction))
-                {
                     tableFunction.Description = string.Concat(extendProperty.Value);
-                }
             }
         }
 
         protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
-            foreach (var item in scalarFunctions)
+            foreach (var dbObject in scalarFunctions)
             {
                 using (var command = connection.CreateCommand())
                 {
+                    var scalarFunction = new ScalarFunction
+                    {
+                        Schema = dbObject.Schema,
+                        Name = dbObject.Name
+                    };
+
                     command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", item.FullName);
+                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                    var queryResults = new List<QueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
-                        while (dataReader.Read())
+                        while (dataReader.NextResult())
                         {
-                            var scalarFunction = new ScalarFunction
-                            {
-                                Schema = item.Schema,
-                                Name = item.Name
-                            };
-
-                            dataReader.NextResult();
+                            var queryResult = new QueryResult();
 
                             while (dataReader.Read())
                             {
-                                var procedureParameter = new Parameter
-                                {
-                                    Name = string.Concat(dataReader["Parameter_name"])
-                                };
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                                procedureParameter.Type = string.Concat(dataReader["Type"]);
-                                procedureParameter.Length = short.Parse(string.Concat(dataReader["Length"]));
-                                procedureParameter.Prec = string.Concat(dataReader["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Prec"]));
-                                procedureParameter.ParamOrder = string.Concat(dataReader["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dataReader["Param_order"]));
-                                procedureParameter.Collation = string.Concat(dataReader["Collation"]);
+                                var row = new Dictionary<string, object>();
 
-                                scalarFunction.Parameters.Add(procedureParameter);
+                                for (var i = 0; i < names.Count; i++)
+                                    row.Add(names[i], dataReader.GetValue(i));
+
+                                queryResult.Items.Add(row);
                             }
 
-                            yield return scalarFunction;
+                            queryResults.Add(queryResult);
                         }
+
+                        foreach (var result in queryResults)
+                        {
+                            foreach (var item in result.Items)
+                            {
+                                if (item.ContainsKey("Parameter_name"))
+                                    AddParameter(scalarFunction, item);
+                            }
+                        }
+
+                        yield return scalarFunction;
                     }
                 }
             }
@@ -687,9 +755,7 @@ namespace CatFactory.SqlServer
             if (ImportSettings.ImportMSDescription)
             {
                 foreach (var extendProperty in connection.GetMsDescriptionForDbObject(scalarFunction))
-                {
                     scalarFunction.Description = string.Concat(extendProperty.Value);
-                }
             }
         }
     }
