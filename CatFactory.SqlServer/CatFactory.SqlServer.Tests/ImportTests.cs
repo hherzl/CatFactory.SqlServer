@@ -11,7 +11,7 @@ namespace CatFactory.SqlServer.Tests
         public void ImportStoreDatabaseTest()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
             // Act
             var database = SqlServerDatabaseFactory
@@ -25,7 +25,7 @@ namespace CatFactory.SqlServer.Tests
         public void ImportNorthwindDatabaseTest()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
             // Act
             var database = SqlServerDatabaseFactory
@@ -34,6 +34,8 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             Assert.True(database.Tables.Count > 0);
             Assert.True(database.FindTable("dbo.ChangeLog") == null);
+            Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
             Assert.True(database.Views.Count > 0);
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
         }
@@ -42,7 +44,7 @@ namespace CatFactory.SqlServer.Tests
         public void FullImportNorthwindDatabaseTest()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
                 ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;",
@@ -59,6 +61,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count > 0);
+            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
+            Assert.True(database.FindTable("dbo.Orders").ForeignKeys.Count > 0);
             Assert.True(database.Views.Count > 0);
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
             Assert.True(database.StoredProcedures.Count > 0);
@@ -68,7 +73,7 @@ namespace CatFactory.SqlServer.Tests
         public void ImportAdventureWorksDatabase()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
             // todo: add mapping for custom types
             var databaseFactory = new SqlServerDatabaseFactory(logger)
@@ -76,7 +81,7 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
-                    ExclusionTypes = new List<string> { "geography" }
+                    ExclusionTypes = { "geography" }
                 }
             };
 
@@ -96,7 +101,7 @@ namespace CatFactory.SqlServer.Tests
         public void FullImportAdventureWorksDatabase()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
             // todo: add mapping for custom types
             var databaseFactory = new SqlServerDatabaseFactory(logger)
@@ -107,7 +112,7 @@ namespace CatFactory.SqlServer.Tests
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true,
-                    ExclusionTypes = new List<string> { "geography" }
+                    ExclusionTypes = { "geography" }
                 }
             };
 
@@ -129,7 +134,7 @@ namespace CatFactory.SqlServer.Tests
         public void ImportWithLoggerStoreTablesTest()
         {
             // Arrange
-            var logger = LoggerMocker.GetLogger<SqlServerDatabaseFactory>();
+            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
             // Act
             var database = SqlServerDatabaseFactory
@@ -137,6 +142,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count == 2);
+            Assert.True(database.FindTable("Sales.Order").Columns.Count > 0);
+            Assert.True(database.FindTable("Sales.Order").PrimaryKey != null);
+            Assert.True(database.FindTable("Sales.Order").ForeignKeys.Count > 0);
             Assert.True(database.Views.Count == 0);
         }
 
@@ -189,6 +197,8 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count == 2);
+            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
             Assert.True(database.Views.Count == 2);
         }
     }

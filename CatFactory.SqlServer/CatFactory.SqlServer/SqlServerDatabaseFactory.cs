@@ -158,12 +158,9 @@ namespace CatFactory.SqlServer
         {
             var database = new Database
             {
-                SupportTransactions = true
+                SupportTransactions = true,
+                Mappings = DatabaseTypeMapList.Definition
             };
-
-            database.Mappings = DatabaseTypeMapList.Definition;
-
-            var extendPropertyRepository = new ExtendPropertyRepository();
 
             using (var connection = GetConnection())
             {
@@ -337,25 +334,12 @@ namespace CatFactory.SqlServer
                             }
                         }
 
+                        SetConstraintsFromConstraintDetails(table);
+
                         yield return table;
                     }
                 }
             }
-        }
-
-        protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
-        {
-            storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
-        }
-
-        protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
-        {
-            scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
-        }
-
-        protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
-        {
-            tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         protected virtual void AddColumn(Table table, IDictionary<string, object> dictionary)
@@ -380,6 +364,21 @@ namespace CatFactory.SqlServer
 
             if (!ImportSettings.ExclusionTypes.Contains(column.Type))
                 tableFunction.Columns.Add(column);
+        }
+
+        protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
+        {
+            storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
+        {
+            scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
+        {
+            tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         protected virtual void SetIdentity(Table table, IDictionary<string, object> dictionary)
@@ -434,47 +433,64 @@ namespace CatFactory.SqlServer
 
         protected virtual void AddContraintToTable(Table table, IDictionary<string, object> dictionary)
         {
-            if (string.Concat(dictionary["constraint_type"]).Contains("PRIMARY KEY"))
+            table.ConstraintDetails.Add(new ConstraintDetail
             {
-                var key = string.Concat(dictionary["constraint_keys"]).Split(',').Select(item => item.Trim()).ToArray();
+                ConstraintType = string.Concat(dictionary["constraint_type"]),
+                ConstraintName = string.Concat(dictionary["constraint_name"]),
+                DeleteAction = string.Concat(dictionary["delete_action"]),
+                UpdateAction = string.Concat(dictionary["update_action"]),
+                StatusEnabled = string.Concat(dictionary["status_enabled"]),
+                StatusForReplication = string.Concat(dictionary["status_for_replication"]),
+                ConstraintKeys = string.Concat(dictionary["constraint_keys"])
+            });
+        }
 
-                table.PrimaryKey = new PrimaryKey(key)
+        protected virtual void SetConstraintsFromConstraintDetails(Table table)
+        {
+            foreach (var constraintDetail in table.ConstraintDetails)
+            {
+                if (constraintDetail.ConstraintType.Contains("PRIMARY KEY"))
                 {
-                    ConstraintName = string.Concat(dictionary["constraint_name"])
-                };
-            }
-            else if (string.Concat(dictionary["constraint_type"]).Contains("FOREIGN KEY"))
-            {
-                var key = dictionary["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
+                    var key = string.Concat(constraintDetail.ConstraintKeys).Split(',').Select(item => item.Trim()).ToArray();
 
-                table.ForeignKeys.Add(new ForeignKey(key)
+                    table.PrimaryKey = new PrimaryKey(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    };
+                }
+                else if (constraintDetail.ConstraintType.Contains("FOREIGN KEY"))
                 {
-                    ConstraintName = string.Concat(dictionary["constraint_name"])
-                });
-            }
-            else if (string.Concat(dictionary["constraint_keys"]).Contains("REFERENCES"))
-            {
-                var value = string.Concat(dictionary["constraint_keys"]).Replace("REFERENCES", string.Empty);
+                    var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
-                table.ForeignKeys[table.ForeignKeys.Count - 1].References = value.Substring(0, value.IndexOf("(")).Trim();
-            }
-            else if (string.Concat(dictionary["constraint_type"]).Contains("UNIQUE"))
-            {
-                var key = dictionary["constraint_keys"].ToString().Split(',').Select(item => item.Trim()).ToArray();
-
-                table.Uniques.Add(new Unique(key)
+                    table.ForeignKeys.Add(new ForeignKey(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    });
+                }
+                else if (constraintDetail.ConstraintKeys.Contains("REFERENCES"))
                 {
-                    ConstraintName = string.Concat(dictionary["constraint_name"])
-                });
-            }
-            else if (string.Concat(dictionary["constraint_type"]).Contains("CHECK"))
-            {
-                var key = dictionary["constraint_keys"].ToString();
+                    var value = constraintDetail.ConstraintKeys.Replace("REFERENCES", string.Empty);
 
-                table.Checks.Add(new Check(key)
+                    table.ForeignKeys.Last().References = value.Substring(0, value.IndexOf("(")).Trim();
+                }
+                else if (constraintDetail.ConstraintType.Contains("UNIQUE"))
                 {
-                    ConstraintName = string.Concat(dictionary["constraint_name"])
-                });
+                    var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
+
+                    table.Uniques.Add(new Unique(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    });
+                }
+                else if (constraintDetail.ConstraintType.Contains("CHECK"))
+                {
+                    var key = constraintDetail.ConstraintKeys.ToString();
+
+                    table.Checks.Add(new Check(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    });
+                }
             }
         }
 
