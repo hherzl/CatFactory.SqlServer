@@ -93,7 +93,7 @@ namespace CatFactory.SqlServer
                 {
                     DatabaseType = "image",
                     ClrFullNameType = typeof(byte[]).FullName,
-                    AllowClrNullable = true,
+                    AllowClrNullable = false,
                     ClrAliasType = "byte[]",
                     DbTypeEnum = DbType.Binary
                 },

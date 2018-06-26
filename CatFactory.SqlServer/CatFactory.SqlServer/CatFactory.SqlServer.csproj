@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build05</Version>
+    <Version>1.0.0-beta-sun-build06</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build05 Version: Fix for constraint details addition for tables</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0-beta-sun-build06 Version: Fix for database type map list (image =&gt; byte[])</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
   </PropertyGroup>
 

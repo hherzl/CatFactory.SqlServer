@@ -12,7 +12,7 @@ namespace CatFactory.SqlServer.Tests
                 var database = new Database()
                 {
                     Name = "StoreMock",
-                    Tables = new List<Table>()
+                    Tables = new List<Table>
                     {
                         new Table
                         {
