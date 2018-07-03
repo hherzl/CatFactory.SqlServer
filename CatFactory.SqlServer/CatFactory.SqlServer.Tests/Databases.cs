@@ -9,16 +9,18 @@ namespace CatFactory.SqlServer.Tests
         {
             get
             {
-                var database = new Database()
+                var database = new Database
                 {
                     Name = "StoreMock",
-                    Tables = new List<Table>
+                    DefaultSchema = "dbo",
+                    Mappings = DatabaseTypeMapList.Definition,
+                    Tables =
                     {
                         new Table
                         {
                             Schema = "dbo",
                             Name = "EventLog",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "EventLogID", Type = "int" },
                                 new Column { Name = "EventType", Type = "int" },
@@ -32,7 +34,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "HumanResources",
                             Name = "Employee",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "EmployeeID", Type = "int" },
                                 new Column { Name = "FirstName", Type = "varchar", Length = 25 },
@@ -46,7 +48,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Production",
                             Name = "ProductCategory",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "ProductCategoryID", Type = "int" },
                                 new Column { Name = "ProductCategoryName", Type = "varchar", Length = 100 },
@@ -57,7 +59,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Production",
                             Name = "Product",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "ProductID", Type = "int" },
                                 new Column { Name = "ProductName", Type = "varchar", Length = 100 },
@@ -70,7 +72,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Production",
                             Name = "ProductInventory",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "ProductInventoryID", Type = "int" },
                                 new Column { Name = "ProductID", Type = "int" },
@@ -83,7 +85,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Sales",
                             Name = "Customer",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "CustomerID", Type = "int" },
                                 new Column { Name = "CompanyName", Type = "varchar", Length = 100, Nullable = true },
@@ -95,7 +97,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Sales",
                             Name = "Shipper",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "ShipperID", Type = "int" },
                                 new Column { Name = "CompanyName", Type = "varchar", Length = 100, Nullable = true },
@@ -107,7 +109,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Sales",
                             Name = "Order",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "OrderID", Type = "int" },
                                 new Column { Name = "OrderDate", Type = "datetime" },
@@ -122,7 +124,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Sales",
                             Name = "OrderDetail",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "OrderID", Type = "int" },
                                 new Column { Name = "ProductID", Type = "int" },
@@ -140,7 +142,7 @@ namespace CatFactory.SqlServer.Tests
                         {
                             Schema = "Sales",
                             Name = "OrderSummary",
-                            Columns = new List<Column>
+                            Columns =
                             {
                                 new Column { Name = "OrderID", Type = "int" },
                                 new Column { Name = "OrderDate", Type = "datetime" },

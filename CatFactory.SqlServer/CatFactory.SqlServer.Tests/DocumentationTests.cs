@@ -15,26 +15,20 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
                 ImportSettings = new DatabaseImportSettings
                 {
-                    ImportMSDescription = true,
+                    ExtendedProperties = { "MS_Description" },
                     ExclusionTypes = new List<string> { "geography" }
                 }
             };
-            
+
             // Act
             var database = databaseFactory.Import();
-
             var table = database.FindTable("Production.Product");
-
             var view = database.Views.First(item => item.FullName == "HumanResources.vEmployee");
 
             // Assert
             Assert.True(table.Description != null);
             Assert.True(table.Columns.First().Description != null);
-
             Assert.True(view.Description != null);
-
-            // todo: Fix this assert
-            // Assert.True(view.Columns.First().Description != null);
         }
 
         [Fact]
@@ -46,22 +40,20 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
             };
 
-            databaseFactory.ImportSettings.ImportMSDescription = true;
-
             // Act
             var database = databaseFactory.Import();
 
             var table = database.FindTable("dbo.Products");
 
-            databaseFactory.DropMsDescription(table);
+            databaseFactory.DropExtendedProperty(table, "MS_Description");
 
-            databaseFactory.AddMsDescription(table, "Test description");
+            databaseFactory.AddExtendedProperty(table, "MS_Description", "Test description");
 
             var column = table.Columns.FirstOrDefault();
 
-            databaseFactory.DropMsDescription(table, column);
+            databaseFactory.DropExtendedProperty(table, column, "MS_Description");
 
-            databaseFactory.AddMsDescription(table, column, "Primary key");
+            databaseFactory.AddExtendedProperty(table, column, "MS_Description", "Primary key");
 
             // Assert
             Assert.True(table.Description == "Test description");
@@ -77,18 +69,16 @@ namespace CatFactory.SqlServer.Tests
                 ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
             };
 
-            databaseFactory.ImportSettings.ImportMSDescription = true;
-
             // Act
             var database = databaseFactory.Import();
 
             var table = database.FindTable("dbo.Products");
 
-            databaseFactory.UpdateMsDescription(table, "Test update description");
+            databaseFactory.UpdateExtendedProperty(table, "MS_Description", "Test update description");
 
             var column = table.Columns.FirstOrDefault();
 
-            databaseFactory.UpdateMsDescription(table, column, "PK (updated)");
+            databaseFactory.UpdateExtendedProperty(table, column, "MS_Description", "PK (updated)");
 
             // Assert
             Assert.True(table.Description == "Test update description");

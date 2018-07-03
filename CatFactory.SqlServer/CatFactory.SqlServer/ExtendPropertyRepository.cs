@@ -10,9 +10,9 @@ namespace CatFactory.SqlServer
         {
             using (var command = connection.CreateCommand())
             {
-                var parameters = new List<string>()
+                var parameters = new List<string>
                 {
-                    string.IsNullOrEmpty(name) ? "default" : name, level0type, level0name, level1type, level1name, level2type, level2name
+                    string.IsNullOrEmpty(name) ? "default" : string.Format("'{0}'", name), level0type, level0name, level1type, level1name, level2type, level2name
                 };
 
                 var commandText = string.Format("select objtype, objname, name, value from fn_listextendedproperty ({0})", string.Join(",", parameters));
@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer
         {
             using (var command = connection.CreateCommand())
             {
-                var parameters = new List<string>()
+                var parameters = new List<string>
                 {
                     string.Format("@name = N'{0}'", name),
                     string.Format("@value = N'{0}'", value)
@@ -66,7 +66,7 @@ namespace CatFactory.SqlServer
         {
             using (var command = connection.CreateCommand())
             {
-                var parameters = new List<string>()
+                var parameters = new List<string>
                 {
                     string.Format("@name = N'{0}'", name),
                     string.Format("@value = N'{0}'", value)
@@ -92,7 +92,7 @@ namespace CatFactory.SqlServer
         {
             using (var command = connection.CreateCommand())
             {
-                var parameters = new List<string>()
+                var parameters = new List<string>
                 {
                     string.Format("@name = N'{0}'", name)
                 };

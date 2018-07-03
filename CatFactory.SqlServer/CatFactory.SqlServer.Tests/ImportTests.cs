@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CatFactory.Mapping;
+﻿using System.Linq;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -36,6 +34,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.ChangeLog") == null);
             Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
+            Assert.True(database.FindTable("dbo.Products").ForeignKeys.Count > 0);
             Assert.True(database.Views.Count > 0);
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
         }
@@ -91,7 +90,7 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             foreach (var table in database.Tables)
             {
-                var flag = table.Columns.Contains(new Column { Name = "SpatialLocation" });
+                var flag = table.Columns.FirstOrDefault(item => item.Name == "SpatialLocation") == null ? false : true;
 
                 Assert.False(flag);
             }
@@ -112,6 +111,7 @@ namespace CatFactory.SqlServer.Tests
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true,
+                    ExtendedProperties = { "MS_Description" },
                     ExclusionTypes = { "geography" }
                 }
             };
@@ -122,10 +122,15 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             foreach (var table in database.Tables)
             {
-                var flag = table.Columns.Contains(new Column { Name = "SpatialLocation" });
+                var flag = table.Columns.FirstOrDefault(item => item.Name == "SpatialLocation") == null ? false : true;
 
                 Assert.False(flag);
             }
+
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").Columns.Count > 0);
+            Assert.False(string.IsNullOrEmpty(database.FindTable("Sales.SalesOrderHeader").Columns.First().Description));
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").PrimaryKey != null);
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").ForeignKeys.Count > 0);
 
             Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CatFactory.SqlServer
@@ -9,11 +10,11 @@ namespace CatFactory.SqlServer
         {
             ImportCommandText = @"
 				select
-					schemas.name as [schema_name],
-					objects.name as [object_name],
+					[schemas].[name] as [schema_name],
+					[objects].[name] as [object_name],
 					[type_desc] as [object_type]
 				from
-					sys.objects objects
+					[sys].[objects] objects
 					inner join [sys].[schemas] schemas on [objects].[schema_id] = [schemas].[schema_id]
 				where
 					[type] in ('FN', 'IF', 'TF', 'U', 'V', 'T', 'P')
@@ -23,6 +24,8 @@ namespace CatFactory.SqlServer
 					[object_name]
 			";
         }
+
+        public string Name { get; set; }
 
         public string ImportCommandText { get; set; }
 
@@ -36,7 +39,8 @@ namespace CatFactory.SqlServer
 
         public bool ImportTableFunctions { get; set; }
 
-        public bool ImportMSDescription { get; set; }
+        [Obsolete("Add extended properties in order to retrieve description")]
+        public bool ImportMSDescription { get; set; } = true;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_exclusions;
@@ -65,6 +69,21 @@ namespace CatFactory.SqlServer
             set
             {
                 m_exclusionTypes = value;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_extendedProperties;
+
+        public List<string> ExtendedProperties
+        {
+            get
+            {
+                return m_extendedProperties ?? (m_extendedProperties = new List<string>());
+            }
+            set
+            {
+                m_extendedProperties = value;
             }
         }
     }
