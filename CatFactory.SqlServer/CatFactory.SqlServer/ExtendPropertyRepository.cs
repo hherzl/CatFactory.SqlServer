@@ -12,7 +12,13 @@ namespace CatFactory.SqlServer
             {
                 var parameters = new List<string>
                 {
-                    string.IsNullOrEmpty(name) ? "default" : string.Format("'{0}'", name), level0type, level0name, level1type, level1name, level2type, level2name
+                    string.IsNullOrEmpty(name) ? "default" : string.Format("'{0}'", name),
+                    string.IsNullOrEmpty(level0type) ? "default" : string.Format("'{0}'", level0type),
+                    string.IsNullOrEmpty(level0name) ? "default" : string.Format("'{0}'", level0name),
+                    string.IsNullOrEmpty(level1type) ? "default" : string.Format("'{0}'", level1type),
+                    string.IsNullOrEmpty(level1name) ? "default" : string.Format("'{0}'", level1name),
+                    string.IsNullOrEmpty(level2type) || level2type == "default" ? "default" : string.Format("'{0}'", level2type),
+                    string.IsNullOrEmpty(level2name) || level2name == "default" ? "default" : string.Format("'{0}'", level2name)
                 };
 
                 var commandText = string.Format("select objtype, objname, name, value from fn_listextendedproperty ({0})", string.Join(",", parameters));

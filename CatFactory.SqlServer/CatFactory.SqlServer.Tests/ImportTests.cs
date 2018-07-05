@@ -46,9 +46,9 @@ namespace CatFactory.SqlServer.Tests
             var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
-                ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;",
                 ImportSettings = new DatabaseImportSettings
                 {
+                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;",
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true
@@ -77,9 +77,9 @@ namespace CatFactory.SqlServer.Tests
             // todo: add mapping for custom types
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
-                ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                 ImportSettings = new DatabaseImportSettings
                 {
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     ExclusionTypes = { "geography" }
                 }
             };
@@ -105,9 +105,9 @@ namespace CatFactory.SqlServer.Tests
             // todo: add mapping for custom types
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
-                ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
                 ImportSettings = new DatabaseImportSettings
                 {
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true,

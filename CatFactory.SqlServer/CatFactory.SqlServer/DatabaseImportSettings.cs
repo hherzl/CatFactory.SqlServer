@@ -27,6 +27,8 @@ namespace CatFactory.SqlServer
 
         public string Name { get; set; }
 
+        public string ConnectionString { get; set; }
+
         public string ImportCommandText { get; set; }
 
         public bool ImportTables { get; set; } = true;

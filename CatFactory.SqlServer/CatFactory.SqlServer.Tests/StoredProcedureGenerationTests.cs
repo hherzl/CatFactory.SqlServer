@@ -10,7 +10,10 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                ConnectionString = "server=(local);database=Store;integrated security=yes;"
+                ImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;"
+                }
             };
 
             // Act
