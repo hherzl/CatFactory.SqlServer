@@ -208,5 +208,57 @@ namespace CatFactory.SqlServer
                 repository.DropExtendedProperty(connection, name, level0type, level0name, level1type, level1name, level2type, level2name);
             }
         }
+
+        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        {
+            var repository = new ExtendPropertyRepository();
+
+            var level0type = "schema";
+            var level0name = view.Schema;
+            var level1type = "view";
+            var level1name = view.Name;
+            var level2type = string.Empty;
+            var level2name = string.Empty;
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = repository.GetExtendProperties(connection, name, level0type, level0name, level1type, level1name, level2type, level2name).FirstOrDefault();
+
+                if (extendedProperty == null)
+                    repository.AddExtendedProperty(connection, name, value, level0type, level0name, level1type, level1name, level2type, level2name);
+                else
+                    repository.UpdateExtendedProperty(connection, name, value, level0type, level0name, level1type, level1name, level2type, level2name);
+
+                view.Description = value;
+            }
+        }
+
+        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        {
+            var repository = new ExtendPropertyRepository();
+
+            var level0type = "schema";
+            var level0name = view.Schema;
+            var level1type = "view";
+            var level1name = view.Name;
+            var level2type = "column";
+            var level2name = column.Name;
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = repository.GetExtendProperties(connection, name, level0type, level0name, level1type, level1name, level2type, level2name).FirstOrDefault();
+
+                if (extendedProperty == null)
+                    repository.AddExtendedProperty(connection, name, value, level0type, level0name, level1type, level1name, level2type, level2name);
+                else
+                    repository.UpdateExtendedProperty(connection, name, value, level0type, level0name, level1type, level1name, level2type, level2name);
+
+                column.Description = value;
+            }
+        }
     }
 }
