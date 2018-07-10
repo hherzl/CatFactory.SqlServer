@@ -181,6 +181,8 @@ namespace CatFactory.SqlServer
 
                 database.Name = connection.Database;
 
+                AddUserDefinedDataTypes(database, connection);
+
                 var dbObjects = GetDbObjects(connection).ToList();
 
                 foreach (var dbObject in dbObjects)
@@ -298,6 +300,65 @@ namespace CatFactory.SqlServer
             }
 
             return database;
+        }
+
+        protected virtual void AddUserDefinedDataTypes(Database database, DbConnection connection)
+        {
+            var cmdText = " select name, system_type_id, user_type_id, collation_name, is_nullable, is_user_defined from sys.types ";
+
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.Connection = connection;
+                cmd.CommandText = cmdText;
+
+                var types = new[]
+                {
+                        new
+                        {
+                            name = string.Empty,
+                            systemTypeId = default(byte),
+                            userTypeId = 0,
+                            collationName = string.Empty,
+                            isNullable = false,
+                            isUserDefined = false
+                        }
+                    }.ToList();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        types.Add(new
+                        {
+                            name = reader.GetString(0),
+                            systemTypeId = reader.GetByte(1),
+                            userTypeId = reader.GetInt32(2),
+                            collationName = reader[3] is DBNull ? null : reader.GetString(3),
+                            isNullable = reader.GetBoolean(4),
+                            isUserDefined = reader.GetBoolean(5)
+                        });
+                    }
+                }
+
+                foreach (var type in types)
+                {
+                    if (type.isUserDefined)
+                    {
+                        var parent = types.FirstOrDefault(item => !item.isUserDefined && item.systemTypeId == type.systemTypeId);
+
+                        if (parent != null)
+                        {
+                            database.Mappings.Add(new DatabaseTypeMap
+                            {
+                                DatabaseType = type.name,
+                                Collation = type.collationName,
+                                IsUserDefined = type.isUserDefined,
+                                ParentDatabaseType = parent.name
+                            });
+                        }
+                    }
+                }
+            }
         }
 
         protected virtual IEnumerable<DbObject> GetDbObjects(DbConnection connection)
