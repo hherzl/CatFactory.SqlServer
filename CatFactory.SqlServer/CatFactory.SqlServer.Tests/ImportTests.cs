@@ -8,12 +8,9 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportStoreDatabaseTest()
         {
-            // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(logger, "server=(local);database=Store;integrated security=yes;");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -22,12 +19,9 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportNorthwindDatabaseTest()
         {
-            // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(logger, "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -43,10 +37,9 @@ namespace CatFactory.SqlServer.Tests
         public void FullImportNorthwindDatabaseTest()
         {
             // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-            var databaseFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
             {
-                ImportSettings = new DatabaseImportSettings
+                DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;",
                     ImportStoredProcedures = true,
@@ -72,12 +65,10 @@ namespace CatFactory.SqlServer.Tests
         public void ImportAdventureWorksDatabase()
         {
             // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-
             // todo: add mapping for custom types
-            var databaseFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
             {
-                ImportSettings = new DatabaseImportSettings
+                DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     ExclusionTypes = { "geography" }
@@ -100,12 +91,10 @@ namespace CatFactory.SqlServer.Tests
         public void FullImportAdventureWorksDatabase()
         {
             // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-
             // todo: add mapping for custom types
-            var databaseFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
             {
-                ImportSettings = new DatabaseImportSettings
+                DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
                     ImportStoredProcedures = true,
@@ -138,12 +127,9 @@ namespace CatFactory.SqlServer.Tests
         [Fact]
         public void ImportWithLoggerStoreTablesTest()
         {
-            // Arrange
-            var logger = LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
-
-            // Act
+            // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .ImportTables(logger, "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
+                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
