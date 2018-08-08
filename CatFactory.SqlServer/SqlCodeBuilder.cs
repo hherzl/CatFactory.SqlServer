@@ -30,9 +30,7 @@ namespace CatFactory.SqlServer
                 foreach (var schema in schemas)
                 {
                     if (string.IsNullOrEmpty(schema))
-                    {
                         continue;
-                    }
 
                     output.AppendFormat("create schema {0}", schema);
                     output.AppendLine();
@@ -45,7 +43,7 @@ namespace CatFactory.SqlServer
 
                 foreach (var table in Database.Tables)
                 {
-                    output.AppendFormat("create table {0}", table.GetObjectName());
+                    output.AppendFormat("create table {0}", Database.GetObjectName(table));
                     output.AppendLine();
 
                     output.AppendLine("(");
@@ -54,24 +52,18 @@ namespace CatFactory.SqlServer
                     {
                         var column = table.Columns[i];
 
-                        output.AppendFormat("{0}{1} {2}", Indent(1), column.GetObjectName(), column.Type);
+                        output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
 
                         if (column.Length > 0)
-                        {
                             output.AppendFormat("({0})", column.Prec > 0 ? string.Format("{0}, {1}", column.Prec, column.Scale) : column.Length.ToString());
-                        }
 
                         output.AppendFormat(" {0}", column.Nullable ? "null" : "not null");
 
                         if (table.Identity != null && table.Identity.Name == column.Name)
-                        {
                             output.AppendFormat(" identity({0}, {1})", table.Identity.Seed, table.Identity.Increment);
-                        }
 
                         if (i < table.Columns.Count - 1)
-                        {
                             output.Append(",");
-                        }
 
                         output.AppendLine();
                     }
@@ -86,7 +78,7 @@ namespace CatFactory.SqlServer
                     {
                         var constraintName = Database.NamingConvention.GetPrimaryKeyConstraintName(table, table.PrimaryKey.Key.ToArray());
 
-                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", table.GetObjectName(), constraintName, string.Join(", ", table.PrimaryKey.Key));
+                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", table.PrimaryKey.Key));
                         output.AppendLine();
 
                         output.AppendFormat("go");
@@ -99,7 +91,7 @@ namespace CatFactory.SqlServer
                     {
                         var constraintName = Database.NamingConvention.GetUniqueConstraintName(table, unique.Key.ToArray());
 
-                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", table.GetObjectName(), constraintName, string.Join(", ", unique.Key));
+                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", unique.Key));
                         output.AppendLine();
 
                         output.AppendFormat("go");

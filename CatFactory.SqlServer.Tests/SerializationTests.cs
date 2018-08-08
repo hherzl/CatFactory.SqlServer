@@ -26,7 +26,7 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Store;
 
             // Act
-            var output = JsonConvert.SerializeObject(database);
+            var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.json", output);
 
@@ -74,7 +74,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var output = JsonConvert.SerializeObject(database);
+            var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
             TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.json", output);
 

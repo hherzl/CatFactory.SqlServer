@@ -3,9 +3,9 @@
 namespace CatFactory.SqlServer
 {
     [DebuggerDisplay("ObjType={ObjType}, ObjName={ObjName}, Name={Name}")]
-    public class ExtendProperty
+    public class ExtendedProperty
     {
-        public ExtendProperty()
+        public ExtendedProperty()
         {
         }
 

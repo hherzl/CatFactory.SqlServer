@@ -8,7 +8,10 @@ namespace CatFactory.SqlServer
     {
         public static EntityResult<TModel> DefineEntity<TModel>(this Database database, string schema, string name, TModel model)
         {
-            var result = new EntityResult<TModel> { Model = model };
+            var result = new EntityResult<TModel>
+            {
+                Model = model
+            };
 
             result.Table = new Table
             {
@@ -29,6 +32,7 @@ namespace CatFactory.SqlServer
             if (memberExpression == null)
             {
                 var unary = (UnaryExpression)selector.Body;
+
                 memberExpression = unary.Operand as MemberExpression;
             }
 

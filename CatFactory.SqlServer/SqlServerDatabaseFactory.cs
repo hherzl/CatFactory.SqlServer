@@ -75,7 +75,8 @@ namespace CatFactory.SqlServer
             {
                 DefaultSchema = "dbo",
                 SupportTransactions = true,
-                Mappings = DatabaseTypeMapList.Definition
+                Mappings = DatabaseTypeMapList.Definition,
+                NamingConvention = new SqlServerDatabaseNamingConvention()
             };
 
             using (var connection = GetConnection())

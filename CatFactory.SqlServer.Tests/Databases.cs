@@ -10,6 +10,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 Name = "StoreMock",
                 DefaultSchema = "dbo",
+                NamingConvention = new SqlServerDatabaseNamingConvention(),
                 Mappings = DatabaseTypeMapList.Definition,
                 Tables =
                 {
@@ -25,7 +26,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "Message", Type = "varchar" },
                             new Column { Name = "EntryDate", Type = "datetime" }
                         },
-                        Identity = new Identity { Name = "EventLogID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("EventLogID", 1, 1)
                     },
                     new Table
                     {
@@ -39,7 +40,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "LastName", Type = "varchar", Length = 25 },
                             new Column { Name = "BirthDate", Type = "datetime" }
                         },
-                        Identity = new Identity { Name = "EmployeeID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("EmployeeID", 1, 1)
                     },
                     new Table
                     {
@@ -50,7 +51,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "ProductCategoryID", Type = "int" },
                             new Column { Name = "ProductCategoryName", Type = "varchar", Length = 100 },
                         },
-                        Identity = new Identity { Name = "ProductCategoryID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("ProductCategoryID", 1, 1)
                     },
                     new Table
                     {
@@ -63,7 +64,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "ProductCategoryID", Type = "int" },
                             new Column { Name = "Description", Type = "varchar", Length = 255, Nullable = true }
                         },
-                        Identity = new Identity { Name = "ProductID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("ProductID", 1, 1)
                     },
                     new Table
                     {
@@ -76,7 +77,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "EntryDate", Type = "datetime" },
                             new Column { Name = "Quantity", Type = "int" }
                         },
-                        Identity = new Identity { Name = "ProductInventoryID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("ProductInventoryID", 1, 1)
                     },
                     new Table
                     {
@@ -88,7 +89,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "CompanyName", Type = "varchar", Length = 100, Nullable = true },
                             new Column { Name = "ContactName", Type = "varchar", Length = 100, Nullable = true }
                         },
-                        Identity = new Identity { Name = "CustomerID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("CustomerID", 1, 1)
                     },
                     new Table
                     {
@@ -100,7 +101,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "CompanyName", Type = "varchar", Length = 100, Nullable = true },
                             new Column { Name = "ContactName", Type = "varchar", Length = 100, Nullable = true }
                         },
-                        Identity = new Identity { Name = "ShipperID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("ShipperID", 1, 1)
                     },
                     new Table
                     {
@@ -115,7 +116,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "ShipperID", Type = "int" },
                             new Column { Name = "Comments", Type = "varchar", Length = 255, Nullable = true }
                         },
-                        Identity = new Identity { Name = "OrderID", Seed = 1, Increment = 1 }
+                        Identity = new Identity("OrderID", 1, 1)
                     },
                     new Table
                     {
@@ -130,7 +131,7 @@ namespace CatFactory.SqlServer.Tests
                             new Column { Name = "Quantity", Type = "int" },
                             new Column { Name = "Total", Type = "decimal", Prec = 8, Scale = 4 }
                         },
-                        PrimaryKey = new PrimaryKey(new string[] { "OrderID", "ProductID" })
+                        PrimaryKey = new PrimaryKey("OrderID", "ProductID")
                     }
                 },
                 Views = new List<View>

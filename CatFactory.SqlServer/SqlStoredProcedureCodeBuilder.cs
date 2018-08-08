@@ -15,6 +15,8 @@ namespace CatFactory.SqlServer
             Mappings = DatabaseTypeMapList.Definition;
         }
 
+        public Database Database { get; set; }
+
         public ITable Table { get; set; }
 
         public override string FileName
@@ -38,6 +40,14 @@ namespace CatFactory.SqlServer
                 default:
                     return string.Format("{0}", column.Type);
             }
+        }
+
+        public override void Translating()
+        {
+            Lines = new List<ILine>
+            {
+                new CodeLine(Code)
+            };
         }
 
         public string Code
@@ -79,7 +89,7 @@ namespace CatFactory.SqlServer
 
         protected virtual void GetAllProcedure(StringBuilder output)
         {
-            var procedureName = Table.GetProcedureName("GetAll");
+            var procedureName = Database.GetProcedureName(Table, "GetAll");
 
             DropProcedure(output, procedureName);
 
@@ -97,7 +107,7 @@ namespace CatFactory.SqlServer
 
                 if (columns.Count == 1)
                 {
-                    output.AppendFormat("{0}{1} {2} = null", Indent(1), columns.First().GetParameterName(), columns.First().Type);
+                    output.AppendFormat("{0}{1} {2} = null", Indent(1), Database.GetParameterName(columns.First()), columns.First().Type);
 
                     if (i < constraints.Count - 1)
                         output.Append(",");
@@ -116,7 +126,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
+                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
 
                 if (i < Table.Columns.Count - 1)
                     output.Append(",");
@@ -127,7 +137,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
+            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
             output.AppendLine();
 
             if (constraints.Count > 0)
@@ -142,7 +152,7 @@ namespace CatFactory.SqlServer
 
                     if (columns.Count == 1)
                     {
-                        output.AppendFormat("{0}({1} is null or {2} = {1})", Indent(2), columns.First().GetParameterName(), columns.First().GetObjectName());
+                        output.AppendFormat("{0}({1} is null or {2} = {1})", Indent(2), Database.GetParameterName(columns.First()), Database.GetParameterName(columns.First()));
 
                         if (i < constraints.Count - 1)
                             output.Append(" and");
@@ -158,7 +168,7 @@ namespace CatFactory.SqlServer
 
         protected virtual void GetProcedure(StringBuilder output)
         {
-            var procedureName = Table.GetProcedureName("Get");
+            var procedureName = Database.GetProcedureName(Table, "Get");
 
             DropProcedure(output, procedureName);
 
@@ -175,7 +185,7 @@ namespace CatFactory.SqlServer
 
                     var column = Table.Columns.FirstOrDefault(x => x.Name == key);
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), key.GetParameterName(), GetType(column));
+                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }
             }
 
@@ -191,7 +201,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
+                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
 
                 if (i < Table.Columns.Count - 1)
                     output.Append(",");
@@ -202,7 +212,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
+            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
             output.AppendLine();
 
             output.AppendFormat("{0}where", Indent(1));
@@ -214,7 +224,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                         output.Append(",");
@@ -229,7 +239,7 @@ namespace CatFactory.SqlServer
 
         protected virtual string InsertProcedure(StringBuilder output)
         {
-            var procedureName = Table.GetProcedureName("Add");
+            var procedureName = Database.GetProcedureName(Table, "Add");
 
             DropProcedure(output, procedureName);
 
@@ -242,7 +252,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), column.GetParameterName(), GetType(column));
+                output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(column), GetType(column));
 
                 if (Table.Identity != null && Table.Identity.Name == column.Name)
                     output.AppendFormat(" output");
@@ -256,7 +266,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("as");
             output.AppendLine();
 
-            output.AppendFormat("{0}insert into {1}", Indent(1), Table.GetObjectName());
+            output.AppendFormat("{0}insert into {1}", Indent(1), Database.GetObjectName(Table));
             output.AppendLine();
 
             output.AppendFormat("{0}(", Indent(1));
@@ -268,7 +278,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), column.GetObjectName());
+                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
 
                 if (i < columns.Count - 1)
                     output.Append(",");
@@ -289,7 +299,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), column.GetParameterName());
+                output.AppendFormat("{0}{1}", Indent(2), Database.GetParameterName(column));
 
                 if (i < columns.Count - 1)
                     output.Append(",");
@@ -304,7 +314,7 @@ namespace CatFactory.SqlServer
             {
                 output.AppendLine();
 
-                output.AppendFormat("{0}select {1} = @@identity", Indent(1), Table.Identity.Name.GetParameterName());
+                output.AppendFormat("{0}select {1} = @@identity", Indent(1), Database.GetParameterName(Table.Identity.Name));
                 output.AppendLine();
             }
 
@@ -316,7 +326,7 @@ namespace CatFactory.SqlServer
 
         protected virtual string UpdateProcedure(StringBuilder output)
         {
-            var procedureName = Table.GetProcedureName("Update");
+            var procedureName = Database.GetProcedureName(Table, "Update");
 
             DropProcedure(output, procedureName);
 
@@ -329,7 +339,7 @@ namespace CatFactory.SqlServer
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), column.GetParameterName(), GetType(column));
+                output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(column), GetType(column));
 
                 if (i < Table.Columns.Count - 1)
                     output.Append(",");
@@ -343,7 +353,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}update", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
+            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
             output.AppendLine();
 
             output.AppendFormat("{0}set", Indent(1));
@@ -355,7 +365,7 @@ namespace CatFactory.SqlServer
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1} = {2}", Indent(2), column.GetObjectName(), column.GetParameterName());
+                output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(column), Database.GetParameterName(column));
 
                 if (i < columns.Count - 1)
                     output.Append(",");
@@ -372,7 +382,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                         output.Append(",");
@@ -389,7 +399,7 @@ namespace CatFactory.SqlServer
 
         protected virtual string DeleteProcedure(StringBuilder output)
         {
-            var procedureName = Table.GetProcedureName("Delete");
+            var procedureName = Database.GetProcedureName(Table, "Delete");
 
             DropProcedure(output, procedureName);
 
@@ -406,7 +416,7 @@ namespace CatFactory.SqlServer
 
                     var column = Table.Columns.FirstOrDefault(x => x.Name == key);
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), key.GetParameterName(), GetType(column));
+                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }
             }
 
@@ -418,7 +428,7 @@ namespace CatFactory.SqlServer
             output.AppendFormat("{0}delete from", Indent(1));
             output.AppendLine();
 
-            output.AppendFormat("{0}{1}", Indent(2), Table.GetObjectName());
+            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
             output.AppendLine();
 
             output.AppendFormat("{0}where", Indent(1));
@@ -430,7 +440,7 @@ namespace CatFactory.SqlServer
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), item.GetObjectName(), item.GetParameterName());
+                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
 
                     if (i < Table.PrimaryKey.Key.Count - 1)
                         output.Append(",");

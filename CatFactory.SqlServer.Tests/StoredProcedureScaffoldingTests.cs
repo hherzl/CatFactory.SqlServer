@@ -2,7 +2,7 @@
 
 namespace CatFactory.SqlServer.Tests
 {
-    public class StoredProcedureGenerationTests
+    public class StoredProcedureScaffoldingTests
     {
         [Fact]
         public void GenerateProceduresFromExistingDatabaseTest()
@@ -23,8 +23,9 @@ namespace CatFactory.SqlServer.Tests
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
+                    Database = database,
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresExistingDatabase",
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresFromExistingDatabase",
                     ForceOverwrite = true
                 };
 
@@ -45,8 +46,9 @@ namespace CatFactory.SqlServer.Tests
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder
                 {
+                    Database = database,
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresMockingDatabase",
+                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresFromMockingDatabase",
                     ForceOverwrite = true
                 };
 

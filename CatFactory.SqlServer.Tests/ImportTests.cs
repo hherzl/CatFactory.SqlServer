@@ -71,7 +71,10 @@ namespace CatFactory.SqlServer.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
-                    ExclusionTypes = { "geography" }
+                    ExclusionTypes =
+                    {
+                        "geography"
+                    }
                 }
             };
 
@@ -100,8 +103,14 @@ namespace CatFactory.SqlServer.Tests
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true,
-                    ExtendedProperties = { "MS_Description" },
-                    ExclusionTypes = { "geography" }
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    },
+                    ExclusionTypes =
+                    {
+                        "geography"
+                    }
                 }
             };
 
