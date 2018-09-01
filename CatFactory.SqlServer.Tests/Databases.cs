@@ -11,7 +11,7 @@ namespace CatFactory.SqlServer.Tests
                 Name = "StoreMock",
                 DefaultSchema = "dbo",
                 NamingConvention = new SqlServerDatabaseNamingConvention(),
-                Mappings = DatabaseTypeMapList.Definition,
+                DatabaseTypeMaps = DatabaseTypeMapList.Definition,
                 Tables =
                 {
                     new Table

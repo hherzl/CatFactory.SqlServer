@@ -75,7 +75,7 @@ namespace CatFactory.SqlServer
             {
                 DefaultSchema = "dbo",
                 SupportTransactions = true,
-                Mappings = DatabaseTypeMapList.Definition,
+                DatabaseTypeMaps = DatabaseTypeMapList.Definition,
                 NamingConvention = new SqlServerDatabaseNamingConvention()
             };
 
@@ -251,7 +251,7 @@ namespace CatFactory.SqlServer
                         var parent = types.FirstOrDefault(item => !item.IsUserDefined && item.SystemTypeId == type.SystemTypeId);
 
                         if (parent != null)
-                            database.Mappings.Add(new DatabaseTypeMap
+                            database.DatabaseTypeMaps.Add(new DatabaseTypeMap
                             {
                                 DatabaseType = type.Name,
                                 Collation = type.CollationName,

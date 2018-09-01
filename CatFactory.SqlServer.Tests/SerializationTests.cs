@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -14,7 +15,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var output = XmlSerializerHelper.Serialize(database);
 
-            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
 
             // Assert
         }
@@ -28,7 +29,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\Store.json", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Store.json", output);
 
             // Assert
         }
@@ -52,7 +53,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = XmlSerializerHelper.Serialize(database);
 
-            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.xml", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.xml", output);
 
             // Assert
         }
@@ -76,7 +77,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            TextFileHelper.CreateFile("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.json", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.json", output);
 
             // Assert
         }
