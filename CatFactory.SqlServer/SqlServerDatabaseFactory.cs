@@ -11,23 +11,44 @@ namespace CatFactory.SqlServer
 {
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static ILogger<SqlServerDatabaseFactory> GetLogger()
             => LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected ILogger Logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public SqlServerDatabaseFactory()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
         public SqlServerDatabaseFactory(ILogger<SqlServerDatabaseFactory> logger)
         {
             Logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public DbConnection GetConnection()
             => new SqlConnection(DatabaseImportSettings.ConnectionString);
 
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Set connection string in ImportSettings")]
         public string ConnectionString
         {
@@ -44,6 +65,9 @@ namespace CatFactory.SqlServer
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DatabaseImportSettings m_databaseImportSettings;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public DatabaseImportSettings DatabaseImportSettings
         {
             get
@@ -56,6 +80,9 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Use DatabaseImportSettings property")]
         public DatabaseImportSettings ImportSettings
         {
@@ -69,6 +96,10 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public virtual Database Import()
         {
             var database = new Database
@@ -95,6 +126,13 @@ namespace CatFactory.SqlServer
                         continue;
 
                     database.DbObjects.Add(dbObject);
+                }
+
+                if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                {
+                    Logger?.LogInformation("Importing extended properties for database...");
+
+                    ImportExtendedProperties(connection, database);
                 }
 
                 if (DatabaseImportSettings.ImportTables)
@@ -206,14 +244,19 @@ namespace CatFactory.SqlServer
             return database;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="connection"></param>
         protected virtual void AddUserDefinedDataTypes(Database database, DbConnection connection)
         {
             var cmdText = " select name, system_type_id, user_type_id, collation_name, is_nullable, is_user_defined from sys.types ";
 
-            using (var cmd = connection.CreateCommand())
+            using (var command = connection.CreateCommand())
             {
-                cmd.Connection = connection;
-                cmd.CommandText = cmdText;
+                command.Connection = connection;
+                command.CommandText = cmdText;
 
                 var types = new[]
                 {
@@ -228,7 +271,7 @@ namespace CatFactory.SqlServer
                     }
                 }.ToList();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -263,6 +306,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<DbObject> GetDbObjects(DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -285,6 +333,12 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tables"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<Table> GetTables(DbConnection connection, IEnumerable<DbObject> tables)
         {
             foreach (var dbObject in tables)
@@ -350,6 +404,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddColumn(Table table, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -358,6 +417,11 @@ namespace CatFactory.SqlServer
                 table.Columns.Add(column);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddColumn(View view, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -366,6 +430,11 @@ namespace CatFactory.SqlServer
                 view.Columns.Add(column);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableFunction"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddColumn(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -374,21 +443,41 @@ namespace CatFactory.SqlServer
                 tableFunction.Columns.Add(column);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="storedProcedure"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
         {
             storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scalarFunction"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
         {
             scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableFunction"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void SetIdentity(Table table, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -397,6 +486,11 @@ namespace CatFactory.SqlServer
                 table.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="dictionary"></param>
         protected virtual void SetIdentity(View view, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -405,6 +499,11 @@ namespace CatFactory.SqlServer
                 view.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tableFunction"></param>
+        /// <param name="dictionary"></param>
         protected virtual void SetIdentity(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -413,6 +512,11 @@ namespace CatFactory.SqlServer
                 tableFunction.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void SetRowGuidCol(Table table, IDictionary<string, object> dictionary)
         {
             table.RowGuidCol = new RowGuidCol
@@ -421,6 +525,11 @@ namespace CatFactory.SqlServer
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="dictionary"></param>
         protected virtual void SetRowGuidCol(View view, IDictionary<string, object> dictionary)
         {
             view.RowGuidCol = new RowGuidCol
@@ -429,6 +538,11 @@ namespace CatFactory.SqlServer
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddIndexToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.Indexes.Add(new Index
@@ -439,6 +553,26 @@ namespace CatFactory.SqlServer
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="dictionary"></param>
+        protected virtual void AddIndexToView(View view, IDictionary<string, object> dictionary)
+        {
+            view.Indexes.Add(new Index
+            {
+                IndexName = string.Concat(dictionary["index_name"]),
+                IndexDescription = string.Concat(dictionary["index_description"]),
+                IndexKeys = string.Concat(dictionary["index_keys"])
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddConstraintToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.ConstraintDetails.Add(new ConstraintDetail
@@ -453,6 +587,10 @@ namespace CatFactory.SqlServer
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
         protected virtual void SetConstraintsFromConstraintDetails(Table table)
         {
             foreach (var constraintDetail in table.ConstraintDetails)
@@ -502,6 +640,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dictionary"></param>
         protected virtual void AddTableReferenceToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.TableReferences.Add(new TableReference
@@ -510,26 +653,50 @@ namespace CatFactory.SqlServer
             });
         }
 
-        private void ImportExtendedProperties(DbConnection connection, ITable table)
+        private void ImportExtendedProperties(DbConnection connection, Database database)
+        {
+            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            {
+                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(exProp))
+                {
+                    database.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+                }
+            }
+        }
+
+        private void ImportExtendedProperties(DbConnection connection, Table table)
         {
             table.Type = "table";
 
             foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
             {
-                if (exProp == "MS_Description")
+                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(table, exProp))
                 {
-                    foreach (var description in connection.GetExtendedPropertiesForDbObject(table, exProp))
-                        table.Description = string.Concat(description.Value);
+                    table.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
 
-                    foreach (var column in table.Columns)
+                    if (exProp == "MS_Description")
+                        table.Description = extendedProperty.Value;
+                }
+
+                foreach (var column in table.Columns)
+                {
+                    foreach (var extendedProperty in connection.GetExtendedPropertiesForColumn(table, column, exProp))
                     {
-                        foreach (var extendProperty in connection.GetExtendedPropertiesForColumn(table, column, exProp))
-                            column.Description = string.Concat(extendProperty.Value);
+                        column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+
+                        if (exProp == "MS_Description")
+                            column.Description = extendedProperty.Value;
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="views"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
         {
             foreach (var dbObject in views)
@@ -578,6 +745,8 @@ namespace CatFactory.SqlServer
                                     SetIdentity(view, item);
                                 else if (item.ContainsKey("RowGuidCol"))
                                     SetRowGuidCol(view, item);
+                                else if (item.ContainsKey("index_name"))
+                                    AddIndexToView(view, item);
                             }
                         }
 
@@ -587,26 +756,39 @@ namespace CatFactory.SqlServer
             }
         }
 
-        private void ImportExtendedProperties(DbConnection connection, IView view)
+        private void ImportExtendedProperties(DbConnection connection, View view)
         {
             view.Type = "view";
 
             foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
             {
-                if (exProp == "MS_Description")
+                foreach (var extendProperty in connection.GetExtendedPropertiesForDbObject(view, exProp))
                 {
-                    foreach (var description in connection.GetExtendedPropertiesForDbObject(view, exProp))
-                        view.Description = string.Concat(description.Value);
+                    view.ExtendedProperties.Add(new ExtendedProperty { Name = extendProperty.Name, Value = extendProperty.Value });
 
-                    foreach (var column in view.Columns)
+                    if (exProp == "MS_Description")
+                        view.Description = extendProperty.Value;
+                }
+
+                foreach (var column in view.Columns)
+                {
+                    foreach (var extendedProperty in connection.GetExtendedPropertiesForColumn(view, column, exProp))
                     {
-                        foreach (var extendProperty in connection.GetExtendedPropertiesForColumn(view, column, exProp))
-                            column.Description = string.Concat(extendProperty.Value);
+                        column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+
+                        if (exProp == "MS_Description")
+                            column.Description = extendedProperty.Value;
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="storedProcedures"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
         {
             foreach (var dbObject in storedProcedures)
@@ -664,14 +846,20 @@ namespace CatFactory.SqlServer
         {
             foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
             {
-                if (exProp == "MS_Description")
+                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(storedProcedure, exProp))
                 {
-                    foreach (var description in connection.GetExtendedPropertiesForDbObject(storedProcedure, exProp))
-                        storedProcedure.Description = string.Concat(description.Value);
+                    if (exProp == "MS_Description")
+                        storedProcedure.Description = extendedProperty.Value;
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="tableFunctions"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
         {
             foreach (var dbObject in tableFunctions)
@@ -733,14 +921,20 @@ namespace CatFactory.SqlServer
         {
             foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
             {
-                if (exProp == "MS_Description")
+                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(tableFunction, exProp))
                 {
-                    foreach (var description in connection.GetExtendedPropertiesForDbObject(tableFunction, exProp))
-                        tableFunction.Description = string.Concat(description.Value);
+                    if (exProp == "MS_Description")
+                        tableFunction.Description = extendedProperty.Value;
                 }
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="scalarFunctions"></param>
+        /// <returns></returns>
         protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
             foreach (var dbObject in scalarFunctions)
@@ -798,10 +992,10 @@ namespace CatFactory.SqlServer
         {
             foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
             {
-                if (exProp == "MS_Description")
+                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(scalarFunction, exProp))
                 {
-                    foreach (var description in connection.GetExtendedPropertiesForDbObject(scalarFunction, exProp))
-                        scalarFunction.Description = string.Concat(description.Value);
+                    if (exProp == "MS_Description")
+                        scalarFunction.Description = extendedProperty.Value;
                 }
             }
         }

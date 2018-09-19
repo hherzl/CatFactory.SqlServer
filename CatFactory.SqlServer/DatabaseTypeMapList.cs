@@ -5,8 +5,14 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class DatabaseTypeMapList
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static List<DatabaseTypeMap> Definition
             => new List<DatabaseTypeMap>
             {

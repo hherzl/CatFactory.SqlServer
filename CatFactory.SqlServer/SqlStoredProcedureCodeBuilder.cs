@@ -6,25 +6,48 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SqlStoredProcedureCodeBuilder : CodeBuilder
     {
         private List<DatabaseTypeMap> Mappings;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public SqlStoredProcedureCodeBuilder()
         {
             Mappings = DatabaseTypeMapList.Definition;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Database Database { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ITable Table { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override string FileName
             => Table.FullName;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override string FileExtension
             => "sql";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
         public virtual string GetType(Column column)
         {
             switch (column.Type)
@@ -42,6 +65,9 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override void Translating()
         {
             Lines = new List<ILine>
@@ -50,6 +76,9 @@ namespace CatFactory.SqlServer
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Code
         {
             get
@@ -75,6 +104,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="procedureName"></param>
         protected virtual void DropProcedure(StringBuilder output, string procedureName)
         {
             output.AppendFormat("if object_id('{0}', 'P') is not null", procedureName.Replace("[", string.Empty).Replace("]", string.Empty));
@@ -87,6 +121,10 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
         protected virtual void GetAllProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "GetAll");
@@ -166,6 +204,10 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
         protected virtual void GetProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Get");
@@ -237,6 +279,11 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <returns></returns>
         protected virtual string InsertProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Add");
@@ -324,6 +371,11 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <returns></returns>
         protected virtual string UpdateProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Update");
@@ -397,6 +449,11 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <returns></returns>
         protected virtual string DeleteProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Delete");

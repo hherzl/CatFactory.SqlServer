@@ -2,19 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build15</Version>
+    <Version>1.0.0-beta-sun-build16</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build15 Version: Core package update</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0-beta-sun-build16 Version: Core package update, addition of extended properties for database, addition of indexes for views and remove of ExtendedProperty model to replace with definition from core package.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp2.0\CatFactory.SqlServer.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build07" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build08" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 

@@ -5,20 +5,38 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class SqlCodeBuilder : CodeBuilder
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public SqlCodeBuilder()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Database Database { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override string FileName
             => Database.Name;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public override string FileExtension
             => "sql";
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Code
         {
             get

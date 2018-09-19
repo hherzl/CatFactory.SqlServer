@@ -4,8 +4,14 @@ using System.Diagnostics;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class DatabaseImportSettings
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public DatabaseImportSettings()
         {
             ImportCommandText = @"
@@ -25,28 +31,58 @@ namespace CatFactory.SqlServer
 			";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string ConnectionString { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string ImportCommandText { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ImportTables { get; set; } = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ImportViews { get; set; } = true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ImportStoredProcedures { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ImportScalarFunctions { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ImportTableFunctions { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Add extended properties in order to retrieve description")]
         public bool ImportMSDescription { get; set; } = true;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_exclusions;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<string> Exclusions
         {
             get
@@ -62,6 +98,9 @@ namespace CatFactory.SqlServer
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_exclusionTypes;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<string> ExclusionTypes
         {
             get
@@ -77,6 +116,9 @@ namespace CatFactory.SqlServer
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_extendedProperties;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<string> ExtendedProperties
         {
             get

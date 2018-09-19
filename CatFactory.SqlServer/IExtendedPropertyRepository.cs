@@ -1,16 +1,36 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
+using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IExtendedPropertyRepository
     {
-        IEnumerable<ExtendedProperty> GetExtendedProperties(DbConnection connection, ExtendedPropertyModel model);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty model);
 
-        void AddExtendedProperty(DbConnection connection, ExtendedPropertyModel model);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        void AddExtendedProperty(ExtendedProperty model);
 
-        void UpdateExtendedProperty(DbConnection connection, ExtendedPropertyModel model);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        void UpdateExtendedProperty(ExtendedProperty model);
 
-        void DropExtendedProperty(DbConnection connection, ExtendedPropertyModel model);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        void DropExtendedProperty(ExtendedProperty model);
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using CatFactory.Mapping;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -15,17 +15,29 @@ namespace CatFactory.SqlServer.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
-                    ExtendedProperties = { "MS_Description" },
-                    ExclusionTypes = new List<string> { "geography" }
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    },
+                    ExclusionTypes =
+                    {
+                        "geography"
+                    }
                 }
             };
 
             // Act
             var database = databaseFactory.Import();
-            var table = database.FindTable("Production.Product");
+            var table = database.FindTable("Production.Product") as Table;
             var view = database.Views.First(item => item.FullName == "HumanResources.vEmployee");
 
             // Assert
+            Assert.True(database.ExtendedProperties.Count > 0);
+
+            Assert.True(table.ExtendedProperties.Count > 0);
+            Assert.True(table.Columns.First().ExtendedProperties.Count > 0);
+            Assert.True(view.ExtendedProperties.Count > 0);
+
             Assert.True(table.Description != null);
             Assert.True(table.Columns.First().Description != null);
             Assert.True(view.Description != null);

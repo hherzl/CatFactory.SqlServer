@@ -4,8 +4,16 @@ using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class SqlServerDatabaseFactoryHelper
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dataReader"></param>
+        /// <returns></returns>
         public static IEnumerable<string> GetNames(DbDataReader dataReader)
         {
             if (dataReader.HasRows)
@@ -15,6 +23,11 @@ namespace CatFactory.SqlServer
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
         public static Column GetColumn(IDictionary<string, object> dictionary)
         {
             var column = new Column
@@ -32,6 +45,11 @@ namespace CatFactory.SqlServer
             return column;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
         public static Parameter GetParameter(IDictionary<string, object> dictionary)
         {
             var parameter = new Parameter

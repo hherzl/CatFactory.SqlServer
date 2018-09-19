@@ -14,6 +14,26 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count > 0);
+            Assert.True(database.Views.Count > 0);
+
+            Assert.True(database.FindTable("Production.Product").Columns.Count > 0);
+            Assert.True(database.FindTable("Production.Product").PrimaryKey != null);
+            Assert.True(database.FindTable("Production.Product").ForeignKeys.Count > 0);
+        }
+
+        [Fact]
+        public void ImportStoreTablesTest()
+        {
+            // Arrange and Act
+            var database = SqlServerDatabaseFactory
+                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
+
+            // Assert
+            Assert.True(database.Tables.Count == 2);
+            Assert.True(database.FindTable("Sales.Order").Columns.Count > 0);
+            Assert.True(database.FindTable("Sales.Order").PrimaryKey != null);
+            Assert.True(database.FindTable("Sales.Order").ForeignKeys.Count > 0);
+            Assert.True(database.Views.Count == 0);
         }
 
         [Fact]
@@ -62,105 +82,6 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportAdventureWorksDatabase()
-        {
-            // Arrange
-            // todo: add mapping for custom types
-            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
-                    ExclusionTypes =
-                    {
-                        "geography"
-                    }
-                }
-            };
-
-            // Act
-            var database = databaseFactory.Import();
-
-            // Assert
-            foreach (var table in database.Tables)
-            {
-                var flag = table.Columns.FirstOrDefault(item => item.Name == "SpatialLocation") == null ? false : true;
-
-                Assert.False(flag);
-            }
-        }
-
-        [Fact]
-        public void FullImportAdventureWorksDatabase()
-        {
-            // Arrange
-            // todo: add mapping for custom types
-            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
-                    ImportStoredProcedures = true,
-                    ImportTableFunctions = true,
-                    ImportScalarFunctions = true,
-                    ExtendedProperties =
-                    {
-                        "MS_Description"
-                    },
-                    ExclusionTypes =
-                    {
-                        "geography"
-                    }
-                }
-            };
-
-            // Act
-            var database = databaseFactory.Import();
-
-            // Assert
-            foreach (var table in database.Tables)
-            {
-                var flag = table.Columns.FirstOrDefault(item => item.Name == "SpatialLocation") == null ? false : true;
-
-                Assert.False(flag);
-            }
-
-            Assert.True(database.FindTable("Sales.SalesOrderHeader").Columns.Count > 0);
-            Assert.False(string.IsNullOrEmpty(database.FindTable("Sales.SalesOrderHeader").Columns.First().Description));
-            Assert.True(database.FindTable("Sales.SalesOrderHeader").PrimaryKey != null);
-            Assert.True(database.FindTable("Sales.SalesOrderHeader").ForeignKeys.Count > 0);
-
-            Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
-        }
-
-        [Fact]
-        public void ImportWithLoggerStoreTablesTest()
-        {
-            // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
-
-            // Assert
-            Assert.True(database.Tables.Count == 2);
-            Assert.True(database.FindTable("Sales.Order").Columns.Count > 0);
-            Assert.True(database.FindTable("Sales.Order").PrimaryKey != null);
-            Assert.True(database.FindTable("Sales.Order").ForeignKeys.Count > 0);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
-        public void ImportWithoutLoggerStoreTablesTest()
-        {
-            // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportTables("server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
-
-            // Assert
-            Assert.True(database.Tables.Count == 2);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
         public void ImportNorthwindTables()
         {
             // Arrange and Act
@@ -200,6 +121,47 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
             Assert.True(database.Views.Count == 2);
+        }
+
+        [Fact]
+        public void ImportAdventureWorksDatabase()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
+                    ImportStoredProcedures = true,
+                    ImportScalarFunctions = true,
+                    ImportTableFunctions = true,
+                    ExclusionTypes =
+                    {
+                        "geography"
+                    }
+                }
+            };
+
+            // Act
+            var database = databaseFactory.Import();
+
+            // Assert
+            foreach (var table in database.Tables)
+            {
+                var flag = table.Columns.FirstOrDefault(item => item.Name == "SpatialLocation") == null ? false : true;
+
+                Assert.False(flag);
+            }
+
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").Columns.Count > 0);
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").Indexes.Count > 0);
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").PrimaryKey != null);
+            Assert.True(database.FindTable("Sales.SalesOrderHeader").ForeignKeys.Count > 0);
+
+            Assert.True(database.FindView("Production.vProductAndDescription").Columns.Count > 0);
+            Assert.True(database.FindView("Production.vProductAndDescription").Indexes.Count > 0);
+
+            Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
         }
     }
 }
