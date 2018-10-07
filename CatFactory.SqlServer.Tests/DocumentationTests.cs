@@ -1,105 +1,161 @@
-﻿using System.Linq;
-using CatFactory.Mapping;
-using Xunit;
+﻿using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
     public class DocumentationTests
     {
         [Fact]
-        public void TestGetTableAndViewMsDescriptionTest()
+        public void TestGetExtendedProperties()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
-                    },
-                    ExclusionTypes =
-                    {
-                        "geography"
                     }
                 }
             };
 
             // Act
             var database = databaseFactory.Import();
-            var table = database.FindTable("Production.Product") as Table;
-            var view = database.Views.First(item => item.FullName == "HumanResources.vEmployee");
+            var table = database.FindTable("Production.Product");
+            var view = database.FindView("HumanResources.vEmployee");
 
             // Assert
             Assert.True(database.ExtendedProperties.Count > 0);
-
             Assert.True(table.ExtendedProperties.Count > 0);
-            Assert.True(table.Columns.First().ExtendedProperties.Count > 0);
             Assert.True(view.ExtendedProperties.Count > 0);
-
-            Assert.True(table.Description != null);
-            Assert.True(table.Columns.First().Description != null);
-            Assert.True(view.Description != null);
         }
 
         [Fact]
-        public void TestAddTableMsDescriptionTest()
+        public void TestAddExtendedPropertiesForDatabase()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    }
                 }
             };
 
             // Act
             var database = databaseFactory.Import();
 
-            var table = database.FindTable("dbo.Products");
+            databaseFactory.DropExtendedProperty(database, "MS_Description");
+            databaseFactory.AddExtendedProperty(database, "MS_Description", "Online store");
 
-            databaseFactory.AddOrUpdateExtendedProperty(table, "MS_Description", "Test description");
+            // Assert
+        }
 
-            var column = table.Columns.FirstOrDefault();
+        [Fact]
+        public void TestAddExtendedPropertiesForTable()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    }
+                }
+            };
 
-            databaseFactory.AddOrUpdateExtendedProperty(table, column, "MS_Description", "Primary key");
+            // Act
+            var database = databaseFactory.Import();
+            var table = database.FindTable("Production.Product");
 
             databaseFactory.DropExtendedProperty(table, "MS_Description");
-            databaseFactory.DropExtendedProperty(table, column, "MS_Description");
+            databaseFactory.AddExtendedProperty(table, "MS_Description", "Products catalog");
 
             // Assert
-            Assert.True(table.Description == "Test description");
-            Assert.True(column.Description == "Primary key");
         }
 
         [Fact]
-        public void TestUpdateTableMsDescriptionTest()
+        public void TestAddExtendedPropertiesForColumnFromTable()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;"
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    }
                 }
             };
 
             // Act
             var database = databaseFactory.Import();
+            var table = database.FindTable("Production.Product");
 
-            var table = database.FindTable("dbo.Products");
-
-            databaseFactory.AddOrUpdateExtendedProperty(table, "MS_Description", "Test update description");
-
-            var column = table.Columns.FirstOrDefault();
-
-            databaseFactory.AddOrUpdateExtendedProperty(table, column, "MS_Description", "PK (updated)");
+            databaseFactory.DropExtendedProperty(table, table.GetColumn("ProductID"), "MS_Description");
+            databaseFactory.AddExtendedProperty(table, table.GetColumn("ProductID"), "MS_Description", "ID for product");
 
             // Assert
-            Assert.True(table.Description == "Test update description");
-            Assert.True(column.Description == "PK (updated)");
+        }
+
+        [Fact]
+        public void TestAddExtendedPropertiesForView()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    }
+                }
+            };
+
+            // Act
+            var database = databaseFactory.Import();
+            var view = database.FindView("Sales.OrderSummary");
+
+            databaseFactory.DropExtendedProperty(view, "MS_Description");
+            databaseFactory.AddExtendedProperty(view, "MS_Description", "Summary for orders");
+
+            // Assert
+        }
+
+        [Fact]
+        public void TestAddExtendedPropertiesForColumnFromView()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=Store;integrated security=yes;",
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    }
+                }
+            };
+
+            // Act
+            var database = databaseFactory.Import();
+            var view = database.FindView("Sales.OrderSummary");
+
+            databaseFactory.DropExtendedProperty(view, view.GetColumn("CustomerName"), "MS_Description");
+            databaseFactory.AddExtendedProperty(view, view.GetColumn("CustomerName"), "MS_Description", "Name for customer (CompanyName)");
         }
     }
 }

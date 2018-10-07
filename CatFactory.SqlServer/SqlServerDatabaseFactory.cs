@@ -116,7 +116,7 @@ namespace CatFactory.SqlServer
 
                 database.Name = connection.Database;
 
-                AddUserDefinedDataTypes(database, connection);
+                SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypes(database, connection);
 
                 var dbObjects = GetDbObjects(connection).ToList();
 
@@ -242,68 +242,6 @@ namespace CatFactory.SqlServer
             }
 
             return database;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="database"></param>
-        /// <param name="connection"></param>
-        protected virtual void AddUserDefinedDataTypes(Database database, DbConnection connection)
-        {
-            var cmdText = " select name, system_type_id, user_type_id, collation_name, is_nullable, is_user_defined from sys.types ";
-
-            using (var command = connection.CreateCommand())
-            {
-                command.Connection = connection;
-                command.CommandText = cmdText;
-
-                var types = new[]
-                {
-                    new
-                    {
-                        Name = string.Empty,
-                        SystemTypeId = default(byte),
-                        UserTypeId = 0,
-                        CollationName = string.Empty,
-                        IsNullable = false,
-                        IsUserDefined = false
-                    }
-                }.ToList();
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        types.Add(new
-                        {
-                            Name = reader.GetString(0),
-                            SystemTypeId = reader.GetByte(1),
-                            UserTypeId = reader.GetInt32(2),
-                            CollationName = reader[3] is DBNull ? null : reader.GetString(3),
-                            IsNullable = reader.GetBoolean(4),
-                            IsUserDefined = reader.GetBoolean(5)
-                        });
-                    }
-                }
-
-                foreach (var type in types)
-                {
-                    if (type.IsUserDefined)
-                    {
-                        var parent = types.FirstOrDefault(item => !item.IsUserDefined && item.SystemTypeId == type.SystemTypeId);
-
-                        if (parent != null)
-                            database.DatabaseTypeMaps.Add(new DatabaseTypeMap
-                            {
-                                DatabaseType = type.Name,
-                                Collation = type.CollationName,
-                                IsUserDefined = type.IsUserDefined,
-                                ParentDatabaseType = parent.Name
-                            });
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -545,12 +483,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary"></param>
         protected virtual void AddIndexToTable(Table table, IDictionary<string, object> dictionary)
         {
-            table.Indexes.Add(new Index
-            {
-                IndexName = string.Concat(dictionary["index_name"]),
-                IndexDescription = string.Concat(dictionary["index_description"]),
-                IndexKeys = string.Concat(dictionary["index_keys"])
-            });
+            table.Indexes.Add(SqlServerDatabaseFactoryHelper.GetIndex(dictionary));
         }
 
         /// <summary>
@@ -560,12 +493,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary"></param>
         protected virtual void AddIndexToView(View view, IDictionary<string, object> dictionary)
         {
-            view.Indexes.Add(new Index
-            {
-                IndexName = string.Concat(dictionary["index_name"]),
-                IndexDescription = string.Concat(dictionary["index_description"]),
-                IndexKeys = string.Concat(dictionary["index_keys"])
-            });
+            view.Indexes.Add(SqlServerDatabaseFactoryHelper.GetIndex(dictionary));
         }
 
         /// <summary>
@@ -575,16 +503,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary"></param>
         protected virtual void AddConstraintToTable(Table table, IDictionary<string, object> dictionary)
         {
-            table.ConstraintDetails.Add(new ConstraintDetail
-            {
-                ConstraintType = string.Concat(dictionary["constraint_type"]),
-                ConstraintName = string.Concat(dictionary["constraint_name"]),
-                DeleteAction = string.Concat(dictionary["delete_action"]),
-                UpdateAction = string.Concat(dictionary["update_action"]),
-                StatusEnabled = string.Concat(dictionary["status_enabled"]),
-                StatusForReplication = string.Concat(dictionary["status_for_replication"]),
-                ConstraintKeys = string.Concat(dictionary["constraint_keys"])
-            });
+            table.ConstraintDetails.Add(SqlServerDatabaseFactoryHelper.GetConstraintDetail(dictionary));
         }
 
         /// <summary>
@@ -655,9 +574,9 @@ namespace CatFactory.SqlServer
 
         private void ImportExtendedProperties(DbConnection connection, Database database)
         {
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(exProp))
+                foreach (var extendedProperty in connection.GetExtendedProperties(name))
                 {
                     database.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
                 }
@@ -668,23 +587,25 @@ namespace CatFactory.SqlServer
         {
             table.Type = "table";
 
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(table, exProp))
+                foreach (var extendedProperty in connection.GetExtendedProperties(table, name))
                 {
                     table.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
 
-                    if (exProp == "MS_Description")
+                    // todo: Remove this token
+                    if (name == "MS_Description")
                         table.Description = extendedProperty.Value;
                 }
 
                 foreach (var column in table.Columns)
                 {
-                    foreach (var extendedProperty in connection.GetExtendedPropertiesForColumn(table, column, exProp))
+                    foreach (var extendedProperty in connection.GetExtendedProperties(table, column, name))
                     {
                         column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
 
-                        if (exProp == "MS_Description")
+                        // todo: Remove this token
+                        if (name == "MS_Description")
                             column.Description = extendedProperty.Value;
                     }
                 }
@@ -760,23 +681,25 @@ namespace CatFactory.SqlServer
         {
             view.Type = "view";
 
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendProperty in connection.GetExtendedPropertiesForDbObject(view, exProp))
+                foreach (var extendProperty in connection.GetExtendedProperties(view, name))
                 {
                     view.ExtendedProperties.Add(new ExtendedProperty { Name = extendProperty.Name, Value = extendProperty.Value });
 
-                    if (exProp == "MS_Description")
+                    // todo: Remove this token
+                    if (name == "MS_Description")
                         view.Description = extendProperty.Value;
                 }
 
                 foreach (var column in view.Columns)
                 {
-                    foreach (var extendedProperty in connection.GetExtendedPropertiesForColumn(view, column, exProp))
+                    foreach (var extendedProperty in connection.GetExtendedProperties(view, column, name))
                     {
                         column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
 
-                        if (exProp == "MS_Description")
+                        // todo: Remove this token
+                        if (name == "MS_Description")
                             column.Description = extendedProperty.Value;
                     }
                 }
@@ -844,11 +767,12 @@ namespace CatFactory.SqlServer
 
         private void ImportExtendedProperties(DbConnection connection, StoredProcedure storedProcedure)
         {
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(storedProcedure, exProp))
+                foreach (var extendedProperty in connection.GetExtendedProperties(storedProcedure, name))
                 {
-                    if (exProp == "MS_Description")
+                    // todo: Remove this token
+                    if (name == "MS_Description")
                         storedProcedure.Description = extendedProperty.Value;
                 }
             }
@@ -919,11 +843,12 @@ namespace CatFactory.SqlServer
 
         private void ImportExtendedProperties(DbConnection connection, TableFunction tableFunction)
         {
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(tableFunction, exProp))
+                foreach (var extendedProperty in connection.GetExtendedProperties(tableFunction, name))
                 {
-                    if (exProp == "MS_Description")
+                    // todo: Remove this token
+                    if (name == "MS_Description")
                         tableFunction.Description = extendedProperty.Value;
                 }
             }
@@ -990,11 +915,12 @@ namespace CatFactory.SqlServer
 
         private void ImportExtendedProperties(DbConnection connection, ScalarFunction scalarFunction)
         {
-            foreach (var exProp in DatabaseImportSettings.ExtendedProperties)
+            foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedPropertiesForDbObject(scalarFunction, exProp))
+                foreach (var extendedProperty in connection.GetExtendedProperties(scalarFunction, name))
                 {
-                    if (exProp == "MS_Description")
+                    // todo: Remove this token
+                    if (name == "MS_Description")
                         scalarFunction.Description = extendedProperty.Value;
                 }
             }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
+﻿using System.Linq;
 using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
@@ -8,75 +6,25 @@ namespace CatFactory.SqlServer
     /// <summary>
     /// 
     /// </summary>
-    public static class ExtendedPropertyExtensions
+    public static class SqlServerDatabaseFactoryExtensions
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="connection"></param>
+        /// <param name="databaseFactory"></param>
+        /// <param name="database"></param>
         /// <param name="name"></param>
-        /// <returns></returns>
-        public static IEnumerable<ExtendedProperty> GetExtendedPropertiesForDbObject(this DbConnection connection, string name)
+        /// <param name="value"></param>
+        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
-            var model = new ExtendedProperty
+            using (var connection = databaseFactory.GetConnection())
             {
-                Name = name,
-                Level0Type = "",
-                Level0Name = "",
-                Level1Type = "",
-                Level1Name = "",
-                Level2Type = "",
-                Level2Name = ""
-            };
+                connection.Open();
 
-            return new ExtendedPropertyRepository(connection).GetExtendedProperties(model).ToList();
-        }
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value });
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="dbObject"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static IEnumerable<ExtendedProperty> GetExtendedPropertiesForDbObject(this DbConnection connection, IDbObject dbObject, string name)
-        {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = dbObject.Schema,
-                Level1Type = dbObject.Type,
-                Level1Name = dbObject.Name,
-                Level2Type = "default",
-                Level2Name = "default"
-            };
-
-            return new ExtendedPropertyRepository(connection).GetExtendedProperties(model).ToList();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="dbObject"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static IEnumerable<ExtendedProperty> GetExtendedPropertiesForColumn(this DbConnection connection, IDbObject dbObject, Column column, string name)
-        {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = dbObject.Schema,
-                Level1Type = dbObject.Type,
-                Level1Name = dbObject.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
-            return new ExtendedPropertyRepository(connection).GetExtendedProperties(model).ToList();
+                database.Description = value;
+            }
         }
 
         /// <summary>
@@ -95,9 +43,7 @@ namespace CatFactory.SqlServer
                 Level0Type = "schema",
                 Level0Name = table.Schema,
                 Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "",
-                Level2Name = ""
+                Level1Name = table.Name
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -146,6 +92,67 @@ namespace CatFactory.SqlServer
         /// 
         /// </summary>
         /// <param name="databaseFactory"></param>
+        /// <param name="view"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Value = value,
+                Level0Type = "schema",
+                Level0Name = view.Schema,
+                Level1Type = "view",
+                Level1Name = view.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+
+                view.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="view"></param>
+        /// <param name="column"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Value = value,
+                Level0Type = "schema",
+                Level0Name = view.Schema,
+                Level1Type = "view",
+                Level1Name = view.Name,
+                Level2Type = "column",
+                Level2Name = column.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+
+                column.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
         /// <param name="table"></param>
         /// <param name="name"></param>
         /// <param name="value"></param>
@@ -158,9 +165,7 @@ namespace CatFactory.SqlServer
                 Level0Type = "schema",
                 Level0Name = table.Schema,
                 Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "",
-                Level2Name = ""
+                Level1Name = table.Name
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -221,9 +226,7 @@ namespace CatFactory.SqlServer
                 Level0Type = "schema",
                 Level0Name = table.Schema,
                 Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "",
-                Level2Name = ""
+                Level1Name = table.Name
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -286,61 +289,6 @@ namespace CatFactory.SqlServer
         /// 
         /// </summary>
         /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="name"></param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
-        {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "",
-                Level2Name = ""
-            };
-
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
-
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
-        {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
-
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="databaseFactory"></param>
         /// <param name="view"></param>
         /// <param name="name"></param>
         /// <param name="value"></param>
@@ -353,9 +301,7 @@ namespace CatFactory.SqlServer
                 Level0Type = "schema",
                 Level0Name = view.Schema,
                 Level1Type = "view",
-                Level1Name = view.Name,
-                Level2Type = "",
-                Level2Name = ""
+                Level1Name = view.Name
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -411,6 +357,133 @@ namespace CatFactory.SqlServer
                     repository.UpdateExtendedProperty(model);
 
                 column.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="database"></param>
+        /// <param name="name"></param>
+        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="table"></param>
+        /// <param name="name"></param>
+        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Level0Type = "schema",
+                Level0Name = table.Schema,
+                Level1Type = "table",
+                Level1Name = table.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="table"></param>
+        /// <param name="column"></param>
+        /// <param name="name"></param>
+        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Level0Type = "schema",
+                Level0Name = table.Schema,
+                Level1Type = "table",
+                Level1Name = table.Name,
+                Level2Type = "column",
+                Level2Name = column.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="view"></param>
+        /// <param name="name"></param>
+        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Level0Type = "schema",
+                Level0Name = view.Schema,
+                Level1Type = "view",
+                Level1Name = view.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="databaseFactory"></param>
+        /// <param name="view"></param>
+        /// <param name="column"></param>
+        /// <param name="name"></param>
+        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
+        {
+            var model = new ExtendedProperty
+            {
+                Name = name,
+                Level0Type = "schema",
+                Level0Name = view.Schema,
+                Level1Type = "view",
+                Level1Name = view.Name,
+                Level2Type = "column",
+                Level2Name = column.Name
+            };
+
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
             }
         }
     }

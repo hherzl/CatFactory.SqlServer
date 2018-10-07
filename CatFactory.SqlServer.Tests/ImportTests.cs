@@ -3,7 +3,7 @@ using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public class Tests
+    public class ImportTests
     {
         [Fact]
         public void ImportStoreDatabaseTest()
@@ -15,10 +15,10 @@ namespace CatFactory.SqlServer.Tests
             // Assert
             Assert.True(database.Tables.Count > 0);
             Assert.True(database.Views.Count > 0);
-
             Assert.True(database.FindTable("Production.Product").Columns.Count > 0);
             Assert.True(database.FindTable("Production.Product").PrimaryKey != null);
             Assert.True(database.FindTable("Production.Product").ForeignKeys.Count > 0);
+            Assert.True(database.FindView("Sales.OrderSummary").Columns.Count > 0);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;MultipleActiveResultSets=true;",
+                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true
@@ -131,7 +131,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
+                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
                     ImportStoredProcedures = true,
                     ImportScalarFunctions = true,
                     ImportTableFunctions = true,

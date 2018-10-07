@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
-using CatFactory.Collections;
+using System.Data.SqlClient;
 using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
@@ -10,41 +11,84 @@ namespace CatFactory.SqlServer
     /// </summary>
     public class ExtendedPropertyRepository : IExtendedPropertyRepository
     {
-        private IDbConnection connection;
+        private IDbConnection Connection;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cnn"></param>
-        public ExtendedPropertyRepository(IDbConnection cnn)
+        /// <param name="connection"></param>
+        public ExtendedPropertyRepository(IDbConnection connection)
         {
-            connection = cnn;
+            Connection = connection;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="extendedProperty"></param>
         /// <returns></returns>
-        public IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty model)
+        public IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty extendedProperty)
         {
-            using (var command = connection.CreateCommand())
+            using (var command = Connection.CreateCommand())
             {
-                var parameters = new List<string>
-                {
-                    string.IsNullOrEmpty(model.Name) ? "default" : string.Format("'{0}'", model.Name),
-                    string.IsNullOrEmpty(model.Level0Type) ? "default" : string.Format("'{0}'", model.Level0Type),
-                    string.IsNullOrEmpty(model.Level0Name) ? "default" : string.Format("'{0}'", model.Level0Name),
-                    string.IsNullOrEmpty(model.Level1Type) ? "default" : string.Format("'{0}'", model.Level1Type),
-                    string.IsNullOrEmpty(model.Level1Name) ? "default" : string.Format("'{0}'", model.Level1Name),
-                    string.IsNullOrEmpty(model.Level2Type) || model.Level2Type == "default" ? "default" : string.Format("'{0}'", model.Level2Type),
-                    string.IsNullOrEmpty(model.Level2Name) || model.Level2Name == "default" ? "default" : string.Format("'{0}'", model.Level2Name)
-                };
+                command.Connection = Connection;
+                command.CommandText = "select [objtype], [objname], [name], [value] from [fn_listextendedproperty](@name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name)";
 
-                var commandText = string.Format("select objtype, objname, name, value from fn_listextendedproperty ({0})", string.Join(",", parameters));
+                command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
 
-                command.Connection = connection;
-                command.CommandText = commandText;
+                var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level0Type))
+                    level0type.Value = DBNull.Value;
+                else
+                    level0type.Value = extendedProperty.Level0Type;
+
+                command.Parameters.Add(level0type);
+
+                var level0name = new SqlParameter("@level0name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level0Name))
+                    level0name.Value = DBNull.Value;
+                else
+                    level0name.Value = extendedProperty.Level0Name;
+
+                command.Parameters.Add(level0name);
+
+                var level1type = new SqlParameter("@level1type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Type))
+                    level1type.Value = DBNull.Value;
+                else
+                    level1type.Value = extendedProperty.Level1Type;
+
+                command.Parameters.Add(level1type);
+
+                var level1name = new SqlParameter("@level1name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Name))
+                    level1name.Value = DBNull.Value;
+                else
+                    level1name.Value = extendedProperty.Level1Name;
+
+                command.Parameters.Add(level1name);
+
+                var level2type = new SqlParameter("@level2type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Type))
+                    level2type.Value = DBNull.Value;
+                else
+                    level2type.Value = extendedProperty.Level2Type;
+
+                command.Parameters.Add(level2type);
+
+                var level2name = new SqlParameter("@level2name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Name))
+                    level2name.Value = DBNull.Value;
+                else
+                    level2name.Value = extendedProperty.Level2Name;
+
+                command.Parameters.Add(level2name);
 
                 using (var dataReader = command.ExecuteReader())
                 {
@@ -63,28 +107,70 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
-        public void AddExtendedProperty(ExtendedProperty model)
+        /// <param name="extendedProperty"></param>
+        public void AddExtendedProperty(ExtendedProperty extendedProperty)
         {
-            using (var command = connection.CreateCommand())
+            using (var command = Connection.CreateCommand())
             {
-                var parameters = new List<string>
-                {
-                    string.Format("@name = N'{0}'",  model.Name),
-                    string.Format("@value = N'{0}'", model.Value)
-                };
+                command.Connection = Connection;
+                command.CommandText = "exec [sys].[sp_addextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
 
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Type), string.Format("@level0type = N'{0}'", model.Level0Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Name), string.Format("@level0name = N'{0}'", model.Level0Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Type), string.Format("@level1type = N'{0}'", model.Level1Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Name), string.Format("@level1name = N'{0}'", model.Level1Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Type), string.Format("@level2type = N'{0}'", model.Level2Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Name), string.Format("@level2name = N'{0}'", model.Level2Name));
+                command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
+                command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
 
-                var commandText = string.Format("exec sys.sp_addextendedproperty {0}", string.Join(", ", parameters));
+                var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);
 
-                command.Connection = connection;
-                command.CommandText = commandText;
+                if (string.IsNullOrEmpty(extendedProperty.Level0Type))
+                    level0type.Value = DBNull.Value;
+                else
+                    level0type.Value = extendedProperty.Level0Type;
+
+                command.Parameters.Add(level0type);
+
+                var level0name = new SqlParameter("@level0name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level0Name))
+                    level0name.Value = DBNull.Value;
+                else
+                    level0name.Value = extendedProperty.Level0Name;
+
+                command.Parameters.Add(level0name);
+
+                var level1type = new SqlParameter("@level1type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Type))
+                    level1type.Value = DBNull.Value;
+                else
+                    level1type.Value = extendedProperty.Level1Type;
+
+                command.Parameters.Add(level1type);
+
+                var level1name = new SqlParameter("@level1name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Name))
+                    level1name.Value = DBNull.Value;
+                else
+                    level1name.Value = extendedProperty.Level1Name;
+
+                command.Parameters.Add(level1name);
+
+                var level2type = new SqlParameter("@level2type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Type))
+                    level2type.Value = DBNull.Value;
+                else
+                    level2type.Value = extendedProperty.Level2Type;
+
+                command.Parameters.Add(level2type);
+
+                var level2name = new SqlParameter("@level2name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Name))
+                    level2name.Value = DBNull.Value;
+                else
+                    level2name.Value = extendedProperty.Level2Name;
+
+                command.Parameters.Add(level2name);
 
                 command.ExecuteNonQuery();
             }
@@ -93,28 +179,70 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
-        public void UpdateExtendedProperty(ExtendedProperty model)
+        /// <param name="extendedProperty"></param>
+        public void UpdateExtendedProperty(ExtendedProperty extendedProperty)
         {
-            using (var command = connection.CreateCommand())
+            using (var command = Connection.CreateCommand())
             {
-                var parameters = new List<string>
-                {
-                    string.Format("@name = N'{0}'",  model.Name),
-                    string.Format("@value = N'{0}'", model.Value)
-                };
+                command.Connection = Connection;
+                command.CommandText = "exec [sys].[sp_updateextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
 
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Type), string.Format("@level0type = N'{0}'", model.Level0Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Name), string.Format("@level0name = N'{0}'", model.Level0Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Type), string.Format("@level1type = N'{0}'", model.Level1Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Name), string.Format("@level1name = N'{0}'", model.Level1Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Type), string.Format("@level2type = N'{0}'", model.Level2Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Name), string.Format("@level2name = N'{0}'", model.Level2Name));
+                command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
+                command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
 
-                var commandText = string.Format("exec sys.sp_updateextendedproperty {0} ", string.Join(", ", parameters));
+                var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);
 
-                command.Connection = connection;
-                command.CommandText = commandText;
+                if (string.IsNullOrEmpty(extendedProperty.Level0Type))
+                    level0type.Value = DBNull.Value;
+                else
+                    level0type.Value = extendedProperty.Level0Type;
+
+                command.Parameters.Add(level0type);
+
+                var level0name = new SqlParameter("@level0name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level0Name))
+                    level0name.Value = DBNull.Value;
+                else
+                    level0name.Value = extendedProperty.Level0Name;
+
+                command.Parameters.Add(level0name);
+
+                var level1type = new SqlParameter("@level1type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Type))
+                    level1type.Value = DBNull.Value;
+                else
+                    level1type.Value = extendedProperty.Level1Type;
+
+                command.Parameters.Add(level1type);
+
+                var level1name = new SqlParameter("@level1name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Name))
+                    level1name.Value = DBNull.Value;
+                else
+                    level1name.Value = extendedProperty.Level1Name;
+
+                command.Parameters.Add(level1name);
+
+                var level2type = new SqlParameter("@level2type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Type))
+                    level2type.Value = DBNull.Value;
+                else
+                    level2type.Value = extendedProperty.Level2Type;
+
+                command.Parameters.Add(level2type);
+
+                var level2name = new SqlParameter("@level2name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Name))
+                    level2name.Value = DBNull.Value;
+                else
+                    level2name.Value = extendedProperty.Level2Name;
+
+                command.Parameters.Add(level2name);
 
                 command.ExecuteNonQuery();
             }
@@ -123,27 +251,69 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="model"></param>
-        public void DropExtendedProperty(ExtendedProperty model)
+        /// <param name="extendedProperty"></param>
+        public void DropExtendedProperty(ExtendedProperty extendedProperty)
         {
-            using (var command = connection.CreateCommand())
+            using (var command = Connection.CreateCommand())
             {
-                var parameters = new List<string>
-                {
-                    string.Format("@name = N'{0}'", model.Name)
-                };
+                command.Connection = Connection;
+                command.CommandText = "exec [sys].[sp_dropextendedproperty] @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
 
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Type), string.Format("@level0type = N'{0}'", model.Level0Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level0Name), string.Format("@level0name = N'{0}'", model.Level0Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Type), string.Format("@level1type = N'{0}'", model.Level1Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level1Name), string.Format("@level1name = N'{0}'", model.Level1Name));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Type), string.Format("@level2type = N'{0}'", model.Level2Type));
-                parameters.Add(!string.IsNullOrEmpty(model.Level2Name), string.Format("@level2name = N'{0}'", model.Level2Name));
+                command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
 
-                var commandText = string.Format("exec sys.sp_dropextendedproperty {0} ", string.Join(", ", parameters));
+                var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);
 
-                command.Connection = connection;
-                command.CommandText = commandText;
+                if (string.IsNullOrEmpty(extendedProperty.Level0Type))
+                    level0type.Value = DBNull.Value;
+                else
+                    level0type.Value = extendedProperty.Level0Type;
+
+                command.Parameters.Add(level0type);
+
+                var level0name = new SqlParameter("@level0name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level0Name))
+                    level0name.Value = DBNull.Value;
+                else
+                    level0name.Value = extendedProperty.Level0Name;
+
+                command.Parameters.Add(level0name);
+
+                var level1type = new SqlParameter("@level1type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Type))
+                    level1type.Value = DBNull.Value;
+                else
+                    level1type.Value = extendedProperty.Level1Type;
+
+                command.Parameters.Add(level1type);
+
+                var level1name = new SqlParameter("@level1name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level1Name))
+                    level1name.Value = DBNull.Value;
+                else
+                    level1name.Value = extendedProperty.Level1Name;
+
+                command.Parameters.Add(level1name);
+
+                var level2type = new SqlParameter("@level2type", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Type))
+                    level2type.Value = DBNull.Value;
+                else
+                    level2type.Value = extendedProperty.Level2Type;
+
+                command.Parameters.Add(level2type);
+
+                var level2name = new SqlParameter("@level2name", SqlDbType.VarChar);
+
+                if (string.IsNullOrEmpty(extendedProperty.Level2Name))
+                    level2name.Value = DBNull.Value;
+                else
+                    level2name.Value = extendedProperty.Level2Name;
+
+                command.Parameters.Add(level2name);
 
                 command.ExecuteNonQuery();
             }
