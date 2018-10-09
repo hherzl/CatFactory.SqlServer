@@ -9,45 +9,48 @@ using Microsoft.Extensions.Logging;
 
 namespace CatFactory.SqlServer
 {
+    /// <summary>
+    /// Implements all operations related to import database feature
+    /// </summary>
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
         /// <summary>
-        /// 
+        /// Gets a instance for <see cref="Logger"/> class
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An instance for <see cref="SqlServerDatabaseFactory"/> class</returns>
         public static ILogger<SqlServerDatabaseFactory> GetLogger()
             => LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
 
         /// <summary>
-        /// 
+        /// Gets the <see cref="Logger"/> instance
         /// </summary>
-        protected ILogger Logger;
+        protected ILogger Logger { get; }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
         /// </summary>
         public SqlServerDatabaseFactory()
         {
         }
 
         /// <summary>
-        /// 
+        /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger"><see cref="Logger"/> class</param>
         public SqlServerDatabaseFactory(ILogger<SqlServerDatabaseFactory> logger)
         {
             Logger = logger;
         }
 
         /// <summary>
-        /// 
+        /// Gets an instance for <see cref="DbConnection"/> class
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An instance of <see cref="SqlConnection"/> class</returns>
         public DbConnection GetConnection()
             => new SqlConnection(DatabaseImportSettings.ConnectionString);
 
         /// <summary>
-        /// 
+        /// Gets or sets the connnection string
         /// </summary>
         [Obsolete("Set connection string in ImportSettings")]
         public string ConnectionString
@@ -66,7 +69,7 @@ namespace CatFactory.SqlServer
         private DatabaseImportSettings m_databaseImportSettings;
 
         /// <summary>
-        /// 
+        /// Gets or sets the database import settings
         /// </summary>
         public DatabaseImportSettings DatabaseImportSettings
         {
@@ -81,7 +84,7 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the import settings
         /// </summary>
         [Obsolete("Use DatabaseImportSettings property")]
         public DatabaseImportSettings ImportSettings
@@ -97,9 +100,9 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Imports an existing database from SQL Server instance using database import settings
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
         public virtual Database Import()
         {
             var database = new Database
@@ -189,6 +192,16 @@ namespace CatFactory.SqlServer
                         database.StoredProcedures.Add(storedProcedure);
                     }
 
+                    Logger?.LogInformation("Getting first result sets for stored procedures...");
+
+                    foreach (var storedProcedure in database.StoredProcedures)
+                    {
+                        foreach (var firstResultSet in SqlServerDatabaseFactoryHelper.GetFirstResultSetForObject(storedProcedure, connection))
+                        {
+                            storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
+                        }
+                    }
+
                     if (DatabaseImportSettings.ExtendedProperties.Count > 0)
                     {
                         Logger?.LogInformation("Importing extended properties for stored procedures...");
@@ -245,10 +258,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets database objects from connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>A sequence of <see cref="DbObject"/> class that represents objects in database</returns>
         protected virtual IEnumerable<DbObject> GetDbObjects(DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -272,11 +285,11 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets tables from database connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="tables"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="tables">Sequence of <see cref="DbObject"/> that represents tables</param>
+        /// <returns>A sequence of <see cref="Table"/></returns>
         protected virtual IEnumerable<Table> GetTables(DbConnection connection, IEnumerable<DbObject> tables)
         {
             foreach (var dbObject in tables)
@@ -343,10 +356,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds a column in table from row dictionary
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddColumn(Table table, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -356,10 +369,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds a column in table from row dictionary
         /// </summary>
-        /// <param name="view"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddColumn(View view, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -369,10 +382,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds a column in table function from row dictionary
         /// </summary>
-        /// <param name="tableFunction"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="tableFunction">Instance of <see cref="TableFunction"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddColumn(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             var column = SqlServerDatabaseFactoryHelper.GetColumn(dictionary);
@@ -382,40 +395,40 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds a parameter in stored procedure from row dictionary
         /// </summary>
-        /// <param name="storedProcedure"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
         {
             storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Adds a parameter in scalar function from row dictionary
         /// </summary>
-        /// <param name="scalarFunction"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="scalarFunction">Instance of <see cref="ScalarFunction"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
         {
             scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Adds a parameter in table function from row dictionary
         /// </summary>
-        /// <param name="tableFunction"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="tableFunction">Instance of <see cref="TableFunction"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Sets identity for table
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(Table table, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -425,10 +438,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Sets identity for view
         /// </summary>
-        /// <param name="view"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(View view, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -438,10 +451,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Sets identity for table function
         /// </summary>
         /// <param name="tableFunction"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
             var identity = string.Concat(dictionary["Identity"]);
@@ -451,10 +464,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Sets row guid column for table
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetRowGuidCol(Table table, IDictionary<string, object> dictionary)
         {
             table.RowGuidCol = new RowGuidCol
@@ -464,10 +477,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Sets row guid column for view
         /// </summary>
-        /// <param name="view"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetRowGuidCol(View view, IDictionary<string, object> dictionary)
         {
             view.RowGuidCol = new RowGuidCol
@@ -477,39 +490,39 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds index to table
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddIndexToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.Indexes.Add(SqlServerDatabaseFactoryHelper.GetIndex(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Add index to view
         /// </summary>
-        /// <param name="view"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddIndexToView(View view, IDictionary<string, object> dictionary)
         {
             view.Indexes.Add(SqlServerDatabaseFactoryHelper.GetIndex(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Adds constraint to table
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddConstraintToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.ConstraintDetails.Add(SqlServerDatabaseFactoryHelper.GetConstraintDetail(dictionary));
         }
 
         /// <summary>
-        /// 
+        /// Sets constraints for table from contraint details
         /// </summary>
-        /// <param name="table"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
         protected virtual void SetConstraintsFromConstraintDetails(Table table)
         {
             foreach (var constraintDetail in table.ConstraintDetails)
@@ -560,10 +573,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds table reference for table
         /// </summary>
-        /// <param name="table"></param>
-        /// <param name="dictionary"></param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddTableReferenceToTable(Table table, IDictionary<string, object> dictionary)
         {
             table.TableReferences.Add(new TableReference
@@ -613,11 +626,11 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets views from database connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="views"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="views">Sequence of views</param>
+        /// <returns>A sequence of <see cref="View"/> that represents existing views in database</returns>
         protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
         {
             foreach (var dbObject in views)
@@ -707,18 +720,18 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets scalar functions from database connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="storedProcedures"></param>
-        /// <returns></returns>
-        protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="scalarFunctions">Sequence of scalar functions</param>
+        /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
+        protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
-            foreach (var dbObject in storedProcedures)
+            foreach (var dbObject in scalarFunctions)
             {
                 using (var command = connection.CreateCommand())
                 {
-                    var storedProcedure = new StoredProcedure
+                    var scalarFunction = new ScalarFunction
                     {
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
@@ -755,35 +768,35 @@ namespace CatFactory.SqlServer
                             foreach (var item in result.Items)
                             {
                                 if (item.ContainsKey("Parameter_name"))
-                                    AddParameter(storedProcedure, item);
+                                    AddParameter(scalarFunction, item);
                             }
                         }
 
-                        yield return storedProcedure;
+                        yield return scalarFunction;
                     }
                 }
             }
         }
 
-        private void ImportExtendedProperties(DbConnection connection, StoredProcedure storedProcedure)
+        private void ImportExtendedProperties(DbConnection connection, ScalarFunction scalarFunction)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(storedProcedure, name))
+                foreach (var extendedProperty in connection.GetExtendedProperties(scalarFunction, name))
                 {
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        storedProcedure.Description = extendedProperty.Value;
+                        scalarFunction.Description = extendedProperty.Value;
                 }
             }
         }
 
         /// <summary>
-        /// 
+        /// Gets table functions from database connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="tableFunctions"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="tableFunctions">Sequence of table functions</param>
+        /// <returns>A sequence of <see cref="TableFunction"/> that represents existing views in database</returns>
         protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
         {
             foreach (var dbObject in tableFunctions)
@@ -855,18 +868,18 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets stored procedures from database connection
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="scalarFunctions"></param>
-        /// <returns></returns>
-        protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="storedProcedures">Sequence of stored procedures</param>
+        /// <returns>A sequence of <see cref="StoredProcedure"/> that represents existing views in database</returns>
+        protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
         {
-            foreach (var dbObject in scalarFunctions)
+            foreach (var dbObject in storedProcedures)
             {
                 using (var command = connection.CreateCommand())
                 {
-                    var scalarFunction = new ScalarFunction
+                    var storedProcedure = new StoredProcedure
                     {
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
@@ -903,25 +916,25 @@ namespace CatFactory.SqlServer
                             foreach (var item in result.Items)
                             {
                                 if (item.ContainsKey("Parameter_name"))
-                                    AddParameter(scalarFunction, item);
+                                    AddParameter(storedProcedure, item);
                             }
                         }
 
-                        yield return scalarFunction;
+                        yield return storedProcedure;
                     }
                 }
             }
         }
 
-        private void ImportExtendedProperties(DbConnection connection, ScalarFunction scalarFunction)
+        private void ImportExtendedProperties(DbConnection connection, StoredProcedure storedProcedure)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(scalarFunction, name))
+                foreach (var extendedProperty in connection.GetExtendedProperties(storedProcedure, name))
                 {
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        scalarFunction.Description = extendedProperty.Value;
+                        storedProcedure.Description = extendedProperty.Value;
                 }
             }
         }

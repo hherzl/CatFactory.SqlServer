@@ -6,36 +6,36 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Represents a code builder for tables
     /// </summary>
     public class SqlCodeBuilder : CodeBuilder
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of <see cref="SqlCodeBuilder"/> class
         /// </summary>
         public SqlCodeBuilder()
         {
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public Database Database { get; set; }
-
-        /// <summary>
-        /// 
+        /// Gets the file name
         /// </summary>
         public override string FileName
             => Database.Name;
 
         /// <summary>
-        /// 
+        /// Gets the file extension
         /// </summary>
         public override string FileExtension
             => "sql";
 
         /// <summary>
-        /// 
+        /// Gets or sets the database
+        /// </summary>
+        public Database Database { get; set; }
+
+        /// <summary>
+        /// Gets the output code for current <see cref="SqlCodeBuilder"/> instance
         /// </summary>
         public string Code
         {

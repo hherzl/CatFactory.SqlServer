@@ -1,39 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using CatFactory.Mapping;
 
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Implements operations to manipulate extended properties
     /// </summary>
     public class ExtendedPropertyRepository : IExtendedPropertyRepository
     {
-        private IDbConnection Connection;
+        private DbConnection Connection;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of <see cref="ExtendedPropertyRepository"/> class
         /// </summary>
-        /// <param name="connection"></param>
-        public ExtendedPropertyRepository(IDbConnection connection)
+        /// <param name="connection">Connection to database</param>
+        public ExtendedPropertyRepository(DbConnection connection)
         {
             Connection = connection;
         }
 
         /// <summary>
-        /// 
+        /// Gets extended properties
         /// </summary>
-        /// <param name="extendedProperty"></param>
-        /// <returns></returns>
+        /// <param name="extendedProperty">Search parameter</param>
+        /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty extendedProperty)
         {
             using (var command = Connection.CreateCommand())
             {
                 command.Connection = Connection;
-                command.CommandText = "select [objtype], [objname], [name], [value] from [fn_listextendedproperty](@name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name)";
-
+                command.CommandText = " select [objtype], [objname], [name], [value] from [fn_listextendedproperty](@name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name) ";
                 command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
 
                 var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);
@@ -105,16 +105,15 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds an extended property
         /// </summary>
-        /// <param name="extendedProperty"></param>
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to add</param>
         public void AddExtendedProperty(ExtendedProperty extendedProperty)
         {
             using (var command = Connection.CreateCommand())
             {
                 command.Connection = Connection;
-                command.CommandText = "exec [sys].[sp_addextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
-
+                command.CommandText = " exec [sys].[sp_addextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name ";
                 command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
                 command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
 
@@ -177,16 +176,15 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Updates an extended property
         /// </summary>
-        /// <param name="extendedProperty"></param>
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to update</param>
         public void UpdateExtendedProperty(ExtendedProperty extendedProperty)
         {
             using (var command = Connection.CreateCommand())
             {
                 command.Connection = Connection;
-                command.CommandText = "exec [sys].[sp_updateextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
-
+                command.CommandText = " exec [sys].[sp_updateextendedproperty] @name, @value, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name ";
                 command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
                 command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
 
@@ -249,16 +247,15 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property
         /// </summary>
-        /// <param name="extendedProperty"></param>
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to drop</param>
         public void DropExtendedProperty(ExtendedProperty extendedProperty)
         {
             using (var command = Connection.CreateCommand())
             {
                 command.Connection = Connection;
-                command.CommandText = "exec [sys].[sp_dropextendedproperty] @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name";
-
+                command.CommandText = " exec [sys].[sp_dropextendedproperty] @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name ";
                 command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
 
                 var level0type = new SqlParameter("@level0type", SqlDbType.VarChar);

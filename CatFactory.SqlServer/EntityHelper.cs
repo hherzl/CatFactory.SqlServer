@@ -5,34 +5,35 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Contains extension methods to define entities (Tables) using lambda expressions
     /// </summary>
     public static class EntityHelper
     {
         /// <summary>
-        /// 
+        /// Defines an entity from anonymous type
         /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="database"></param>
-        /// <param name="schema"></param>
-        /// <param name="name"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        public static EntityResult<TModel> DefineEntity<TModel>(this Database database, string schema, string name, TModel model)
+        /// <typeparam name="TModel">Anonymous type</typeparam>
+        /// <param name="database"><see cref="Database"/> instance</param>
+        /// <param name="schema">Schema name</param>
+        /// <param name="name">Table name</param>
+        /// <param name="model">Anonymous type</param>
+        /// <returns><see cref="Database"/> Instance</returns>
+        public static EntityResult<TModel> DefineEntity<TModel>(this Database database, string schema, string name, TModel model) where TModel : class
         {
             var result = new EntityResult<TModel>
             {
-                Model = model
-            };
-
-            result.Table = new Table
-            {
-                Schema = schema,
-                Name = name
+                Model = model,
+                Table = new Table
+                {
+                    Schema = schema,
+                    Name = name
+                }
             };
 
             foreach (var property in model.GetType().GetProperties())
                 result.Table.Columns.Add(new Column { Name = property.Name });
+
+            database.Tables.Add(result.Table);
 
             return result;
         }
@@ -58,7 +59,7 @@ namespace CatFactory.SqlServer
         /// <param name="selector"></param>
         /// <param name="column"></param>
         /// <returns></returns>
-        public static EntityResult<TModel> SetColumnForProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, Column column)
+        public static EntityResult<TModel> SetColumnForProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, Column column) where TModel : class
         {
             if (string.IsNullOrEmpty(column.Name))
                 column.Name = GetPropertyName(selector);
@@ -91,7 +92,7 @@ namespace CatFactory.SqlServer
         /// <param name="seed"></param>
         /// <param name="increment"></param>
         /// <returns></returns>
-        public static EntityResult<TModel> SetIdentity<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, int seed = 1, int increment = 1)
+        public static EntityResult<TModel> SetIdentity<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, int seed = 1, int increment = 1) where TModel : class
         {
             var name = GetPropertyName(selector);
 
@@ -109,22 +110,13 @@ namespace CatFactory.SqlServer
         /// <param name="selector"></param>
         /// <param name="constraintName"></param>
         /// <returns></returns>
-        public static EntityResult<TModel> SetPrimaryKey<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null)
+        public static EntityResult<TModel> SetPrimaryKey<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
         {
             var name = GetPropertyName(selector);
 
             result.Table.PrimaryKey = new PrimaryKey(name);
 
             return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="database"></param>
-        public static void Translate(Database database)
-        {
-            // todo: Implement this feature
         }
     }
 }

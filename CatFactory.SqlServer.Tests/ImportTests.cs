@@ -79,6 +79,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.Views.Count > 0);
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
             Assert.True(database.StoredProcedures.Count > 0);
+            Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").FirstResultSetsForObject.Count > 0);
         }
 
         [Fact]
@@ -162,6 +163,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindView("Production.vProductAndDescription").Indexes.Count > 0);
 
             Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
+            Assert.True(database.StoredProcedures.FirstOrDefault(item => item.FullName == "HumanResources.uspUpdateEmployeeHireInfo").FirstResultSetsForObject.Count == 0);
         }
     }
 }

@@ -4,33 +4,33 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Contains operations to manipulate extended properties
     /// </summary>
     public interface IExtendedPropertyRepository
     {
         /// <summary>
-        /// 
+        /// Gets extended properties
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty model);
+        /// <param name="extendedProperty">Search parameter</param>
+        /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
+        IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty extendedProperty);
 
         /// <summary>
-        /// 
+        /// Adds an extended property
         /// </summary>
-        /// <param name="model"></param>
-        void AddExtendedProperty(ExtendedProperty model);
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to add</param>
+        void AddExtendedProperty(ExtendedProperty extendedProperty);
 
         /// <summary>
-        /// 
+        /// Updates an extended property
         /// </summary>
-        /// <param name="model"></param>
-        void UpdateExtendedProperty(ExtendedProperty model);
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to update</param>
+        void UpdateExtendedProperty(ExtendedProperty extendedProperty);
 
         /// <summary>
-        /// 
+        /// Drops an extended property
         /// </summary>
-        /// <param name="model"></param>
-        void DropExtendedProperty(ExtendedProperty model);
+        /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to drop</param>
+        void DropExtendedProperty(ExtendedProperty extendedProperty);
     }
 }

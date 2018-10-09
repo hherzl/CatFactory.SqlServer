@@ -4,17 +4,17 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Contains extension methods for <see cref="SqlServerDatabaseFactory"/> class to allow perform CRUD operations for extended properties
     /// </summary>
     public static class SqlServerDatabaseFactoryExtensions
     {
         /// <summary>
-        /// 
+        /// Adds an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="database"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="database">Instance of <see cref="Database"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
             using (var connection = databaseFactory.GetConnection())
@@ -28,195 +28,187 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
 
                 table.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Adds an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
 
                 column.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Adds an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
 
                 view.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Adds an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
 
                 column.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Updates an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="database"></param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
+        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value });
+
+                database.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// Updates an extended property for database object
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
+        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
 
                 table.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Updates an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
 
                 column.Description = value;
             }
         }
 
         /// <summary>
-        /// 
+        /// Updates an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
+        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+
+                view.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// Updates an extended property for database object
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
+        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+
+                column.Description = value;
+            }
+        }
+
+        /// <summary>
+        /// Adds if not exists or updates if exists an extended property for database object
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
             var model = new ExtendedProperty
@@ -247,13 +239,13 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds if not exists or updates if exists an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
             var model = new ExtendedProperty
@@ -286,23 +278,15 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds if not exists or updates if exists an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name
-            };
+            var model = new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name };
 
             using (var connection = databaseFactory.GetConnection())
             {
@@ -322,13 +306,13 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Adds if not exists or updates if exists an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
             var model = new ExtendedProperty
@@ -361,129 +345,180 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="database"></param>
-        /// <param name="name"></param>
+        /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name });
             }
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="name"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
             }
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="table"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
             }
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="name"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
             }
         }
 
         /// <summary>
-        /// 
+        /// Drops an extended property for database object
         /// </summary>
-        /// <param name="databaseFactory"></param>
-        /// <param name="view"></param>
-        /// <param name="column"></param>
-        /// <param name="name"></param>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
         {
-            var model = new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            };
-
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(model);
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+            }
+        }
+
+        /// <summary>
+        /// Drops an extended property for database object if exists
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="name">Extended property name</param>
+        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, string name)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = connection.GetExtendedProperties(name).FirstOrDefault();
+
+                if (extendedProperty != null)
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name });
+            }
+        }
+
+        /// <summary>
+        /// Drops an extended property for database object if exists
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="name">Extended property name</param>
+        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
+
+                if (extendedProperty != null)
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
+            }
+        }
+
+        /// <summary>
+        /// Drops an extended property for database object if exists
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="table">Instance of <see cref="Table"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
+
+                if (extendedProperty != null)
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
+            }
+        }
+
+        /// <summary>
+        /// Drops an extended property for database object if exists
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="name">Extended property name</param>
+        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+
+                if (extendedProperty != null)
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+            }
+        }
+
+        /// <summary>
+        /// Drops an extended property for database object if exists
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="view">Instance of <see cref="View"/> class</param>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
+        /// <param name="name">Extended property name</param>
+        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
+        {
+            using (var connection = databaseFactory.GetConnection())
+            {
+                connection.Open();
+
+                var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+
+                if (extendedProperty != null)
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
             }
         }
     }

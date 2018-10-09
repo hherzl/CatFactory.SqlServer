@@ -7,49 +7,48 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Represents a code builder for stored procedures
     /// </summary>
     public class SqlStoredProcedureCodeBuilder : CodeBuilder
     {
-        private List<DatabaseTypeMap> Mappings;
-
         /// <summary>
-        /// 
+        /// Initializes a new instance of <see cref="SqlStoredProcedureCodeBuilder"/> class
         /// </summary>
         public SqlStoredProcedureCodeBuilder()
         {
-            Mappings = DatabaseTypeMapList.Definition;
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public Database Database { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ITable Table { get; set; }
-
-        /// <summary>
-        /// 
+        /// Gets the file name
         /// </summary>
         public override string FileName
             => Table.FullName;
 
         /// <summary>
-        /// 
+        /// Gets the file extension
         /// </summary>
         public override string FileExtension
             => "sql";
 
         /// <summary>
-        /// 
+        /// Gets the database associated with current <see cref="SqlStoredProcedureCodeBuilder"/> instance
         /// </summary>
-        /// <param name="column"></param>
+        public Database Database { get; set; }
+
+        /// <summary>
+        /// Gets the table associated with current <see cref="SqlStoredProcedureCodeBuilder"/> instance
+        /// </summary>
+        public ITable Table { get; set; }
+
+        /// <summary>
+        /// Gets an string that represents database type for column
+        /// </summary>
+        /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <returns></returns>
-        public virtual string GetType(Column column)
+        protected virtual string GetType(Column column)
         {
+            // todo: Add database types collection
+            // todo: Refactor this switch to use data types from database types
             switch (column.Type)
             {
                 case "char":
@@ -66,7 +65,7 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Translates object definition to a sequence of <see cref="ILine"/> interface
         /// </summary>
         public override void Translating()
         {
@@ -77,7 +76,7 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets the output code for current <see cref="SqlStoredProcedureCodeBuilder"/> instance
         /// </summary>
         public string Code
         {
@@ -104,12 +103,7 @@ namespace CatFactory.SqlServer
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        /// <param name="procedureName"></param>
-        protected virtual void DropProcedure(StringBuilder output, string procedureName)
+        private void DropProcedure(StringBuilder output, string procedureName)
         {
             output.AppendFormat("if object_id('{0}', 'P') is not null", procedureName.Replace("[", string.Empty).Replace("]", string.Empty));
             output.AppendLine();
@@ -121,11 +115,7 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        protected virtual void GetAllProcedure(StringBuilder output)
+        private void GetAllProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "GetAll");
 
@@ -204,11 +194,7 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        protected virtual void GetProcedure(StringBuilder output)
+        private void GetProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Get");
 
@@ -225,7 +211,7 @@ namespace CatFactory.SqlServer
                 {
                     var key = Table.PrimaryKey.Key[i];
 
-                    var column = Table.Columns.FirstOrDefault(x => x.Name == key);
+                    var column = Table.GetColumnsFromConstraint(Table.PrimaryKey).First();
 
                     output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }
@@ -279,12 +265,7 @@ namespace CatFactory.SqlServer
             output.AppendLine();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        /// <returns></returns>
-        protected virtual string InsertProcedure(StringBuilder output)
+        private string InsertProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Add");
 
@@ -371,12 +352,7 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        /// <returns></returns>
-        protected virtual string UpdateProcedure(StringBuilder output)
+        private string UpdateProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Update");
 
@@ -449,12 +425,7 @@ namespace CatFactory.SqlServer
             return output.ToString();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="output"></param>
-        /// <returns></returns>
-        protected virtual string DeleteProcedure(StringBuilder output)
+        private string DeleteProcedure(StringBuilder output)
         {
             var procedureName = Database.GetProcedureName(Table, "Delete");
 
@@ -471,7 +442,7 @@ namespace CatFactory.SqlServer
                 {
                     var key = Table.PrimaryKey.Key[i];
 
-                    var column = Table.Columns.FirstOrDefault(x => x.Name == key);
+                    var column = Table.GetColumnsFromConstraint(Table.PrimaryKey).First();
 
                     output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }

@@ -6,12 +6,12 @@ using CatFactory.Mapping;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Contains collections for SQL Server data types
     /// </summary>
     public static class DatabaseTypeMapList
     {
         /// <summary>
-        /// 
+        /// Gets a sequence of <see cref="DatabaseTypeMap"/> class that represents data types for SQLServer database
         /// </summary>
         public static List<DatabaseTypeMap> Definition
             => new List<DatabaseTypeMap>

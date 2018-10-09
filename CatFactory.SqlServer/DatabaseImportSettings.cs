@@ -5,12 +5,12 @@ using System.Diagnostics;
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// 
+    /// Represents settings for database import feature
     /// </summary>
     public class DatabaseImportSettings
     {
         /// <summary>
-        /// 
+        /// Initializes a new instance of <see cref="DatabaseImportSettings"/> class
         /// </summary>
         public DatabaseImportSettings()
         {
@@ -32,47 +32,47 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the name for database import settings
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the connection string for database import settings
         /// </summary>
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the import command text for database import settings
         /// </summary>
         public string ImportCommandText { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets a flag to import tables
         /// </summary>
         public bool ImportTables { get; set; } = true;
 
         /// <summary>
-        /// 
+        /// Gets or sets a flag to import views
         /// </summary>
         public bool ImportViews { get; set; } = true;
 
         /// <summary>
-        /// 
-        /// </summary>
-        public bool ImportStoredProcedures { get; set; }
-
-        /// <summary>
-        /// 
+        /// Gets or sets a flag to import scalar functions
         /// </summary>
         public bool ImportScalarFunctions { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets a flag to import table functions
         /// </summary>
         public bool ImportTableFunctions { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets a flag to import stored procedures
+        /// </summary>
+        public bool ImportStoredProcedures { get; set; }
+
+        /// <summary>
+        /// Gets or sets a flag to import MS_Description extended property
         /// </summary>
         [Obsolete("Add extended properties in order to retrieve description")]
         public bool ImportMSDescription { get; set; } = true;
@@ -81,7 +81,7 @@ namespace CatFactory.SqlServer
         private List<string> m_exclusions;
 
         /// <summary>
-        /// 
+        /// Gets or sets exclusions (database objects) for database import settings
         /// </summary>
         public List<string> Exclusions
         {
@@ -99,7 +99,7 @@ namespace CatFactory.SqlServer
         private List<string> m_exclusionTypes;
 
         /// <summary>
-        /// 
+        /// Gets or sets exclusion types (database types) for database import settings
         /// </summary>
         public List<string> ExclusionTypes
         {
@@ -117,7 +117,7 @@ namespace CatFactory.SqlServer
         private List<string> m_extendedProperties;
 
         /// <summary>
-        /// 
+        /// Gets or sets extended properties for database import settings
         /// </summary>
         public List<string> ExtendedProperties
         {
