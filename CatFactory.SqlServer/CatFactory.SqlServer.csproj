@@ -2,14 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build18</Version>
+    <Version>1.0.0-beta-sun-build19</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build18 Version: Addition of method DropExtendedPropertyIfExists, addition of XML comments and code refactor for methods</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0-beta-sun-build19 Version: Core package update.
+
+Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
   </PropertyGroup>
 
@@ -18,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build09" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build10" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 

@@ -21,7 +21,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value });
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name) { Value = value });
 
                 database.Description = value;
             }
@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
 
                 table.Description = value;
             }
@@ -60,7 +60,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -79,7 +79,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
 
                 view.Description = value;
             }
@@ -99,7 +99,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -137,7 +137,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
 
                 table.Description = value;
             }
@@ -157,7 +157,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -176,7 +176,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
 
                 view.Description = value;
             }
@@ -196,7 +196,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -211,14 +211,9 @@ namespace CatFactory.SqlServer
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            var model = new ExtendedProperty
+            var model = new ExtendedProperty(name, "schema", table.Schema, "table", table.Name)
             {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name
+                Value = value
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -248,16 +243,9 @@ namespace CatFactory.SqlServer
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            var model = new ExtendedProperty
+            var model = new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name)
             {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = "table",
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
+                Value = value
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -286,7 +274,10 @@ namespace CatFactory.SqlServer
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            var model = new ExtendedProperty { Name = name, Value = value, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name };
+            var model = new ExtendedProperty(name, "schema", view.Schema, "view", view.Name)
+            {
+                Value = value
+            };
 
             using (var connection = databaseFactory.GetConnection())
             {
@@ -315,16 +306,9 @@ namespace CatFactory.SqlServer
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            var model = new ExtendedProperty
+            var model = new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name)
             {
-                Name = name,
-                Value = value,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = "view",
-                Level1Name = view.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
+                Value = value
             };
 
             using (var connection = databaseFactory.GetConnection())
@@ -356,7 +340,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name });
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name));
             }
         }
 
@@ -372,7 +356,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
             }
         }
 
@@ -389,7 +373,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
             }
         }
 
@@ -405,7 +389,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
             }
         }
 
@@ -422,7 +406,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
             }
         }
 
@@ -440,7 +424,7 @@ namespace CatFactory.SqlServer
                 var extendedProperty = connection.GetExtendedProperties(name).FirstOrDefault();
 
                 if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name });
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name));
             }
         }
 
@@ -459,7 +443,7 @@ namespace CatFactory.SqlServer
                 var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
 
                 if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name });
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
             }
         }
 
@@ -479,7 +463,7 @@ namespace CatFactory.SqlServer
                 var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
 
                 if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = table.Schema, Level1Type = "table", Level1Name = table.Name, Level2Type = "column", Level2Name = column.Name });
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
             }
         }
 
@@ -498,7 +482,7 @@ namespace CatFactory.SqlServer
                 var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
 
                 if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name });
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
             }
         }
 
@@ -518,7 +502,7 @@ namespace CatFactory.SqlServer
                 var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
 
                 if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty { Name = name, Level0Type = "schema", Level0Name = view.Schema, Level1Type = "view", Level1Name = view.Name, Level2Type = "column", Level2Name = column.Name });
+                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
             }
         }
     }

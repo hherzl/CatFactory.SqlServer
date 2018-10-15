@@ -17,7 +17,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty { Name = name }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for table
@@ -27,14 +27,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, ITable table, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = table.Type,
-                Level1Name = table.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", table.Schema, table.Type, table.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for view
@@ -44,14 +37,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, IView view, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = view.Type,
-                Level1Name = view.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", view.Schema, view.Type, view.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for table function
@@ -61,14 +47,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, ITableFunction tableFunction, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = tableFunction.Schema,
-                Level1Type = tableFunction.Type,
-                Level1Name = tableFunction.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", tableFunction.Schema, tableFunction.Type, tableFunction.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for scalar function
@@ -78,14 +57,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, ScalarFunction scalarFunction, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = scalarFunction.Schema,
-                Level1Type = scalarFunction.Type,
-                Level1Name = scalarFunction.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", scalarFunction.Schema, scalarFunction.Type, scalarFunction.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for stored procedure
@@ -95,14 +67,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, StoredProcedure storedProcedure, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = storedProcedure.Schema,
-                Level1Type = storedProcedure.Type,
-                Level1Name = storedProcedure.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", storedProcedure.Schema, storedProcedure.Type, storedProcedure.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for table's column
@@ -113,16 +78,7 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, ITable table, Column column, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = table.Schema,
-                Level1Type = table.Type,
-                Level1Name = table.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", table.Schema, table.Type, table.Name, "column", column.Name)).ToList();
 
         /// <summary>
         /// Gets a sequence of extended properties for view's column
@@ -133,15 +89,6 @@ namespace CatFactory.SqlServer
         /// <param name="name">Name for extended property</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
         public static IEnumerable<ExtendedProperty> GetExtendedProperties(this DbConnection connection, IView view, Column column, string name)
-            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty
-            {
-                Name = name,
-                Level0Type = "schema",
-                Level0Name = view.Schema,
-                Level1Type = view.Type,
-                Level1Name = view.Name,
-                Level2Type = "column",
-                Level2Name = column.Name
-            }).ToList();
+            => new ExtendedPropertyRepository(connection).GetExtendedProperties(new ExtendedProperty(name, "schema", view.Schema, view.Type, view.Name, "column", column.Name)).ToList();
     }
 }
