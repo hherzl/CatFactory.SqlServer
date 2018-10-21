@@ -7,12 +7,12 @@ namespace CatFactory.SqlServer
     /// Represents a dynamic query result
     /// </summary>
     [DebuggerDisplay("Items={Items.Count}")]
-    internal class QueryResult
+    internal class DynamicQueryResult
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="QueryResult"/> class
+        /// Initializes a new instance of <see cref="DynamicQueryResult"/> class
         /// </summary>
-        public QueryResult()
+        public DynamicQueryResult()
         {
         }
 

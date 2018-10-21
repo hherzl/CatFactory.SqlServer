@@ -3,7 +3,7 @@ using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.CodeFactory
 {
     /// <summary>
     /// Represents a code builder for tables
@@ -14,6 +14,7 @@ namespace CatFactory.SqlServer
         /// Initializes a new instance of <see cref="SqlCodeBuilder"/> class
         /// </summary>
         public SqlCodeBuilder()
+            : base()
         {
         }
 

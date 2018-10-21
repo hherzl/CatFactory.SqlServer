@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using CatFactory.SqlServer.Features;
+using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {

@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using CatFactory.SqlServer.Tests.Helpers;
+using CatFactory.SqlServer.Tests.Models;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -43,8 +45,14 @@ namespace CatFactory.SqlServer.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
-                    ExtendedProperties = { "MS_Description" },
-                    Exclusions = { "dbo.EventLog" }
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    },
+                    Exclusions =
+                    {
+                        "dbo.EventLog"
+                    }
                 }
             };
 
@@ -67,8 +75,14 @@ namespace CatFactory.SqlServer.Tests
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
                     ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
-                    ExtendedProperties = { "MS_Description" },
-                    Exclusions = { "dbo.EventLog" }
+                    ExtendedProperties =
+                    {
+                        "MS_Description"
+                    },
+                    Exclusions =
+                    {
+                        "dbo.EventLog"
+                    }
                 }
             };
 

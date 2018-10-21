@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests.Models
 {
     public static class Databases
     {

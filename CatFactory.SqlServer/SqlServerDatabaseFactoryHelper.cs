@@ -98,10 +98,13 @@ namespace CatFactory.SqlServer
             };
 
             column.Type = string.Concat(dictionary["Type"]);
+            column.Computed = string.Concat(dictionary["Computed"]);
             column.Length = int.Parse(string.Concat(dictionary["Length"]));
             column.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Prec"]));
             column.Scale = string.Concat(dictionary["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Scale"]));
             column.Nullable = string.Compare(string.Concat(dictionary["Nullable"]), "yes", true) == 0 ? true : false;
+            column.TrimTrailingBlanks = string.Concat(dictionary["TrimTrailingBlanks"]);
+            column.FixedLenNullInSource = string.Concat(dictionary["FixedLenNullInSource"]);
             column.Collation = string.Concat(dictionary["Collation"]);
 
             return column;

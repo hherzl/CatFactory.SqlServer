@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.Features
 {
     /// <summary>
     /// Contains operations to manipulate extended properties

@@ -22,7 +22,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportStoreTablesTest()
+        public void ImportTablesFromStoreDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
@@ -49,6 +49,8 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
             Assert.True(database.FindTable("dbo.Products").ForeignKeys.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").Defaults.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").Checks.Count > 0);
             Assert.True(database.Views.Count > 0);
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
         }
@@ -83,7 +85,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportNorthwindTables()
+        public void ImportTablesFromNorthwindDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
@@ -107,7 +109,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportNorthwindTablesAndViews()
+        public void ImportTablesAndViewsFromNorthwindTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
@@ -164,6 +166,27 @@ namespace CatFactory.SqlServer.Tests
 
             Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
             Assert.True(database.StoredProcedures.FirstOrDefault(item => item.FullName == "HumanResources.uspUpdateEmployeeHireInfo").FirstResultSetsForObject.Count == 0);
+        }
+
+        [Fact]
+        public void ImportWideWorldImportersDatabase()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;"
+                }
+            };
+
+            // Act
+            var database = databaseFactory.Import();
+
+            // Assert
+            Assert.True(database.FindTable("Warehouse.StockItems").Columns.Count > 0);
+            Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
+            Assert.True(database.FindTable("Warehouse.StockItems").Defaults.Count > 0);
         }
     }
 }

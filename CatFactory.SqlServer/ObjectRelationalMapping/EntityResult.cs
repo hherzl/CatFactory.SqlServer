@@ -1,6 +1,6 @@
 ﻿using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.ObjectRelationalMapping
 {
     /// <summary>
     /// Represents an entity result (Definition for entity)

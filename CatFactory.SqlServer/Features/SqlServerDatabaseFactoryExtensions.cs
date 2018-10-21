@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.Features
 {
     /// <summary>
     /// Contains extension methods for <see cref="SqlServerDatabaseFactory"/> class to allow perform CRUD operations for extended properties

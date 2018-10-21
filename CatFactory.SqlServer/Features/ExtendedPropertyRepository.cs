@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.Features
 {
     /// <summary>
     /// Implements operations to manipulate extended properties

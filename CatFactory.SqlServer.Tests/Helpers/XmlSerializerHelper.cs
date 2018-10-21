@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests.Helpers
 {
     public static class XmlSerializerHelper
     {

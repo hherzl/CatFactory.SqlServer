@@ -4,7 +4,7 @@ using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.CodeFactory
 {
     /// <summary>
     /// Represents a code builder for stored procedures
@@ -15,6 +15,7 @@ namespace CatFactory.SqlServer
         /// Initializes a new instance of <see cref="SqlStoredProcedureCodeBuilder"/> class
         /// </summary>
         public SqlStoredProcedureCodeBuilder()
+            : base()
         {
         }
 

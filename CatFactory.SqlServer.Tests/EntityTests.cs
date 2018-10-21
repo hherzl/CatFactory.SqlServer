@@ -1,4 +1,5 @@
 ﻿using CatFactory.Mapping;
+using CatFactory.SqlServer.ObjectRelationalMapping;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using CatFactory.Mapping;
+using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
 
 namespace CatFactory.SqlServer
@@ -305,13 +306,13 @@ namespace CatFactory.SqlServer
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
-                    var queryResults = new List<QueryResult>();
+                    var queryResults = new List<DynamicQueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
                         while (dataReader.NextResult())
                         {
-                            var queryResult = new QueryResult();
+                            var queryResult = new DynamicQueryResult();
 
                             while (dataReader.Read())
                             {
@@ -527,14 +528,23 @@ namespace CatFactory.SqlServer
         {
             foreach (var constraintDetail in table.ConstraintDetails)
             {
-                if (constraintDetail.ConstraintType.Contains("PRIMARY KEY"))
+                if (constraintDetail.ConstraintType.Contains("CHECK"))
                 {
-                    var key = string.Concat(constraintDetail.ConstraintKeys).Split(',').Select(item => item.Trim()).ToArray();
+                    var key = constraintDetail.ConstraintKeys.ToString();
 
-                    table.PrimaryKey = new PrimaryKey(key)
+                    table.Checks.Add(new Check(key)
                     {
                         ConstraintName = constraintDetail.ConstraintName
-                    };
+                    });
+                }
+                else if (constraintDetail.ConstraintType.Contains("DEFAULT"))
+                {
+                    var key = constraintDetail.ConstraintKeys.ToString();
+
+                    table.Defaults.Add(new Default(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    });
                 }
                 else if (constraintDetail.ConstraintType.Contains("FOREIGN KEY"))
                 {
@@ -544,6 +554,15 @@ namespace CatFactory.SqlServer
                     {
                         ConstraintName = constraintDetail.ConstraintName
                     });
+                }
+                else if (constraintDetail.ConstraintType.Contains("PRIMARY KEY"))
+                {
+                    var key = string.Concat(constraintDetail.ConstraintKeys).Split(',').Select(item => item.Trim()).ToArray();
+
+                    table.PrimaryKey = new PrimaryKey(key)
+                    {
+                        ConstraintName = constraintDetail.ConstraintName
+                    };
                 }
                 else if (constraintDetail.ConstraintKeys.Contains("REFERENCES"))
                 {
@@ -556,15 +575,6 @@ namespace CatFactory.SqlServer
                     var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
                     table.Uniques.Add(new Unique(key)
-                    {
-                        ConstraintName = constraintDetail.ConstraintName
-                    });
-                }
-                else if (constraintDetail.ConstraintType.Contains("CHECK"))
-                {
-                    var key = constraintDetail.ConstraintKeys.ToString();
-
-                    table.Checks.Add(new Check(key)
                     {
                         ConstraintName = constraintDetail.ConstraintName
                     });
@@ -646,13 +656,13 @@ namespace CatFactory.SqlServer
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
-                    var queryResults = new List<QueryResult>();
+                    var queryResults = new List<DynamicQueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
                         while (dataReader.NextResult())
                         {
-                            var queryResult = new QueryResult();
+                            var queryResult = new DynamicQueryResult();
 
                             while (dataReader.Read())
                             {
@@ -740,13 +750,13 @@ namespace CatFactory.SqlServer
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
-                    var queryResults = new List<QueryResult>();
+                    var queryResults = new List<DynamicQueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
                         while (dataReader.NextResult())
                         {
-                            var queryResult = new QueryResult();
+                            var queryResult = new DynamicQueryResult();
 
                             while (dataReader.Read())
                             {
@@ -812,13 +822,13 @@ namespace CatFactory.SqlServer
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
-                    var queryResults = new List<QueryResult>();
+                    var queryResults = new List<DynamicQueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
                         while (dataReader.NextResult())
                         {
-                            var queryResult = new QueryResult();
+                            var queryResult = new DynamicQueryResult();
 
                             while (dataReader.Read())
                             {
@@ -888,13 +898,13 @@ namespace CatFactory.SqlServer
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
-                    var queryResults = new List<QueryResult>();
+                    var queryResults = new List<DynamicQueryResult>();
 
                     using (var dataReader = command.ExecuteReader())
                     {
                         while (dataReader.NextResult())
                         {
-                            var queryResult = new QueryResult();
+                            var queryResult = new DynamicQueryResult();
 
                             while (dataReader.Read())
                             {

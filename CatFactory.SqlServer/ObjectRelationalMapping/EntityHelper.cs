@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using CatFactory.Mapping;
 
-namespace CatFactory.SqlServer
+namespace CatFactory.SqlServer.ObjectRelationalMapping
 {
     /// <summary>
     /// Contains extension methods to define entities (Tables) using lambda expressions
