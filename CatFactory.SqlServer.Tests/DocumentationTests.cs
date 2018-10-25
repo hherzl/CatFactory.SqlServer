@@ -103,8 +103,8 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Production.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table.GetColumn("ProductID"), "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table.GetColumn("ProductID"), "MS_Description", "ID for product");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
+            databaseFactory.AddExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product");
 
             // Assert
         }
@@ -155,8 +155,8 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var view = database.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view.GetColumn("CustomerName"), "MS_Description");
-            databaseFactory.AddExtendedProperty(view, view.GetColumn("CustomerName"), "MS_Description", "Name for customer (CompanyName)");
+            databaseFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
+            databaseFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
         }
 
         [Fact]
@@ -232,9 +232,9 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Production.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table.GetColumn("ProductID"), "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table.GetColumn("ProductID"), "MS_Description", "ID for product");
-            databaseFactory.UpdateExtendedProperty(table, table.GetColumn("ProductID"), "MS_Description", "ID for product (Update)");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
+            databaseFactory.AddExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product");
+            databaseFactory.UpdateExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product (Update)");
 
             // Assert
         }
@@ -286,9 +286,9 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var view = database.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view.GetColumn("CustomerName"), "MS_Description");
-            databaseFactory.AddExtendedProperty(view, view.GetColumn("CustomerName"), "MS_Description", "Name for customer (CompanyName)");
-            databaseFactory.UpdateExtendedProperty(view, view.GetColumn("CustomerName"), "MS_Description", "Name for customer (CompanyName)");
+            databaseFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
+            databaseFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
+            databaseFactory.UpdateExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
         }
 
         [Fact]
@@ -360,7 +360,7 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Production.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table.GetColumn("ProductID"), "MS_Description");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
 
             // Assert
         }
@@ -410,7 +410,7 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var view = database.FindView("HumanResources.EmployeeInfo");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view.GetColumn("EmployeeName"), "MS_Description");
+            databaseFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], "MS_Description");
         }
     }
 }

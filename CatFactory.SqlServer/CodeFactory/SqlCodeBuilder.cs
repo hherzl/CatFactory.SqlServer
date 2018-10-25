@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer.CodeFactory
 {

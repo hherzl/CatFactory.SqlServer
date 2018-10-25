@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer
 {

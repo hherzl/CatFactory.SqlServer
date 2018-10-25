@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 using Microsoft.Extensions.Logging;
 
 namespace CatFactory.SqlServer

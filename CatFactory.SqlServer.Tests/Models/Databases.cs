@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer.Tests.Models
 {

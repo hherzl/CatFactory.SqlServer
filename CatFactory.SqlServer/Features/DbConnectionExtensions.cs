@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Programmability;
 
 namespace CatFactory.SqlServer.Features
 {

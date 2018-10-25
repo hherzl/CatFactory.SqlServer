@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer.ObjectRelationalMapping
 {

@@ -4,7 +4,8 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using CatFactory.Mapping;
+using CatFactory.ObjectRelationalMapping;
+using CatFactory.ObjectRelationalMapping.Programmability;
 using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
 

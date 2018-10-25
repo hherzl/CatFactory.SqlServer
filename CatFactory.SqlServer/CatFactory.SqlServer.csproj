@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build20</Version>
+    <Version>1.0.0-beta-sun-build21</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server, Extended Properties, Reverse Engineering for Databases, Database First</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build20 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build21 Version:
 
 * Addition of CodeFactory namespace
 * Addition of Features namespace
@@ -27,7 +27,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build10" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build11" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
