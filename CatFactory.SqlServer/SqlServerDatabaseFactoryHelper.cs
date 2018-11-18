@@ -182,9 +182,9 @@ namespace CatFactory.SqlServer
                         yield return new FirstResultSetForObject
                         {
                             ColumnOrdinal = dataReader.GetInt32(0),
-                            Name = dataReader.GetString(1),
-                            IsNullable = dataReader.GetBoolean(2),
-                            SystemTypeName = dataReader.GetString(3)
+                            Name = dataReader[1] is DBNull ? string.Empty : dataReader.GetString(1),
+                            IsNullable = dataReader[2] is DBNull ? false : dataReader.GetBoolean(2),
+                            SystemTypeName = dataReader[3] is DBNull ? string.Empty : dataReader.GetString(3)
                         };
                     }
                 }

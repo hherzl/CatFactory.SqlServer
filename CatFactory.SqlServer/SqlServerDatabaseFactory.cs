@@ -21,7 +21,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         /// <returns>An instance for <see cref="SqlServerDatabaseFactory"/> class</returns>
         public static ILogger<SqlServerDatabaseFactory> GetLogger()
-            => LoggerHelper.GetLogger<SqlServerDatabaseFactory>();
+            => LoggingHelper.GetLogger<SqlServerDatabaseFactory>();
 
         /// <summary>
         /// Gets the <see cref="Logger"/> instance
