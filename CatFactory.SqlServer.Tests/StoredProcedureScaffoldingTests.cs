@@ -14,7 +14,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Store;integrated security=yes;"
+                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;"
                 }
             };
 

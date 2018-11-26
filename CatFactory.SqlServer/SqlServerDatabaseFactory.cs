@@ -531,20 +531,19 @@ namespace CatFactory.SqlServer
             {
                 if (constraintDetail.ConstraintType.Contains("CHECK"))
                 {
-                    var key = constraintDetail.ConstraintKeys.ToString();
-
-                    table.Checks.Add(new Check(key)
+                    table.Checks.Add(new Check(constraintDetail.ConstraintKeys)
                     {
                         ConstraintName = constraintDetail.ConstraintName
                     });
                 }
                 else if (constraintDetail.ConstraintType.Contains("DEFAULT"))
                 {
-                    var key = constraintDetail.ConstraintKeys.ToString();
+                    var column = constraintDetail.ConstraintType.Replace("DEFAULT on column ", string.Empty).Trim();
 
-                    table.Defaults.Add(new Default(key)
+                    table.Defaults.Add(new Default(column)
                     {
-                        ConstraintName = constraintDetail.ConstraintName
+                        ConstraintName = constraintDetail.ConstraintName,
+                        Value = constraintDetail.ConstraintKeys
                     });
                 }
                 else if (constraintDetail.ConstraintType.Contains("FOREIGN KEY"))

@@ -6,33 +6,39 @@ namespace CatFactory.SqlServer.Tests
     public class ImportTests
     {
         [Fact]
-        public void ImportStoreDatabaseTest()
+        public void ImportOnLineStoreDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnLineStore;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
+
+            Assert.True(database.FindTable("Warehouse.Product").Columns.Count > 0);
+            Assert.True(database.FindTable("Warehouse.Product").PrimaryKey != null);
+            Assert.True(database.FindTable("Warehouse.Product").ForeignKeys.Count > 0);
+
             Assert.True(database.Views.Count > 0);
-            Assert.True(database.FindTable("Production.Product").Columns.Count > 0);
-            Assert.True(database.FindTable("Production.Product").PrimaryKey != null);
-            Assert.True(database.FindTable("Production.Product").ForeignKeys.Count > 0);
+
             Assert.True(database.FindView("Sales.OrderSummary").Columns.Count > 0);
         }
 
         [Fact]
-        public void ImportTablesFromStoreDatabaseTest()
+        public void ImportTablesFromOnLineStoreDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Store;integrated security=yes;", "Sales.Order", "Sales.OrderDetail");
+                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnLineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
-            Assert.True(database.FindTable("Sales.Order").Columns.Count > 0);
-            Assert.True(database.FindTable("Sales.Order").PrimaryKey != null);
-            Assert.True(database.FindTable("Sales.Order").ForeignKeys.Count > 0);
+
+            Assert.True(database.FindTable("Sales.OrderHeader").Columns.Count > 0);
+            Assert.True(database.FindTable("Sales.OrderHeader").PrimaryKey != null);
+            Assert.True(database.FindTable("Sales.OrderHeader").ForeignKeys.Count > 0);
+            Assert.True(database.FindTable("Sales.OrderDetail").ForeignKeys.Count > 0);
+
             Assert.True(database.Views.Count == 0);
         }
 
@@ -45,13 +51,16 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count > 0);
+
             Assert.True(database.FindTable("dbo.ChangeLog") == null);
             Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
             Assert.True(database.FindTable("dbo.Products").ForeignKeys.Count > 0);
             Assert.True(database.FindTable("dbo.Products").Defaults.Count > 0);
             Assert.True(database.FindTable("dbo.Products").Checks.Count > 0);
+
             Assert.True(database.Views.Count > 0);
+
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
         }
 
@@ -75,12 +84,17 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.Tables.Count > 0);
+
             Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
             Assert.True(database.FindTable("dbo.Orders").ForeignKeys.Count > 0);
+
             Assert.True(database.Views.Count > 0);
+
             Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
+
             Assert.True(database.StoredProcedures.Count > 0);
+
             Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").FirstResultSetsForObject.Count > 0);
         }
 
@@ -123,6 +137,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.Tables.Count == 2);
             Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
             Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
+
             Assert.True(database.Views.Count == 2);
         }
 

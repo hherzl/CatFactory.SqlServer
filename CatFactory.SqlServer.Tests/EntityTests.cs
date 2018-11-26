@@ -12,7 +12,9 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var database = new Database
             {
-                Name = "Blogging"
+                Name = "Blogging",
+                DefaultSchema = "dbo",
+                DatabaseTypeMaps = DatabaseTypeMapList.Definition
             };
 
             // Act
