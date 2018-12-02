@@ -41,7 +41,7 @@ namespace CatFactory.SqlServer.Tests
         public void GenerateProceduresFromMockDatabaseTest()
         {
             // Arrange
-            var database = Databases.Store;
+            var database = Databases.Blogging;
 
             // Act
             foreach (var table in database.Tables)

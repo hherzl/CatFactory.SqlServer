@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
@@ -36,9 +37,20 @@ namespace CatFactory.SqlServer.CodeFactory
         public Database Database { get; set; }
 
         /// <summary>
+        /// Translates object definition to a sequence of <see cref="ILine"/> interface
+        /// </summary>
+        public override void Translating()
+        {
+            Lines = new List<ILine>
+            {
+                new CodeLine(Code)
+            };
+        }
+
+        /// <summary>
         /// Gets the output code for current <see cref="SqlCodeBuilder"/> instance
         /// </summary>
-        public string Code
+        protected string Code
         {
             get
             {
@@ -105,6 +117,8 @@ namespace CatFactory.SqlServer.CodeFactory
 
                         output.AppendLine();
                     }
+
+                    // todo: Add foreign key in script
 
                     foreach (var unique in table.Uniques)
                     {

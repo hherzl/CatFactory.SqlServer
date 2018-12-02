@@ -12,12 +12,12 @@ namespace CatFactory.SqlServer.Tests
         public void SerializeMockDatabaseToXmlTest()
         {
             // Arrange
-            var database = Databases.Store;
+            var database = Databases.Blogging;
 
             // Act
             var output = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Store.xml", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Blogging.xml", output);
 
             // Assert
         }
@@ -26,12 +26,12 @@ namespace CatFactory.SqlServer.Tests
         public void SerializeMockDatabaseToJsonTest()
         {
             // Arrange
-            var database = Databases.Store;
+            var database = Databases.Blogging;
 
             // Act
             var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Store.json", output);
+            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Blogging.json", output);
 
             // Assert
         }

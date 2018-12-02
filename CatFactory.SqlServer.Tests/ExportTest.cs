@@ -10,7 +10,7 @@ namespace CatFactory.SqlServer.Tests
         public void ExportScript()
         {
             // Arrange
-            var database = Databases.Store;
+            var database = Databases.Blogging;
 
             // Act
             var codeBuilder = new SqlCodeBuilder

@@ -48,21 +48,14 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <returns></returns>
         protected virtual string GetType(Column column)
         {
-            // todo: Add database types collection
-            // todo: Refactor this switch to use data types from database types
-            switch (column.Type)
-            {
-                case "char":
-                case "varchar":
-                case "nvarchar":
-                    return column.Length == 0 ? string.Format("{0}(max)", column.Type) : string.Format("{0}({1})", column.Type, column.Length);
+            var databaseTypes = Database.DatabaseTypeMaps;
 
-                case "decimal":
-                    return string.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
-
-                default:
-                    return string.Format("{0}", column.Type);
-            }
+            if (Database.ColumnIsDecimal(column))
+                return string.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
+            else if (Database.ColumnIsString(column))
+                return column.Length == 0 ? string.Format("{0}(max)", column.Type) : string.Format("{0}({1})", column.Type, column.Length);
+            else
+                return string.Format("{0}", column.Type);
         }
 
         /// <summary>
@@ -79,7 +72,7 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <summary>
         /// Gets the output code for current <see cref="SqlStoredProcedureCodeBuilder"/> instance
         /// </summary>
-        public string Code
+        protected string Code
         {
             get
             {
