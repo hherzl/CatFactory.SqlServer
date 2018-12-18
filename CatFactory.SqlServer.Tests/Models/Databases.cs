@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer.Tests.Models
                 }
             }
             .AddDbObjectsFromTables()
-            .SetPrimaryKeyToTables()
+            .SetPrimaryKeyForTables()
             .AddColumnsForTables(new Column[]
             {
                 new Column { Name = "CreationUser", Type = "varchar", Length = 50 },
