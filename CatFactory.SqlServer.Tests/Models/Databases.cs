@@ -20,7 +20,8 @@ namespace CatFactory.SqlServer.Tests.Models
                         Columns =
                         {
                             new Column { Name = "BlogId", Type = "int" },
-                            new Column { Name = "Url", Type = "varchar", Length = 128 }
+                            new Column { Name = "Name", Type = "varchar", Length = 128 },
+                            new Column { Name = "Url", Type = "varchar", Length = 255 }
                         },
                         Identity = new Identity("BlogId")
                     },
@@ -33,9 +34,20 @@ namespace CatFactory.SqlServer.Tests.Models
                             new Column { Name = "PostId", Type = "int" },
                             new Column { Name = "Title", Type = "varchar", Length = 128 },
                             new Column { Name = "Content", Type = "varchar" },
-                            new Column { Name = "BlogId", Type = "int", Length = 25 }
+                            new Column { Name = "BlogId", Type = "int" }
                         },
-                        Identity = new Identity("PostId")
+                        Identity = new Identity("PostId"),
+                        Uniques =
+                        {
+                            new Unique
+                            {
+                                Key =
+                                {
+                                    "PostId",
+                                    "BlogId"
+                                }
+                            }
+                        }
                     }
                 }
             }

@@ -21,6 +21,11 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         public Table Table { get; set; }
 
         /// <summary>
+        /// Gets or sets the database for current entity result
+        /// </summary>
+        public Database Database { get; set; }
+
+        /// <summary>
         /// Gets or sets the model associated with current entity result
         /// </summary>
         public TModel Model { get; set; }

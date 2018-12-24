@@ -9,12 +9,12 @@ namespace CatFactory.SqlServer.CodeFactory
     /// <summary>
     /// Represents a code builder for tables
     /// </summary>
-    public class SqlCodeBuilder : CodeBuilder
+    public class SqlServerDatabaseScriptCodeBuilder : CodeBuilder
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="SqlCodeBuilder"/> class
+        /// Initializes a new instance of <see cref="SqlServerDatabaseScriptCodeBuilder"/> class
         /// </summary>
-        public SqlCodeBuilder()
+        public SqlServerDatabaseScriptCodeBuilder()
             : base()
         {
         }
@@ -48,13 +48,29 @@ namespace CatFactory.SqlServer.CodeFactory
         }
 
         /// <summary>
-        /// Gets the output code for current <see cref="SqlCodeBuilder"/> instance
+        /// Gets the output code for current <see cref="SqlServerDatabaseScriptCodeBuilder"/> instance
         /// </summary>
         protected string Code
         {
             get
             {
                 var output = new StringBuilder();
+
+                output.AppendFormat("create database {0}", Database.GetObjectName(Database.Name));
+                output.AppendLine();
+
+                output.AppendFormat("go");
+                output.AppendLine();
+
+                output.AppendLine();
+
+                output.AppendFormat("use {0}", Database.GetObjectName(Database.Name));
+                output.AppendLine();
+
+                output.AppendFormat("go");
+                output.AppendLine();
+
+                output.AppendLine();
 
                 var schemas = Database.Tables.Select(item => item.Schema).Distinct().ToList();
 
@@ -63,7 +79,7 @@ namespace CatFactory.SqlServer.CodeFactory
                     if (string.IsNullOrEmpty(schema))
                         continue;
 
-                    output.AppendFormat("create schema {0}", schema);
+                    output.AppendFormat("create schema {0}", Database.GetObjectName(schema));
                     output.AppendLine();
 
                     output.AppendFormat("go");
@@ -100,6 +116,10 @@ namespace CatFactory.SqlServer.CodeFactory
                     }
 
                     output.AppendLine(")");
+
+                    output.AppendFormat("go");
+                    output.AppendLine();
+
                     output.AppendLine();
                 }
 
@@ -107,9 +127,11 @@ namespace CatFactory.SqlServer.CodeFactory
                 {
                     if (table.PrimaryKey != null)
                     {
-                        var constraintName = Database.NamingConvention.GetPrimaryKeyConstraintName(table, table.PrimaryKey.Key.ToArray());
+                        var pk = table.PrimaryKey;
 
-                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", table.PrimaryKey.Key));
+                        var constraintName = string.IsNullOrEmpty(pk.ConstraintName) ? Database.NamingConvention.GetPrimaryKeyConstraintName(table, pk.Key.ToArray()) : Database.GetObjectName(pk.ConstraintName);
+
+                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
                         output.AppendFormat("go");
@@ -118,17 +140,45 @@ namespace CatFactory.SqlServer.CodeFactory
                         output.AppendLine();
                     }
 
-                    // todo: Add foreign key in script
-
                     foreach (var unique in table.Uniques)
                     {
-                        var constraintName = Database.NamingConvention.GetUniqueConstraintName(table, unique.Key.ToArray());
+                        var constraintName = string.IsNullOrEmpty(unique.ConstraintName) ? Database.NamingConvention.GetUniqueConstraintName(table, unique.Key.ToArray()) : Database.GetObjectName(unique.ConstraintName);
 
-                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", unique.Key));
+                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
                         output.AppendFormat("go");
                         output.AppendLine();
+
+                        output.AppendLine();
+                    }
+
+                    for (var i = 0; i < table.ForeignKeys.Count; i++)
+                    {
+                        var foreignKey = table.ForeignKeys[i];
+
+                        var references = Database.FindTable(foreignKey.References);
+
+                        if (references == null)
+                        {
+                            output.AppendFormat("/* There is not a table with name: {0} */", foreignKey.References);
+                            output.AppendLine();
+                        }
+                        else
+                        {
+                            if (references.PrimaryKey != null)
+                            {
+                                var constraintName = string.IsNullOrEmpty(foreignKey.ConstraintName) ? Database.NamingConvention.GetForeignKeyConstraintName(table, foreignKey.Key.ToArray(), references) : Database.GetObjectName(foreignKey.ConstraintName);
+
+                                output.AppendFormat("alter table {0} add constraint {1} foreign key ({2}) references {3}", Database.GetObjectName(table), constraintName, string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
+                                output.AppendLine();
+
+                                output.AppendFormat("go");
+                                output.AppendLine();
+
+                                output.AppendLine();
+                            }
+                        }
                     }
                 }
 

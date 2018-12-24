@@ -1,5 +1,4 @@
-﻿using CatFactory.ObjectRelationalMapping;
-using CatFactory.SqlServer.ObjectRelationalMapping;
+﻿using CatFactory.SqlServer.ObjectRelationalMapping;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -7,48 +6,69 @@ namespace CatFactory.SqlServer.Tests
     public class EntityTests
     {
         [Fact]
-        public void TestDefinitionForBloggingEntities()
+        public void TestDefinitionForCollegeEntities()
         {
             // Arrange
-            var database = new Database
-            {
-                Name = "Blogging",
-                DefaultSchema = "dbo",
-                DatabaseTypeMaps = DatabaseTypeMapList.Definition
-            };
+            var database = SqlServerDatabaseFactory.CreateWithDefaults("College");
 
             // Act
-            var blog = database
-                .DefineEntity("dbo", "Blog", new { BlogId = 0, Url = "" })
-                .SetColumnForProperty(e => e.Url, new Column { Type = "nvarchar", Length = 128 })
-                .SetIdentity(e => e.BlogId)
-                .SetPrimaryKey(e => e.BlogId);
+            var student = database
+                .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
+                .SetName("Student")
+                .SetColumnFor(e => e.FirstName, type: "nvarchar", length: 10)
+                    .AddExtendedProperty(e => e.FirstName, "MS_Description", "First name")
+                .SetColumnFor(e => e.MiddleName, type: "nvarchar", length: 10, nullable: true)
+                    .AddExtendedProperty(e => e.MiddleName, "MS_Description", "Middle name")
+                .SetColumnFor(e => e.LastName, type: "nvarchar", length: 10)
+                    .AddExtendedProperty(e => e.LastName, "MS_Description", "Last name")
+                .SetIdentity(e => e.StudentId)
+                .SetPrimaryKey(e => e.StudentId);
 
-            var post = database
-                .DefineEntity("dbo", "Post", new { PostId = 0, Title = "", Content = "", BlogId = 0 })
-                .SetColumnForProperty(e => e.Title, new Column { Type = "nvarchar", Length = 128 })
-                .SetColumnForProperty(e => e.Content, new Column { Type = "nvarchar" })
-                .SetIdentity(e => e.PostId)
-                .SetPrimaryKey(e => e.PostId);
+            var course = database
+                .DefineEntity(new { CourseId = 0, Name = "" })
+                .SetName("Course")
+                .SetColumnFor(e => e.Name, type: "nvarchar", length: 255)
+                .SetIdentity(e => e.CourseId)
+                .SetPrimaryKey(e => e.CourseId)
+                .AddUnique(e => e.Name);
+
+            var courseStudent = database
+                .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
+                .SetName("CourseStudent")
+                .SetIdentity(e => e.CourseStudentId)
+                .SetPrimaryKey(e => e.CourseStudentId)
+                .AddUnique(e => new { e.CourseId, e.StudentId })
+                .AddForeignKey(e => e.CourseId, course.Table)
+                .AddForeignKey(e => e.StudentId, student.Table);
 
             // Assert
-            Assert.True(blog.Table.Columns.Count == 2);
-            Assert.False(blog.Table.PrimaryKey == null);
-            Assert.False(blog.Table.Identity == null);
+            Assert.True(student.Table.Columns.Count == 4);
+            Assert.False(student.Table.PrimaryKey == null);
+            Assert.False(student.Table.Identity == null);
 
-            Assert.True(post.Table.Columns.Count == 4);
-            Assert.False(post.Table.PrimaryKey == null);
-            Assert.False(post.Table.Identity == null);
+            Assert.True(course.Table.Columns.Count == 2);
+            Assert.False(course.Table.PrimaryKey == null);
+            Assert.False(course.Table.Identity == null);
 
-            Assert.True(database.Tables.Count == 2);
+            Assert.True(courseStudent.Table.Columns.Count == 3);
+            Assert.False(courseStudent.Table.PrimaryKey == null);
+            Assert.False(courseStudent.Table.Identity == null);
 
-            Assert.True(database.FindTable("dbo.Blog").Columns.Count == 2);
-            Assert.False(database.FindTable("dbo.Blog").Identity == null);
-            Assert.False(database.FindTable("dbo.Blog").PrimaryKey == null);
+            Assert.True(database.Tables.Count == 3);
 
-            Assert.True(database.FindTable("dbo.Post").Columns.Count == 4);
-            Assert.False(database.FindTable("dbo.Post").Identity == null);
-            Assert.False(database.FindTable("dbo.Post").PrimaryKey == null);
+            Assert.True(database.FindTable("dbo.Student").Columns.Count == 4);
+            Assert.False(database.FindTable("dbo.Student").Identity == null);
+            Assert.False(database.FindTable("dbo.Student").PrimaryKey == null);
+            Assert.True(database.FindTable("dbo.Student")["MiddleName"].ExtendedProperties.Count == 1);
+
+            Assert.True(database.FindTable("dbo.Course").Columns.Count == 2);
+            Assert.False(database.FindTable("dbo.Course").Identity == null);
+            Assert.False(database.FindTable("dbo.Course").PrimaryKey == null);
+            Assert.True(database.FindTable("dbo.Course").Uniques.Count == 1);
+
+            Assert.True(database.FindTable("dbo.CourseStudent").Columns.Count == 3);
+            Assert.False(database.FindTable("dbo.CourseStudent").Identity == null);
+            Assert.False(database.FindTable("dbo.CourseStudent").PrimaryKey == null);
         }
     }
 }

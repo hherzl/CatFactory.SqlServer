@@ -336,7 +336,7 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 output.AppendLine();
 
-                output.AppendFormat("{0}select {1} = @@identity", Indent(1), Database.GetParameterName(Table.Identity.Name));
+                output.AppendFormat("{0}select {1} = scope_identity()", Indent(1), Database.GetParameterName(Table.Identity.Name));
                 output.AppendLine();
             }
 

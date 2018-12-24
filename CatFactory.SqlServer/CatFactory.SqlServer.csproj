@@ -2,16 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build25</Version>
+    <Version>1.0.0-beta-sun-build26</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server, Extended Properties, Reverse Engineering for Databases, Database First</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build25 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build26 Version:
 
-* Core package update
+* Addition of static method in SqlServerDatabaseFactory class to create a database with default values
+* Addition of unique constraints for entity fluent api
+* Addition of foreign key constraints for entity fluent api
+* Change @@identity for scope_identity() in insert stored procedure
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>

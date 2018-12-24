@@ -24,9 +24,21 @@ namespace CatFactory.SqlServer
             => LoggingHelper.GetLogger<SqlServerDatabaseFactory>();
 
         /// <summary>
-        /// Gets the <see cref="Logger"/> instance
+        /// Gets a database with default values (Schema and DatabaseTypeMaps)
         /// </summary>
-        protected ILogger Logger { get; }
+        /// <param name="name">Name</param>
+        /// <param name="defaultSchema">Default schema</param>
+        /// <param name="databaseTypeMaps">Database type maps</param>
+        /// <param name="namingConvention">Database naming convention</param>
+        /// <returns>An instance of <see cref="Database"/> class</returns>
+        public static Database CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
+            => new Database
+            {
+                Name = name,
+                DefaultSchema = defaultSchema,
+                DatabaseTypeMaps = databaseTypeMaps ?? DatabaseTypeMapList.Definition,
+                NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
+            };
 
         /// <summary>
         /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
@@ -43,6 +55,11 @@ namespace CatFactory.SqlServer
         {
             Logger = logger;
         }
+
+        /// <summary>
+        /// Gets the <see cref="Logger"/> instance
+        /// </summary>
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// Gets an instance for <see cref="DbConnection"/> class
