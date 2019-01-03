@@ -91,7 +91,24 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         /// <param name="name"></param>
         /// <param name="schema"></param>
         /// <returns></returns>
+        [Obsolete("Use SetNaming method")]
         public static EntityResult<TModel> SetName<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
+        {
+            result.Table.Name = name;
+            result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="result"></param>
+        /// <param name="name"></param>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        public static EntityResult<TModel> SetNaming<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
         {
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
@@ -109,10 +126,11 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         /// <param name="type"></param>
         /// <param name="length"></param>
         /// <param name="prec"></param>
+        /// <param name="scale"></param>
         /// <param name="nullable"></param>
         /// <param name="collation"></param>
         /// <returns></returns>
-        public static EntityResult<TModel> SetColumnFor<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string type = "", int length = 0, short prec = 0, bool nullable = false, string collation = "") where TModel : class
+        public static EntityResult<TModel> SetColumnFor<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string type = "", int length = 0, short prec = 0, short scale = 0, bool nullable = false, string collation = "") where TModel : class
         {
             var column = new Column
             {
@@ -121,16 +139,40 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             if (result.Table.Columns.Contains(column))
             {
-                result.Table[column.Name].Type = type;
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
                 result.Table[column.Name].Length = length;
                 result.Table[column.Name].Prec = prec;
+                result.Table[column.Name].Scale = scale;
                 result.Table[column.Name].Nullable = nullable;
-                result.Table[column.Name].Collation = collation;
+
+                if (!string.IsNullOrEmpty(collation))
+                    result.Table[column.Name].Collation = collation;
             }
             else
             {
                 result.Table.Columns.Add(column);
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="result"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static EntityResult<TModel> AddExtendedProperty<TModel>(this EntityResult<TModel> result, string name, string value) where TModel : class
+        {
+            result.Table.ExtendedProperties.Add(new ExtendedProperty
+            {
+                Name = name,
+                Value = value
+            });
 
             return result;
         }
@@ -239,6 +281,17 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             });
 
             return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static List<TModel> CreateList<TModel>(this TModel obj) where TModel : class
+        {
+            return new List<TModel>();
         }
     }
 }

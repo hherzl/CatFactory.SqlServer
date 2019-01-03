@@ -59,16 +59,32 @@ namespace CatFactory.SqlServer.CodeFactory
                 output.AppendFormat("create database {0}", Database.GetObjectName(Database.Name));
                 output.AppendLine();
 
-                output.AppendFormat("go");
-                output.AppendLine();
+                output.AppendLine("go");
 
                 output.AppendLine();
 
                 output.AppendFormat("use {0}", Database.GetObjectName(Database.Name));
                 output.AppendLine();
 
-                output.AppendFormat("go");
-                output.AppendLine();
+                output.AppendLine("go");
+
+                if (Database.ExtendedProperties.Count > 0)
+                {
+                    output.AppendLine();
+
+                    foreach (var extendedProperty in Database.ExtendedProperties)
+                    {
+                        output.AppendLine("exec [sp_addextendedproperty]");
+
+                        output.AppendFormat("{0}@name = '{1}', @value = '{2}', ", Indent(1), extendedProperty.Name, extendedProperty.Value);
+                        output.Append("@level0type = null, @level0name = null, ");
+                        output.Append("@level1type = null, @level1name = null, ");
+                        output.Append("@level2type = null, @level2name = null");
+                        output.AppendLine();
+                    }
+
+                    output.AppendLine("go");
+                }
 
                 output.AppendLine();
 
@@ -76,14 +92,13 @@ namespace CatFactory.SqlServer.CodeFactory
 
                 foreach (var schema in schemas)
                 {
-                    if (string.IsNullOrEmpty(schema))
+                    if (string.IsNullOrEmpty(schema) || Database.DefaultSchema == schema)
                         continue;
 
                     output.AppendFormat("create schema {0}", Database.GetObjectName(schema));
                     output.AppendLine();
 
-                    output.AppendFormat("go");
-                    output.AppendLine();
+                    output.AppendLine("go");
 
                     output.AppendLine();
                 }
@@ -99,10 +114,24 @@ namespace CatFactory.SqlServer.CodeFactory
                     {
                         var column = table.Columns[i];
 
-                        output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
-
-                        if (column.Length > 0)
-                            output.AppendFormat("({0})", column.Prec > 0 ? string.Format("{0}, {1}", column.Prec, column.Scale) : column.Length.ToString());
+                        if (Database.ColumnIsString(column))
+                        {
+                            if (column.Length == 0)
+                                output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, "max");
+                            else
+                                output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, column.Length);
+                        }
+                        else if (Database.ColumnIsNumber(column))
+                        {
+                            if (column.Prec > 0 && column.Scale > 0)
+                                output.AppendFormat("{0}{1} {2}({3}, {4})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec, column.Scale);
+                            else if (column.Prec > 0)
+                                output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec);
+                        }
+                        else
+                        {
+                            output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
+                        }
 
                         output.AppendFormat(" {0}", column.Nullable ? "null" : "not null");
 
@@ -117,10 +146,22 @@ namespace CatFactory.SqlServer.CodeFactory
 
                     output.AppendLine(")");
 
-                    output.AppendFormat("go");
-                    output.AppendLine();
+                    output.AppendLine("go");
 
                     output.AppendLine();
+
+                    foreach (var extendedProperty in table.ExtendedProperties)
+                    {
+                        output.AppendLine("exec [sp_addextendedproperty]");
+
+                        output.AppendFormat("{0}@name = '{1}', @value = '{2}', ", Indent(1), extendedProperty.Name, extendedProperty.Value);
+                        output.AppendFormat("@level0type = '{0}', @level0name = '{1}', ", "schema", table.Schema);
+                        output.AppendFormat("@level1type = '{0}', @level1name = '{1}', ", "table", table.Name);
+                        output.AppendLine("@level2type = null, @level2name = null");
+
+                        output.AppendLine("go");
+                        output.AppendLine();
+                    }
                 }
 
                 foreach (var table in Database.Tables)
@@ -134,8 +175,7 @@ namespace CatFactory.SqlServer.CodeFactory
                         output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
-                        output.AppendFormat("go");
-                        output.AppendLine();
+                        output.AppendLine("go");
 
                         output.AppendLine();
                     }
@@ -147,8 +187,7 @@ namespace CatFactory.SqlServer.CodeFactory
                         output.AppendFormat("alter table {0} add constraint {1} unique ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
-                        output.AppendFormat("go");
-                        output.AppendLine();
+                        output.AppendLine("go");
 
                         output.AppendLine();
                     }
@@ -173,12 +212,36 @@ namespace CatFactory.SqlServer.CodeFactory
                                 output.AppendFormat("alter table {0} add constraint {1} foreign key ({2}) references {3}", Database.GetObjectName(table), constraintName, string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
                                 output.AppendLine();
 
-                                output.AppendFormat("go");
-                                output.AppendLine();
+                                output.AppendLine("go");
 
                                 output.AppendLine();
                             }
                         }
+                    }
+
+                    var columnsWithExtendedProperties = table.Columns.Where(item => item.ExtendedProperties.Count > 0).ToList();
+
+                    if (columnsWithExtendedProperties.Count > 0)
+                    {
+                        for (var i = 0; i < columnsWithExtendedProperties.Count; i++)
+                        {
+                            var column = columnsWithExtendedProperties[i];
+
+                            foreach (var extendedProperty in column.ExtendedProperties)
+                            {
+                                output.AppendLine("exec [sp_addextendedproperty]");
+
+                                output.AppendFormat("{0}@name = '{1}', @value = '{2}', ", Indent(1), extendedProperty.Name, extendedProperty.Value);
+                                output.AppendFormat("@level0type = '{0}', @level0name = '{1}', ", "schema", table.Schema);
+                                output.AppendFormat("@level1type = '{0}', @level1name = '{1}', ", "table", table.Name);
+                                output.AppendFormat("@level2type = '{0}', @level2name = '{1}'", "column", column.Name);
+                                output.AppendLine();
+                            }
+                        }
+
+                        output.AppendLine("go");
+
+                        output.AppendLine();
                     }
                 }
 

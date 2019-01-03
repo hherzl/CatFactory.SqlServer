@@ -11,8 +11,9 @@ namespace CatFactory.SqlServer
     public static class DatabaseTypeMapList
     {
         /// <summary>
-        /// Gets a sequence of <see cref="DatabaseTypeMap"/> class that represents data types for SQLServer database
+        /// Gets a sequence of <see cref="DatabaseTypeMap"/> class that represents data types for SQL Server database
         /// </summary>
+        [Obsolete("Use DatabaseTypeMaps property in SqlServerDatabaseFactory class")]
         public static List<DatabaseTypeMap> Definition
             => new List<DatabaseTypeMap>
             {

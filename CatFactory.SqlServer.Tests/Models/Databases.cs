@@ -1,4 +1,5 @@
-﻿using CatFactory.ObjectRelationalMapping;
+﻿using System.Linq;
+using CatFactory.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer.Tests.Models
 {
@@ -10,7 +11,7 @@ namespace CatFactory.SqlServer.Tests.Models
                 Name = "Blogging",
                 DefaultSchema = "dbo",
                 NamingConvention = new SqlServerDatabaseNamingConvention(),
-                DatabaseTypeMaps = DatabaseTypeMapList.Definition,
+                DatabaseTypeMaps = new SqlServerDatabaseFactory().DatabaseTypeMaps.ToList(),
                 Tables =
                 {
                     new Table

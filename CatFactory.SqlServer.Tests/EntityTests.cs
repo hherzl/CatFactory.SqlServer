@@ -14,7 +14,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var student = database
                 .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
-                .SetName("Student")
+                .SetNaming("Student")
                 .SetColumnFor(e => e.FirstName, type: "nvarchar", length: 10)
                     .AddExtendedProperty(e => e.FirstName, "MS_Description", "First name")
                 .SetColumnFor(e => e.MiddleName, type: "nvarchar", length: 10, nullable: true)
@@ -26,7 +26,7 @@ namespace CatFactory.SqlServer.Tests
 
             var course = database
                 .DefineEntity(new { CourseId = 0, Name = "" })
-                .SetName("Course")
+                .SetNaming("Course")
                 .SetColumnFor(e => e.Name, type: "nvarchar", length: 255)
                 .SetIdentity(e => e.CourseId)
                 .SetPrimaryKey(e => e.CourseId)
@@ -34,7 +34,7 @@ namespace CatFactory.SqlServer.Tests
 
             var courseStudent = database
                 .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
-                .SetName("CourseStudent")
+                .SetNaming("CourseStudent")
                 .SetIdentity(e => e.CourseStudentId)
                 .SetPrimaryKey(e => e.CourseStudentId)
                 .AddUnique(e => new { e.CourseId, e.StudentId })
