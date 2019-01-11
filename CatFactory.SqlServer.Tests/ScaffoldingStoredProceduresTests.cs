@@ -4,23 +4,15 @@ using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public class StoredProcedureScaffoldingTests
+    public class ScaffoldingStoredProceduresTests
     {
         [Fact]
         public void GenerateProceduresFromExistingDatabaseTest()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;"
-                }
-            };
+            var database = SqlServerDatabaseFactory.Import("server=(local);database=OnLineStore;integrated security=yes;");
 
             // Act
-            var database = dbFactory.Import();
-
             foreach (var table in database.Tables)
             {
                 var codeBuilder = new SqlStoredProcedureCodeBuilder

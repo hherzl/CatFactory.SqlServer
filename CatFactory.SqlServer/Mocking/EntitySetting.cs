@@ -33,11 +33,31 @@ namespace CatFactory.SqlServer.Mocking
         /// <summary>
         /// 
         /// </summary>
-        public Func<DateTime> DateTimeFunc;
+        public Func<DateTime> DateTimeFunc { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Func<int> Int32Func;
+        public Func<Decimal> DecimalFunc { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<short> Int16Func { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<int> Int32Func { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<long> Int64Func { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<string> StringFunc { get; set; }
     }
 }

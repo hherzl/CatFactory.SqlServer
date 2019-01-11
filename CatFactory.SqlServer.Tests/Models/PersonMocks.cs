@@ -2,7 +2,7 @@
 
 namespace CatFactory.SqlServer.Tests.Models
 {
-    public static class Mock
+    public static class PersonMocks
     {
         public static IEnumerable<string> Genders
             => new List<string>
