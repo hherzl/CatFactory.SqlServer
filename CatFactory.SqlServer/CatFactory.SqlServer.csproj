@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build27</Version>
+    <Version>1.0.0-beta-sun-build28</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server;Scaffolding;Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build27 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build28 Version:
 
-* Addition of func for DateTime, short, int y long types
+* Core package update
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
@@ -23,7 +23,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build15" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build16" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
   </ItemGroup>
 
