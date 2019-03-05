@@ -150,6 +150,8 @@ namespace CatFactory.SqlServer
 
                 var database = new Database
                 {
+                    DataSource = connection.DataSource,
+                    Catalog = connection.Database,
                     Name = connection.Database
                 };
 
