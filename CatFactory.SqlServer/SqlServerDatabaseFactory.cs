@@ -392,9 +392,7 @@ namespace CatFactory.SqlServer
 
                 SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypes(database, connection);
 
-                var dbObjects = GetDbObjects(connection).ToList();
-
-                foreach (var dbObject in dbObjects)
+                foreach (var dbObject in GetDbObjects(connection).ToList())
                 {
                     if (DatabaseImportSettings.Exclusions.Contains(dbObject.FullName))
                         continue;
@@ -426,7 +424,9 @@ namespace CatFactory.SqlServer
                         Logger?.LogInformation("Importing extended properties for tables...");
 
                         foreach (var table in database.Tables)
+                        {
                             ImportExtendedProperties(connection, table);
+                        }
                     }
                 }
 
@@ -447,7 +447,9 @@ namespace CatFactory.SqlServer
                         Logger?.LogInformation("Importing extended properties for views...");
 
                         foreach (var view in database.Views)
+                        {
                             ImportExtendedProperties(connection, view);
+                        }
                     }
                 }
 
@@ -478,7 +480,9 @@ namespace CatFactory.SqlServer
                         Logger?.LogInformation("Importing extended properties for stored procedures...");
 
                         foreach (var storedProcedure in database.StoredProcedures)
+                        {
                             ImportExtendedProperties(connection, storedProcedure);
+                        }
                     }
                 }
 
@@ -499,7 +503,9 @@ namespace CatFactory.SqlServer
                         Logger?.LogInformation("Importing extended properties for table functions...");
 
                         foreach (var tableFunction in database.TableFunctions)
+                        {
                             ImportExtendedProperties(connection, tableFunction);
+                        }
                     }
                 }
 
@@ -520,7 +526,9 @@ namespace CatFactory.SqlServer
                         Logger?.LogInformation("Importing extended properties for scalar functions...");
 
                         foreach (var scalarFunction in database.ScalarFunctions)
+                        {
                             ImportExtendedProperties(connection, scalarFunction);
+                        }
                     }
                 }
             }
@@ -870,7 +878,7 @@ namespace CatFactory.SqlServer
             {
                 foreach (var extendedProperty in connection.GetExtendedProperties(name))
                 {
-                    database.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+                    database.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
                 }
             }
         }
@@ -883,7 +891,7 @@ namespace CatFactory.SqlServer
             {
                 foreach (var extendedProperty in connection.GetExtendedProperties(table, name))
                 {
-                    table.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+                    table.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
@@ -894,7 +902,7 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var extendedProperty in connection.GetExtendedProperties(table, column, name))
                     {
-                        column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+                        column.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
@@ -977,7 +985,7 @@ namespace CatFactory.SqlServer
             {
                 foreach (var extendProperty in connection.GetExtendedProperties(view, name))
                 {
-                    view.ExtendedProperties.Add(new ExtendedProperty { Name = extendProperty.Name, Value = extendProperty.Value });
+                    view.ExtendedProperties.Add(new ExtendedProperty(extendProperty.Name, extendProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
@@ -988,7 +996,7 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var extendedProperty in connection.GetExtendedProperties(view, column, name))
                     {
-                        column.ExtendedProperties.Add(new ExtendedProperty { Name = extendedProperty.Name, Value = extendedProperty.Value });
+                        column.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
