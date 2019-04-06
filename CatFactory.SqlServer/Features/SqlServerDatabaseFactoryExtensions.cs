@@ -118,7 +118,7 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty { Name = name, Value = value });
+                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, value));
 
                 database.Description = value;
             }

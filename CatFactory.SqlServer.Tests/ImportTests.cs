@@ -10,7 +10,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnLineStore;integrated security=yes;");
+                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -29,7 +29,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnLineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
+                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
