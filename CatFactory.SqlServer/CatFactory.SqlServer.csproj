@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <Version>1.0.0-beta-sun-build33</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
@@ -11,21 +11,22 @@
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>1.0.0-beta-sun-build33 Version:
 
-* Addition of unit tests for database type maps
+* Core package update
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/hherzl/CatFactory.SqlServer/blob/master/LICENSE</PackageLicenseUrl>
-  </PropertyGroup>
+        <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/hherzl/CatFactory.SqlServer/blob/master/LICENSE</PackageLicenseUrl>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\CatFactory.SqlServer.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\netcoreapp2.0\CatFactory.SqlServer.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build20" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build21" />
+        <PackageReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
+    </ItemGroup>
 
 </Project>

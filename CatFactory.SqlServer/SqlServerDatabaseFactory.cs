@@ -376,19 +376,20 @@ namespace CatFactory.SqlServer
         /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
         public virtual Database Import()
         {
-            var database = new Database
-            {
-                DefaultSchema = "dbo",
-                SupportTransactions = true,
-                DatabaseTypeMaps = DatabaseTypeMaps.ToList(),
-                NamingConvention = new SqlServerDatabaseNamingConvention()
-            };
-
+            Database database;
             using (var connection = GetConnection())
             {
-                connection.Open();
+                database = new Database
+                {
+                    DataSource = connection.DataSource,
+                    Name = connection.Database,
+                    DefaultSchema = "dbo",
+                    SupportTransactions = true,
+                    DatabaseTypeMaps = this.DatabaseTypeMaps.ToList(),
+                    NamingConvention = new SqlServerDatabaseNamingConvention()
+                };
 
-                database.Name = connection.Database;
+                connection.Open();
 
                 SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypes(database, connection);
 
@@ -554,6 +555,8 @@ namespace CatFactory.SqlServer
                     {
                         yield return new DbObject
                         {
+                            DataSource = connection.DataSource,
+                            Catalog = connection.Database,
                             Schema = dataReader.GetString(0),
                             Name = dataReader.GetString(1),
                             Type = dataReader.GetString(2)
@@ -577,6 +580,8 @@ namespace CatFactory.SqlServer
                 {
                     var table = new Table
                     {
+                        DataSource = connection.DataSource,
+                        Catalog = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -926,6 +931,8 @@ namespace CatFactory.SqlServer
                 {
                     var view = new View
                     {
+                        DataSource = connection.DataSource,
+                        Catalog = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -1020,6 +1027,8 @@ namespace CatFactory.SqlServer
                 {
                     var scalarFunction = new ScalarFunction
                     {
+                        DataSource = connection.DataSource,
+                        Catalog = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -1092,6 +1101,8 @@ namespace CatFactory.SqlServer
                 {
                     var tableFunction = new TableFunction
                     {
+                        DataSource = connection.DataSource,
+                        Catalog = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -1168,6 +1179,8 @@ namespace CatFactory.SqlServer
                 {
                     var storedProcedure = new StoredProcedure
                     {
+                        DataSource = connection.DataSource,
+                        Catalog = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
