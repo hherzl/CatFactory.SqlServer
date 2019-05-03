@@ -6,7 +6,7 @@ namespace CatFactory.SqlServer.Tests
     public class ImportTests
     {
         [Fact]
-        public void ImportOnLineStoreDatabaseTest()
+        public void ImportOnlineStoreDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
@@ -25,7 +25,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportTablesFromOnLineStoreDatabaseTest()
+        public void ImportTablesFromOnlineStoreDatabaseTest()
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
@@ -202,6 +202,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("Warehouse.StockItems").Columns.Count > 0);
             Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
             Assert.True(database.FindTable("Warehouse.StockItems").Defaults.Count > 0);
+            Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ComputedExpression == null);
         }
     }
 }

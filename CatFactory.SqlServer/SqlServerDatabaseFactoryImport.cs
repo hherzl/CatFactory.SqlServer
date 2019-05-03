@@ -57,7 +57,11 @@ namespace CatFactory.SqlServer
 
                 var database = new Database
                 {
-                    Name = connection.Database
+                    Name = connection.Database,
+                    DefaultSchema = "dbo",
+                    SupportTransactions = true,
+                    DatabaseTypeMaps = SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
+                    NamingConvention = new SqlServerDatabaseNamingConvention()
                 };
 
                 if (tables.Length == 0)
@@ -104,7 +108,11 @@ namespace CatFactory.SqlServer
 
                 var database = new Database
                 {
-                    Name = connection.Database
+                    Name = connection.Database,
+                    DefaultSchema = "dbo",
+                    SupportTransactions = true,
+                    DatabaseTypeMaps = SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
+                    NamingConvention = new SqlServerDatabaseNamingConvention()
                 };
 
                 if (views.Length == 0)
@@ -152,7 +160,11 @@ namespace CatFactory.SqlServer
                 {
                     DataSource = connection.DataSource,
                     Catalog = connection.Database,
-                    Name = connection.Database
+                    Name = connection.Database,
+                    DefaultSchema = "dbo",
+                    SupportTransactions = true,
+                    DatabaseTypeMaps = SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
+                    NamingConvention = new SqlServerDatabaseNamingConvention()
                 };
 
                 if (names.Length == 0)
