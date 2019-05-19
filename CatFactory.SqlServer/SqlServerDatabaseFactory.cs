@@ -578,18 +578,14 @@ namespace CatFactory.SqlServer
             {
                 if (constraintDetail.ConstraintType.Contains("CHECK"))
                 {
-                    table.Checks.Add(new Check(constraintDetail.ConstraintKeys)
-                    {
-                        ConstraintName = constraintDetail.ConstraintName
-                    });
+                    table.Checks.Add(new Check(constraintDetail.ConstraintName, new string[] { constraintDetail.ConstraintKeys }));
                 }
                 else if (constraintDetail.ConstraintType.Contains("DEFAULT"))
                 {
                     var column = constraintDetail.ConstraintType.Replace("DEFAULT on column ", string.Empty).Trim();
 
-                    table.Defaults.Add(new Default(column)
+                    table.Defaults.Add(new Default(constraintDetail.ConstraintName, new string[] { column })
                     {
-                        ConstraintName = constraintDetail.ConstraintName,
                         Value = constraintDetail.ConstraintKeys
                     });
                 }
@@ -597,19 +593,13 @@ namespace CatFactory.SqlServer
                 {
                     var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
-                    table.ForeignKeys.Add(new ForeignKey(key)
-                    {
-                        ConstraintName = constraintDetail.ConstraintName
-                    });
+                    table.ForeignKeys.Add(new ForeignKey(constraintDetail.ConstraintName, key));
                 }
                 else if (constraintDetail.ConstraintType.Contains("PRIMARY KEY"))
                 {
                     var key = string.Concat(constraintDetail.ConstraintKeys).Split(',').Select(item => item.Trim()).ToArray();
 
-                    table.PrimaryKey = new PrimaryKey(key)
-                    {
-                        ConstraintName = constraintDetail.ConstraintName
-                    };
+                    table.PrimaryKey = new PrimaryKey(constraintDetail.ConstraintName, key);
                 }
                 else if (constraintDetail.ConstraintKeys.Contains("REFERENCES"))
                 {
@@ -621,10 +611,7 @@ namespace CatFactory.SqlServer
                 {
                     var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
-                    table.Uniques.Add(new Unique(key)
-                    {
-                        ConstraintName = constraintDetail.ConstraintName
-                    });
+                    table.Uniques.Add(new Unique(constraintDetail.ConstraintName, key));
                 }
             }
         }

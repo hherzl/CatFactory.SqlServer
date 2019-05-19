@@ -10,7 +10,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;");
+                .Import("server=(local);database=OnlineStore;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -29,7 +29,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .ImportTables(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
+                .ImportTables("server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -47,7 +47,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = SqlServerDatabaseFactory
-                .Import(SqlServerDatabaseFactory.GetLogger(), "server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+                .Import("server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -68,7 +68,7 @@ namespace CatFactory.SqlServer.Tests
         public void FullImportNorthwindDatabaseTest()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            var databaseFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
