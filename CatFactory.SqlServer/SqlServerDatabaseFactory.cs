@@ -588,6 +588,8 @@ namespace CatFactory.SqlServer
                     {
                         Value = constraintDetail.ConstraintKeys
                     });
+
+                    table[column].DefaultValue = constraintDetail.ConstraintKeys;
                 }
                 else if (constraintDetail.ConstraintType.Contains("FOREIGN KEY"))
                 {
