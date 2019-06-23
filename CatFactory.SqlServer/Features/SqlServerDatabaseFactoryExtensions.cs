@@ -21,7 +21,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.AddExtendedProperty(new ExtendedProperty(name, value));
 
                 database.Description = value;
             }
@@ -40,7 +42,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
 
                 table.Description = value;
             }
@@ -60,7 +64,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -79,7 +85,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
 
                 view.Description = value;
             }
@@ -99,7 +107,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -118,7 +128,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, value));
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.UpdateExtendedProperty(new ExtendedProperty(name, value));
 
                 database.Description = value;
             }
@@ -137,7 +149,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
 
                 table.Description = value;
             }
@@ -156,6 +170,8 @@ namespace CatFactory.SqlServer.Features
             using (var connection = databaseFactory.GetConnection())
             {
                 connection.Open();
+
+                var repository = new ExtendedPropertyRepository(connection);
 
                 new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
 
@@ -176,7 +192,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
 
                 view.Description = value;
             }
@@ -196,7 +214,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
 
                 column.Description = value;
             }
@@ -356,7 +376,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
             }
         }
 
@@ -373,7 +395,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
             }
         }
 
@@ -389,7 +413,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
             }
         }
 
@@ -406,7 +432,9 @@ namespace CatFactory.SqlServer.Features
             {
                 connection.Open();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
+                var repository = new ExtendedPropertyRepository(connection);
+
+                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
             }
         }
 

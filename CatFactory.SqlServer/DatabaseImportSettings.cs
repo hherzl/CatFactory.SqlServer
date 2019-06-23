@@ -9,6 +9,10 @@ namespace CatFactory.SqlServer
     /// </summary>
     public class DatabaseImportSettings
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_exclusions;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_exclusionTypes;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_extendedProperties;
+
         /// <summary>
         /// Initializes a new instance of <see cref="DatabaseImportSettings"/> class
         /// </summary>
@@ -23,7 +27,7 @@ namespace CatFactory.SqlServer
 					[sys].[objects] objects
 					inner join [sys].[schemas] schemas on [objects].[schema_id] = [schemas].[schema_id]
 				where
-					[type] in ('FN', 'IF', 'TF', 'U', 'V', 'T', 'P')
+					[type] in ('FN', 'IF', 'TF', 'U', 'V', 'T', 'P', 'SO')
 				order by
 					[object_type],
 					[schema_name],
@@ -72,63 +76,41 @@ namespace CatFactory.SqlServer
         public bool ImportStoredProcedures { get; set; }
 
         /// <summary>
+        /// Gets or sets a flag to import sequences
+        /// </summary>
+        public bool ImportSequences { get; set; }
+
+        /// <summary>
         /// Gets or sets a flag to import MS_Description extended property
         /// </summary>
         [Obsolete("Add extended properties in order to retrieve description")]
         public bool ImportMSDescription { get; set; } = true;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_exclusions;
 
         /// <summary>
         /// Gets or sets exclusions (database objects) for database import settings
         /// </summary>
         public List<string> Exclusions
         {
-            get
-            {
-                return m_exclusions ?? (m_exclusions = new List<string>());
-            }
-            set
-            {
-                m_exclusions = value;
-            }
+            get => m_exclusions ?? (m_exclusions = new List<string>());
+            set => m_exclusions = value;
         }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_exclusionTypes;
 
         /// <summary>
         /// Gets or sets exclusion types (database types) for database import settings
         /// </summary>
         public List<string> ExclusionTypes
         {
-            get
-            {
-                return m_exclusionTypes ?? (m_exclusionTypes = new List<string>());
-            }
-            set
-            {
-                m_exclusionTypes = value;
-            }
+            get => m_exclusionTypes ?? (m_exclusionTypes = new List<string>());
+            set => m_exclusionTypes = value;
         }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<string> m_extendedProperties;
 
         /// <summary>
         /// Gets or sets extended properties for database import settings
         /// </summary>
         public List<string> ExtendedProperties
         {
-            get
-            {
-                return m_extendedProperties ?? (m_extendedProperties = new List<string>());
-            }
-            set
-            {
-                m_extendedProperties = value;
-            }
+            get => m_extendedProperties ?? (m_extendedProperties = new List<string>());
+            set => m_extendedProperties = value;
         }
     }
 }

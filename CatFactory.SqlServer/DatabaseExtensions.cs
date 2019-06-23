@@ -50,6 +50,14 @@ namespace CatFactory.SqlServer
             => database.DbObjects.Where(item => new string[] { "SQL_STORED_PROCEDURE" }.Contains(item.Type));
 
         /// <summary>
+        /// Gets all database objects that represent sequences from database instance
+        /// </summary>
+        /// <param name="database">Instance of <see cref="Database"/> class</param>
+        /// <returns>A sequence of <see cref="DbObject"/> that represents sequences in database instance</returns>
+        public static IEnumerable<DbObject> GetSequences(this Database database)
+            => database.DbObjects.Where(item => new string[] { "SEQUENCE_OBJECT" }.Contains(item.Type));
+
+        /// <summary>
         /// Get the name for table according to database naming convention
         /// </summary>
         /// <param name="database">Instance of <see cref="Database"/> class</param>

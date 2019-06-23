@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
+using CatFactory.SqlServer.DocumentObjectModel.Queries;
 
 namespace CatFactory.SqlServer
 {
@@ -19,56 +19,25 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         public static void AddUserDefinedDataTypes(Database database, DbConnection connection)
         {
-            using (var command = connection.CreateCommand())
+            var sysTypes = connection.GetSysTypes().ToList();
+
+            foreach (var type in sysTypes)
             {
-                command.Connection = connection;
-                command.CommandText = " select name, system_type_id, user_type_id, collation_name, is_nullable, is_user_defined from sys.types ";
+                if (type.IsUserDefined == false)
+                    continue;
 
-                var types = new[]
+                var parent = sysTypes.FirstOrDefault(item => item.IsUserDefined == false && item.SystemTypeId == type.SystemTypeId);
+
+                if (parent == null)
+                    continue;
+
+                database.DatabaseTypeMaps.Add(new DatabaseTypeMap
                 {
-                    new
-                    {
-                        Name = string.Empty,
-                        SystemTypeId = default(byte),
-                        UserTypeId = 0,
-                        CollationName = string.Empty,
-                        IsNullable = false,
-                        IsUserDefined = false
-                    }
-                }.ToList();
-
-                using (var dataReader = command.ExecuteReader())
-                {
-                    while (dataReader.Read())
-                    {
-                        types.Add(new
-                        {
-                            Name = dataReader.GetString(0),
-                            SystemTypeId = dataReader.GetByte(1),
-                            UserTypeId = dataReader.GetInt32(2),
-                            CollationName = dataReader[3] is DBNull ? null : dataReader.GetString(3),
-                            IsNullable = dataReader.GetBoolean(4),
-                            IsUserDefined = dataReader.GetBoolean(5)
-                        });
-                    }
-                }
-
-                foreach (var type in types)
-                {
-                    if (type.IsUserDefined)
-                    {
-                        var parent = types.FirstOrDefault(item => !item.IsUserDefined && item.SystemTypeId == type.SystemTypeId);
-
-                        if (parent != null)
-                            database.DatabaseTypeMaps.Add(new DatabaseTypeMap
-                            {
-                                DatabaseType = type.Name,
-                                Collation = type.CollationName,
-                                IsUserDefined = type.IsUserDefined,
-                                ParentDatabaseType = parent.Name
-                            });
-                    }
-                }
+                    DatabaseType = type.Name,
+                    Collation = type.CollationName,
+                    IsUserDefined = (bool)type.IsUserDefined,
+                    ParentDatabaseType = parent.Name
+                });
             }
         }
 
@@ -167,27 +136,18 @@ namespace CatFactory.SqlServer
         /// </summary>
         /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <returns></returns>
+        /// <returns>A sequence of <see cref="FirstResultSetForObject"/> class</returns>
         public static IEnumerable<FirstResultSetForObject> GetFirstResultSetForObject(StoredProcedure storedProcedure, DbConnection connection)
         {
-            using (var command = connection.CreateCommand())
+            foreach (var item in connection.DescribeFirstResultSetForObject(storedProcedure.FullName))
             {
-                command.Connection = connection;
-                command.CommandText = string.Format(" select[column_ordinal], [name], [is_nullable], [system_type_name] from [sys].[dm_exec_describe_first_result_set_for_object] (object_id('{0}'), null) ", storedProcedure.FullName);
-
-                using (var dataReader = command.ExecuteReader())
+                yield return new FirstResultSetForObject
                 {
-                    while (dataReader.Read())
-                    {
-                        yield return new FirstResultSetForObject
-                        {
-                            ColumnOrdinal = dataReader.GetInt32(0),
-                            Name = dataReader[1] is DBNull ? string.Empty : dataReader.GetString(1),
-                            IsNullable = dataReader[2] is DBNull ? false : dataReader.GetBoolean(2),
-                            SystemTypeName = dataReader[3] is DBNull ? string.Empty : dataReader.GetString(3)
-                        };
-                    }
-                }
+                    ColumnOrdinal = item.ColumnOrdinal,
+                    Name = item.Name,
+                    IsNullable = item.IsNullable,
+                    SystemTypeName = item.SystemTypeName
+                };
             }
         }
     }

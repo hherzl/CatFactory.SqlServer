@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -65,7 +65,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -91,7 +91,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -103,8 +103,8 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
+            databaseFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
 
             // Assert
         }
@@ -117,7 +117,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -143,7 +143,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -167,7 +167,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -193,7 +193,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -220,7 +220,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -232,9 +232,9 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product");
-            databaseFactory.UpdateExtendedProperty(table, table["ProductID"], "MS_Description", "ID for product (Update)");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
+            databaseFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
+            databaseFactory.UpdateExtendedProperty(table, table["ID"], "MS_Description", "ID for product (Update)");
 
             // Assert
         }
@@ -247,7 +247,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -274,7 +274,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -299,7 +299,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -323,7 +323,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -348,7 +348,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -360,7 +360,7 @@ namespace CatFactory.SqlServer.Tests
             var database = databaseFactory.Import();
             var table = database.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ProductID"], "MS_Description");
+            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
 
             // Assert
         }
@@ -373,7 +373,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -398,7 +398,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnLineStore;integrated security=yes;",
+                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
                     ExtendedProperties =
                     {
                         "MS_Description"

@@ -191,7 +191,8 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;"
+                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;",
+                    ImportSequences = true
                 }
             };
 
@@ -203,6 +204,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
             Assert.True(database.FindTable("Warehouse.StockItems").Defaults.Count > 0);
             Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ComputedExpression == null);
+            Assert.True(database.Sequences.Count > 0);
         }
     }
 }

@@ -168,11 +168,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         /// <returns></returns>
         public static EntityResult<TModel> AddExtendedProperty<TModel>(this EntityResult<TModel> result, string name, string value) where TModel : class
         {
-            result.Table.ExtendedProperties.Add(new ExtendedProperty
-            {
-                Name = name,
-                Value = value
-            });
+            result.Table.ExtendedProperties.Add(new ExtendedProperty(name, value));
 
             return result;
         }
@@ -189,11 +185,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         /// <returns></returns>
         public static EntityResult<TModel> AddExtendedProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string name, string value) where TModel : class
         {
-            result.Table[GetPropertyName(selector)].ExtendedProperties.Add(new ExtendedProperty
-            {
-                Name = name,
-                Value = value
-            });
+            result.Table[GetPropertyName(selector)].ExtendedProperties.Add(new ExtendedProperty(name,value));
 
             return result;
         }

@@ -7,10 +7,10 @@ namespace CatFactory.SqlServer.Tests
     public class ScaffoldingStoredProceduresTests
     {
         [Fact]
-        public void GenerateProceduresFromExistingDatabaseTest()
+        public void ScaffoldProceduresFromExistingDatabaseTest()
         {
             // Arrange
-            var database = SqlServerDatabaseFactory.Import("server=(local);database=OnLineStore;integrated security=yes;");
+            var database = SqlServerDatabaseFactory.Import("server=(local);database=OnlineStore;integrated security=yes;");
 
             // Act
             foreach (var table in database.Tables)
@@ -30,7 +30,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void GenerateProceduresFromMockDatabaseTest()
+        public void ScaffoldProceduresFromMockDatabaseTest()
         {
             // Arrange
             var database = Databases.Blogging;

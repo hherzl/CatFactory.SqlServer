@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
+using CatFactory.SqlServer.DocumentObjectModel.Queries;
 using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +17,8 @@ namespace CatFactory.SqlServer
     /// </summary>
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private DatabaseImportSettings m_databaseImportSettings;
+
         /// <summary>
         /// Gets a instance for <see cref="Logger"/> class
         /// </summary>
@@ -74,32 +77,17 @@ namespace CatFactory.SqlServer
         [Obsolete("Set connection string in ImportSettings")]
         public string ConnectionString
         {
-            get
-            {
-                return DatabaseImportSettings.ConnectionString;
-            }
-            set
-            {
-                DatabaseImportSettings.ConnectionString = value;
-            }
+            get => DatabaseImportSettings.ConnectionString;
+            set => DatabaseImportSettings.ConnectionString = value;
         }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private DatabaseImportSettings m_databaseImportSettings;
 
         /// <summary>
         /// Gets or sets the database import settings
         /// </summary>
         public DatabaseImportSettings DatabaseImportSettings
         {
-            get
-            {
-                return m_databaseImportSettings ?? (m_databaseImportSettings = new DatabaseImportSettings());
-            }
-            set
-            {
-                m_databaseImportSettings = value;
-            }
+            get => m_databaseImportSettings ?? (m_databaseImportSettings = new DatabaseImportSettings());
+            set => m_databaseImportSettings = value;
         }
 
         /// <summary>
@@ -108,14 +96,8 @@ namespace CatFactory.SqlServer
         [Obsolete("Use DatabaseImportSettings property")]
         public DatabaseImportSettings ImportSettings
         {
-            get
-            {
-                return DatabaseImportSettings;
-            }
-            set
-            {
-                DatabaseImportSettings = value;
-            }
+            get => DatabaseImportSettings;
+            set => DatabaseImportSettings = value;
         }
 
         /// <summary>
@@ -283,6 +265,16 @@ namespace CatFactory.SqlServer
                         {
                             ImportExtendedProperties(connection, scalarFunction);
                         }
+                    }
+                }
+
+                if (DatabaseImportSettings.ImportSequences)
+                {
+                    Logger?.LogInformation("Importing sequences for '{0}'...", database.Name);
+
+                    foreach (var sequence in GetSequences(connection, database.GetSequences()))
+                    {
+                        database.Sequences.Add(sequence);
                     }
                 }
 
@@ -683,14 +675,6 @@ namespace CatFactory.SqlServer
             {
                 using (var command = connection.CreateCommand())
                 {
-                    var view = new View
-                    {
-                        DataSource = connection.DataSource,
-                        Catalog = connection.Database,
-                        Schema = dbObject.Schema,
-                        Name = dbObject.Name
-                    };
-
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
@@ -716,6 +700,14 @@ namespace CatFactory.SqlServer
 
                             queryResults.Add(queryResult);
                         }
+
+                        var view = new View
+                        {
+                            DataSource = connection.DataSource,
+                            Catalog = connection.Database,
+                            Schema = dbObject.Schema,
+                            Name = dbObject.Name
+                        };
 
                         foreach (var result in queryResults)
                         {
@@ -853,14 +845,6 @@ namespace CatFactory.SqlServer
             {
                 using (var command = connection.CreateCommand())
                 {
-                    var tableFunction = new TableFunction
-                    {
-                        DataSource = connection.DataSource,
-                        Catalog = connection.Database,
-                        Schema = dbObject.Schema,
-                        Name = dbObject.Name
-                    };
-
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
@@ -886,6 +870,14 @@ namespace CatFactory.SqlServer
 
                             queryResults.Add(queryResult);
                         }
+
+                        var tableFunction = new TableFunction
+                        {
+                            DataSource = connection.DataSource,
+                            Catalog = connection.Database,
+                            Schema = dbObject.Schema,
+                            Name = dbObject.Name
+                        };
 
                         foreach (var result in queryResults)
                         {
@@ -931,14 +923,6 @@ namespace CatFactory.SqlServer
             {
                 using (var command = connection.CreateCommand())
                 {
-                    var storedProcedure = new StoredProcedure
-                    {
-                        DataSource = connection.DataSource,
-                        Catalog = connection.Database,
-                        Schema = dbObject.Schema,
-                        Name = dbObject.Name
-                    };
-
                     command.Connection = connection;
                     command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
 
@@ -965,6 +949,14 @@ namespace CatFactory.SqlServer
                             queryResults.Add(queryResult);
                         }
 
+                        var storedProcedure = new StoredProcedure
+                        {
+                            DataSource = connection.DataSource,
+                            Catalog = connection.Database,
+                            Schema = dbObject.Schema,
+                            Name = dbObject.Name
+                        };
+
                         foreach (var result in queryResults)
                         {
                             foreach (var item in result.Items)
@@ -989,6 +981,112 @@ namespace CatFactory.SqlServer
                     // todo: Remove this token
                     if (name == "MS_Description")
                         storedProcedure.Description = extendedProperty.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets scalar functions from database connection
+        /// </summary>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="sequences">Sequence of scalar functions</param>
+        /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
+        protected virtual IEnumerable<Sequence> GetSequences(DbConnection connection, IEnumerable<DbObject> sequences)
+        {
+            var sysSequences = connection.GetSysSequences().ToList();
+
+            var sysSchemas = connection.GetSysSchemas().ToList();
+
+            var sysTypes = connection.GetSysTypes().ToList();
+
+            var summary =
+                from sysSequence in sysSequences
+                join sysSchema in sysSchemas on sysSequence.SchemaId equals sysSchema.SchemaId
+                join sysType in sysTypes on sysSequence.SystemTypeId equals sysType.SystemTypeId
+                select new
+                {
+                    Schema = sysSchema.Name,
+                    sysSequence.Name,
+                    Type = sysType.Name,
+                    sysSequence.StartValue,
+                    sysSequence.MinimumValue,
+                    sysSequence.MaximumValue,
+                    sysSequence.CurrentValue,
+                    sysSequence.Increment,
+                    sysSequence.IsCached,
+                    sysSequence.IsCycling
+                };
+
+            var databaseTypeMaps = SqlServerDatabaseTypeMaps.DatabaseTypeMaps;
+
+            foreach (var dbObject in sequences)
+            {
+                var record = summary.FirstOrDefault(item => item.Schema == dbObject.Schema && item.Name == dbObject.Name);
+
+                if (record == null)
+                    continue;
+
+                var sequenceDatabaseTypeMap = databaseTypeMaps.First(item => item.DatabaseType == record.Type);
+
+                if (sequenceDatabaseTypeMap.GetClrType() == typeof(int))
+                {
+                    yield return new Int32Sequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (int)record.StartValue,
+                        MinimumValue = (int)record.MinimumValue,
+                        MaximumValue = (int)record.MaximumValue,
+                        CurrentValue = (int)record.CurrentValue,
+                        Increment = (int)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    };
+                }
+                if (sequenceDatabaseTypeMap.GetClrType() == typeof(long))
+                {
+                    yield return new Int64Sequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (long)record.StartValue,
+                        MinimumValue = (long)record.MinimumValue,
+                        MaximumValue = (long)record.MaximumValue,
+                        CurrentValue = (long)record.CurrentValue,
+                        Increment = (long)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    };
+                }
+                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
+                {
+                    yield return new Int16Sequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (short)record.StartValue,
+                        MinimumValue = (short)record.MinimumValue,
+                        MaximumValue = (short)record.MaximumValue,
+                        CurrentValue = (short)record.CurrentValue,
+                        Increment = (short)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    };
+                }
+                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(decimal))
+                {
+                    yield return new DecimalSequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (decimal)record.StartValue,
+                        MinimumValue = (decimal)record.MinimumValue,
+                        MaximumValue = (decimal)record.MaximumValue,
+                        CurrentValue = (decimal)record.CurrentValue,
+                        Increment = (decimal)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    };
                 }
             }
         }
