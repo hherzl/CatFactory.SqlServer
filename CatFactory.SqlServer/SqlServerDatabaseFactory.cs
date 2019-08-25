@@ -17,7 +17,7 @@ namespace CatFactory.SqlServer
     /// </summary>
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private DatabaseImportSettings m_databaseImportSettings;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]private DatabaseImportSettings m_databaseImportSettings;
 
         /// <summary>
         /// Gets a instance for <see cref="Logger"/> class

@@ -1,7 +1,7 @@
 ﻿namespace CatFactory.SqlServer.DocumentObjectModel
 {
     /// <summary>
-    /// 
+    /// Represents the model for sys.types view
     /// </summary>
     public class SysType
     {

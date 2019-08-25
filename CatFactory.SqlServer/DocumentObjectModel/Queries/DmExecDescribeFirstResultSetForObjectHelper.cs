@@ -9,7 +9,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
     /// <summary>
     /// 
     /// </summary>
-    public static class DescribeFirstResultSetForObjects
+    public static class DmExecDescribeFirstResultSetForObjectHelper
     {
         /// <summary>
         /// 
@@ -18,7 +18,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// <param name="objectId"></param>
         /// <param name="browseInformationMode"></param>
         /// <returns></returns>
-        public static IEnumerable<DescribeFirstResultSetForObjectResult> DescribeFirstResultSetForObject(this DbConnection connection, string objectId, byte? browseInformationMode = null)
+        public static IEnumerable<DmExecDescribeFirstResultSetForObject> DmExecDescribeFirstResultSetForObject(this DbConnection connection, string objectId, byte? browseInformationMode = null)
         {
             using (var command = connection.CreateCommand())
             {
@@ -41,7 +41,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 {
                     while (dataReader.Read())
                     {
-                        yield return new DescribeFirstResultSetForObjectResult
+                        yield return new DmExecDescribeFirstResultSetForObject
                         {
                             ColumnOrdinal = dataReader.GetInt32(0),
                             Name = dataReader[1] is DBNull ? string.Empty : dataReader.GetString(1),

@@ -3,7 +3,7 @@
 namespace CatFactory.SqlServer.DocumentObjectModel
 {
     /// <summary>
-    /// 
+    /// Represents the model for sys.sequences view
     /// </summary>
     public class SysSequence
     {

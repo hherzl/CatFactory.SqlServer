@@ -139,7 +139,7 @@ namespace CatFactory.SqlServer
         /// <returns>A sequence of <see cref="FirstResultSetForObject"/> class</returns>
         public static IEnumerable<FirstResultSetForObject> GetFirstResultSetForObject(StoredProcedure storedProcedure, DbConnection connection)
         {
-            foreach (var item in connection.DescribeFirstResultSetForObject(storedProcedure.FullName))
+            foreach (var item in connection.DmExecDescribeFirstResultSetForObject(storedProcedure.FullName))
             {
                 yield return new FirstResultSetForObject
                 {
