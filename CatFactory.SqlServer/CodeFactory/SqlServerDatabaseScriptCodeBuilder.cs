@@ -127,6 +127,8 @@ namespace CatFactory.SqlServer.CodeFactory
                                 output.AppendFormat("{0}{1} {2}({3}, {4})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec, column.Scale);
                             else if (column.Prec > 0)
                                 output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec);
+                            else
+                                output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
                         }
                         else
                         {
@@ -148,20 +150,38 @@ namespace CatFactory.SqlServer.CodeFactory
 
                     output.AppendLine("go");
 
-                    output.AppendLine();
-
                     foreach (var extendedProperty in table.ExtendedProperties)
                     {
                         output.AppendLine("exec [sp_addextendedproperty]");
 
-                        output.AppendFormat("{0}@name = '{1}', @value = '{2}', ", Indent(1), extendedProperty.Name, extendedProperty.Value);
-                        output.AppendFormat("@level0type = '{0}', @level0name = '{1}', ", "schema", table.Schema);
-                        output.AppendFormat("@level1type = '{0}', @level1name = '{1}', ", "table", table.Name);
-                        output.AppendLine("@level2type = null, @level2name = null");
+                        output.AppendFormat("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level0type = '{1}',", Indent(1), "schema");
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level0name = '{1}', ", Indent(1), table.Schema);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level1type = '{1}',", Indent(1), "table");
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level1name = '{1}',", Indent(1), table.Name);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level2type = null,", Indent(1));
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}@level2name = null", Indent(1));
+                        output.AppendLine();
 
                         output.AppendLine("go");
-                        output.AppendLine();
                     }
+
+                    output.AppendLine();
                 }
 
                 foreach (var table in Database.Tables)
@@ -172,7 +192,10 @@ namespace CatFactory.SqlServer.CodeFactory
 
                         var constraintName = string.IsNullOrEmpty(pk.ConstraintName) ? Database.NamingConvention.GetPrimaryKeyConstraintName(table, pk.Key.ToArray()) : Database.GetObjectName(pk.ConstraintName);
 
-                        output.AppendFormat("alter table {0} add constraint {1} primary key ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
+                        output.AppendFormat("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}primary key ({1})", Indent(1), string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
                         output.AppendLine("go");
@@ -184,7 +207,10 @@ namespace CatFactory.SqlServer.CodeFactory
                     {
                         var constraintName = string.IsNullOrEmpty(unique.ConstraintName) ? Database.NamingConvention.GetUniqueConstraintName(table, unique.Key.ToArray()) : Database.GetObjectName(unique.ConstraintName);
 
-                        output.AppendFormat("alter table {0} add constraint {1} unique ({2})", Database.GetObjectName(table), constraintName, string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
+                        output.AppendFormat("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                        output.AppendLine();
+
+                        output.AppendFormat("{0}unique ({1})", Indent(1), string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
                         output.AppendLine();
 
                         output.AppendLine("go");
@@ -209,7 +235,10 @@ namespace CatFactory.SqlServer.CodeFactory
                             {
                                 var constraintName = string.IsNullOrEmpty(foreignKey.ConstraintName) ? Database.NamingConvention.GetForeignKeyConstraintName(table, foreignKey.Key.ToArray(), references) : Database.GetObjectName(foreignKey.ConstraintName);
 
-                                output.AppendFormat("alter table {0} add constraint {1} foreign key ({2}) references {3}", Database.GetObjectName(table), constraintName, string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
+                                output.AppendFormat("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}foreign key ({1}) references {2}", Indent(1), string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
                                 output.AppendLine();
 
                                 output.AppendLine("go");
@@ -231,10 +260,30 @@ namespace CatFactory.SqlServer.CodeFactory
                             {
                                 output.AppendLine("exec [sp_addextendedproperty]");
 
-                                output.AppendFormat("{0}@name = '{1}', @value = '{2}', ", Indent(1), extendedProperty.Name, extendedProperty.Value);
-                                output.AppendFormat("@level0type = '{0}', @level0name = '{1}', ", "schema", table.Schema);
-                                output.AppendFormat("@level1type = '{0}', @level1name = '{1}', ", "table", table.Name);
-                                output.AppendFormat("@level2type = '{0}', @level2name = '{1}'", "column", column.Name);
+                                output.AppendFormat("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level0type = '{1}',", Indent(1), "schema");
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level0name = '{1}',", Indent(1), table.Schema);
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level1type = '{1}',", Indent(1), "table");
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level1name = '{1}',", Indent(1), table.Name);
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level2type = '{1}',", Indent(1), "column");
+                                output.AppendLine();
+
+                                output.AppendFormat("{0}@level2name = '{1}'", Indent(1), column.Name);
+                                output.AppendLine();
+
                                 output.AppendLine();
                             }
                         }
