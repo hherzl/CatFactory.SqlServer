@@ -48,6 +48,66 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
+        public void TestGetSysTables()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+
+            // Act
+
+            connection.Open();
+
+            var tables = connection.GetSysTables().ToList();
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(tables.Count > 0);
+        }
+
+        [Fact]
+        public void TestGetSysViews()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+
+            // Act
+
+            connection.Open();
+
+            var views = connection.GetSysViews().ToList();
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(views.Count > 0);
+        }
+
+        [Fact]
+        public void TestGetSysColumns()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+
+            // Act
+
+            connection.Open();
+
+            var columns = connection.GetSysColumns().ToList();
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(columns.Count > 0);
+        }
+
+        [Fact]
         public void TestGetSysSequences()
         {
             // Arrange
