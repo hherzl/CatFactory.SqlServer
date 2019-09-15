@@ -7,7 +7,7 @@ using System.Text;
 namespace CatFactory.SqlServer.DocumentObjectModel.Queries
 {
     /// <summary>
-    /// 
+    /// Provides extension methods to read results from sys views
     /// </summary>
     public static class SysQueries
     {
@@ -23,9 +23,9 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 var cmdText = new StringBuilder();
 
                 cmdText.Append(" select ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [principal_id] PrincipalId, ");
-                cmdText.Append("  [schema_id] SchemaId ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [principal_id], ");
+                cmdText.Append("  [schema_id] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[schemas] ");
 
@@ -60,21 +60,21 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 var cmdText = new StringBuilder();
 
                 cmdText.Append(" select ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [system_type_id] SystemTypeId, ");
-                cmdText.Append("  [user_type_id] UserTypeId, ");
-                cmdText.Append("  [schema_id] SchemaId, ");
-                cmdText.Append("  [principal_id] PrincipalId, ");
-                cmdText.Append("  [max_length] MaxLength, ");
-                cmdText.Append("  [precision] Precision, ");
-                cmdText.Append("  [scale] Scale, ");
-                cmdText.Append("  [collation_name] CollationName, ");
-                cmdText.Append("  [is_nullable] IsNullable, ");
-                cmdText.Append("  [is_user_defined] IsUserDefined, ");
-                cmdText.Append("  [is_assembly_type] IsAssemblyType, ");
-                cmdText.Append("  [default_object_id] DefaultObjectId, ");
-                cmdText.Append("  [rule_object_id] RuleObjectId, ");
-                cmdText.Append("  [is_table_type] IsTableType ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [system_type_id], ");
+                cmdText.Append("  [user_type_id], ");
+                cmdText.Append("  [schema_id], ");
+                cmdText.Append("  [principal_id], ");
+                cmdText.Append("  [max_length], ");
+                cmdText.Append("  [precision], ");
+                cmdText.Append("  [scale], ");
+                cmdText.Append("  [collation_name], ");
+                cmdText.Append("  [is_nullable], ");
+                cmdText.Append("  [is_user_defined], ");
+                cmdText.Append("  [is_assembly_type], ");
+                cmdText.Append("  [default_object_id], ");
+                cmdText.Append("  [rule_object_id], ");
+                cmdText.Append("  [is_table_type] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[types] ");
 
@@ -118,52 +118,50 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         {
             using (var command = connection.CreateCommand())
             {
-                // Create string builder for query
                 var cmdText = new StringBuilder();
 
-                // Create sql statement
                 cmdText.Append(" select ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [object_id] ObjectId, ");
-                cmdText.Append("  [principal_id] PrincipalId, ");
-                cmdText.Append("  [schema_id] SchemaId, ");
-                cmdText.Append("  [parent_object_id] ParentObjectId, ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [object_id], ");
+                cmdText.Append("  [principal_id], ");
+                cmdText.Append("  [schema_id], ");
+                cmdText.Append("  [parent_object_id], ");
                 cmdText.Append("  [type] Type, ");
-                cmdText.Append("  [type_desc] TypeDesc, ");
-                cmdText.Append("  [create_date] CreateDate, ");
-                cmdText.Append("  [modify_date] ModifyDate, ");
-                cmdText.Append("  [is_ms_shipped] IsMsShipped, ");
-                cmdText.Append("  [is_published] IsPublished, ");
-                cmdText.Append("  [is_schema_published] IsSchemaPublished, ");
-                cmdText.Append("  [lob_data_space_id] LobDataSpaceId, ");
-                cmdText.Append("  [filestream_data_space_id] FilestreamDataSpaceId, ");
-                cmdText.Append("  [max_column_id_used] MaxColumnIdUsed, ");
-                cmdText.Append("  [lock_on_bulk_load] LockOnBulkLoad, ");
-                cmdText.Append("  [uses_ansi_nulls] UsesAnsiNulls, ");
-                cmdText.Append("  [is_replicated] IsReplicated, ");
-                cmdText.Append("  [has_replication_filter] HasReplicationFilter, ");
-                cmdText.Append("  [is_merge_published] IsMergePublished, ");
-                cmdText.Append("  [is_sync_tran_subscribed] IsSyncTranSubscribed, ");
-                cmdText.Append("  [has_unchecked_assembly_data] HasUncheckedAssemblyData, ");
-                cmdText.Append("  [text_in_row_limit] TextInRowLimit, ");
-                cmdText.Append("  [large_value_types_out_of_row] LargeValueTypesOutOfRow, ");
-                cmdText.Append("  [is_tracked_by_cdc] IsTrackedByCdc, ");
-                cmdText.Append("  [lock_escalation] LockEscalation, ");
-                cmdText.Append("  [lock_escalation_desc] LockEscalationDesc, ");
-                cmdText.Append("  [is_filetable] IsFiletable, ");
-                cmdText.Append("  [is_memory_optimized] IsMemoryOptimized, ");
-                cmdText.Append("  [durability] Durability, ");
-                cmdText.Append("  [durability_desc] DurabilityDesc, ");
-                cmdText.Append("  [temporal_type] TemporalType, ");
-                cmdText.Append("  [temporal_type_desc] TemporalTypeDesc, ");
-                cmdText.Append("  [history_table_id] HistoryTableId, ");
-                cmdText.Append("  [is_remote_data_archive_enabled] IsRemoteDataArchiveEnabled, ");
-                cmdText.Append("  [is_external] IsExternal, ");
-                cmdText.Append("  [history_retention_period] HistoryRetentionPeriod, ");
-                cmdText.Append("  [history_retention_period_unit] HistoryRetentionPeriodUnit, ");
-                cmdText.Append("  [history_retention_period_unit_desc] HistoryRetentionPeriodUnitDesc, ");
-                cmdText.Append("  [is_node] IsNode, ");
-                cmdText.Append("  [is_edge] IsEdge ");
+                cmdText.Append("  [type_desc], ");
+                cmdText.Append("  [create_date], ");
+                cmdText.Append("  [modify_date], ");
+                cmdText.Append("  [is_ms_shipped], ");
+                cmdText.Append("  [is_published], ");
+                cmdText.Append("  [is_schema_published], ");
+                cmdText.Append("  [lob_data_space_id], ");
+                cmdText.Append("  [filestream_data_space_id], ");
+                cmdText.Append("  [max_column_id_used], ");
+                cmdText.Append("  [lock_on_bulk_load], ");
+                cmdText.Append("  [uses_ansi_nulls], ");
+                cmdText.Append("  [is_replicated], ");
+                cmdText.Append("  [has_replication_filter], ");
+                cmdText.Append("  [is_merge_published], ");
+                cmdText.Append("  [is_sync_tran_subscribed], ");
+                cmdText.Append("  [has_unchecked_assembly_data], ");
+                cmdText.Append("  [text_in_row_limit], ");
+                cmdText.Append("  [large_value_types_out_of_row], ");
+                cmdText.Append("  [is_tracked_by_cdc], ");
+                cmdText.Append("  [lock_escalation], ");
+                cmdText.Append("  [lock_escalation_desc], ");
+                cmdText.Append("  [is_filetable], ");
+                cmdText.Append("  [is_memory_optimized], ");
+                cmdText.Append("  [durability], ");
+                cmdText.Append("  [durability_desc], ");
+                cmdText.Append("  [temporal_type], ");
+                cmdText.Append("  [temporal_type_desc], ");
+                cmdText.Append("  [history_table_id], ");
+                cmdText.Append("  [is_remote_data_archive_enabled], ");
+                cmdText.Append("  [is_external], ");
+                cmdText.Append("  [history_retention_period], ");
+                cmdText.Append("  [history_retention_period_unit], ");
+                cmdText.Append("  [history_retention_period_unit_desc], ");
+                cmdText.Append("  [is_node], ");
+                cmdText.Append("  [is_edge] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[tables] ");
 
@@ -233,30 +231,28 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         {
             using (var command = connection.CreateCommand())
             {
-                // Create string builder for query
                 var cmdText = new StringBuilder();
 
-                // Create sql statement
                 cmdText.Append(" select ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [object_id] ObjectId, ");
-                cmdText.Append("  [principal_id] PrincipalId, ");
-                cmdText.Append("  [schema_id] SchemaId, ");
-                cmdText.Append("  [parent_object_id] ParentObjectId, ");
-                cmdText.Append("  [type] Type, ");
-                cmdText.Append("  [type_desc] TypeDesc, ");
-                cmdText.Append("  [create_date] CreateDate, ");
-                cmdText.Append("  [modify_date] ModifyDate, ");
-                cmdText.Append("  [is_ms_shipped] IsMsShipped, ");
-                cmdText.Append("  [is_published] IsPublished, ");
-                cmdText.Append("  [is_schema_published] IsSchemaPublished, ");
-                cmdText.Append("  [is_replicated] IsReplicated, ");
-                cmdText.Append("  [has_replication_filter] HasReplicationFilter, ");
-                cmdText.Append("  [has_opaque_metadata] HasOpaqueMetadata, ");
-                cmdText.Append("  [has_unchecked_assembly_data] HasUncheckedAssemblyData, ");
-                cmdText.Append("  [with_check_option] WithCheckOption, ");
-                cmdText.Append("  [is_date_correlation_view] IsDateCorrelationView, ");
-                cmdText.Append("  [is_tracked_by_cdc] IsTrackedByCdc ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [object_id], ");
+                cmdText.Append("  [principal_id], ");
+                cmdText.Append("  [schema_id], ");
+                cmdText.Append("  [parent_object_id], ");
+                cmdText.Append("  [type], ");
+                cmdText.Append("  [type_desc], ");
+                cmdText.Append("  [create_date], ");
+                cmdText.Append("  [modify_date], ");
+                cmdText.Append("  [is_ms_shipped], ");
+                cmdText.Append("  [is_published], ");
+                cmdText.Append("  [is_schema_published], ");
+                cmdText.Append("  [is_replicated], ");
+                cmdText.Append("  [has_replication_filter], ");
+                cmdText.Append("  [has_opaque_metadata], ");
+                cmdText.Append("  [has_unchecked_assembly_data], ");
+                cmdText.Append("  [with_check_option], ");
+                cmdText.Append("  [is_date_correlation_view], ");
+                cmdText.Append("  [is_tracked_by_cdc] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[views] ");
 
@@ -288,7 +284,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             HasUncheckedAssemblyData = reader.GetBoolean(15),
                             WithCheckOption = reader.GetBoolean(16),
                             IsDateCorrelationView = reader.GetBoolean(17),
-                            IsTrackedByCdc = reader[18] is DBNull ? false : reader.GetBoolean(18),
+                            IsTrackedByCdc = reader[18] is DBNull ? false : reader.GetBoolean(18)
                         };
                     }
                 }
@@ -304,47 +300,45 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         {
             using (var command = connection.CreateCommand())
             {
-                // Create string builder for query
                 var cmdText = new StringBuilder();
 
-                // Create sql statement
                 cmdText.Append(" select ");
-                cmdText.Append("  [object_id] ObjectId, ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [column_id] ColumnId, ");
-                cmdText.Append("  [system_type_id] SystemTypeId, ");
-                cmdText.Append("  [user_type_id] UserTypeId, ");
-                cmdText.Append("  [max_length] MaxLength, ");
-                cmdText.Append("  [precision] Precision, ");
-                cmdText.Append("  [scale] Scale, ");
-                cmdText.Append("  [collation_name] CollationName, ");
-                cmdText.Append("  [is_nullable] IsNullable, ");
-                cmdText.Append("  [is_ansi_padded] IsAnsiPadded, ");
-                cmdText.Append("  [is_rowguidcol] IsRowguidcol, ");
-                cmdText.Append("  [is_identity] IsIdentity, ");
-                cmdText.Append("  [is_computed] IsComputed, ");
-                cmdText.Append("  [is_filestream] IsFilestream, ");
-                cmdText.Append("  [is_replicated] IsReplicated, ");
-                cmdText.Append("  [is_non_sql_subscribed] IsNonSqlSubscribed, ");
-                cmdText.Append("  [is_merge_published] IsMergePublished, ");
-                cmdText.Append("  [is_dts_replicated] IsDtsReplicated, ");
-                cmdText.Append("  [is_xml_document] IsXmlDocument, ");
-                cmdText.Append("  [xml_collection_id] XmlCollectionId, ");
-                cmdText.Append("  [default_object_id] DefaultObjectId, ");
-                cmdText.Append("  [rule_object_id] RuleObjectId, ");
-                cmdText.Append("  [is_sparse] IsSparse, ");
-                cmdText.Append("  [is_column_set] IsColumnSet, ");
-                cmdText.Append("  [generated_always_type] GeneratedAlwaysType, ");
-                cmdText.Append("  [generated_always_type_desc] GeneratedAlwaysTypeDesc, ");
-                cmdText.Append("  [encryption_type] EncryptionType, ");
-                cmdText.Append("  [encryption_type_desc] EncryptionTypeDesc, ");
-                cmdText.Append("  [encryption_algorithm_name] EncryptionAlgorithmName, ");
-                cmdText.Append("  [column_encryption_key_id] ColumnEncryptionKeyId, ");
-                cmdText.Append("  [column_encryption_key_database_name] ColumnEncryptionKeyDatabaseName, ");
-                cmdText.Append("  [is_hidden] IsHidden, ");
-                cmdText.Append("  [is_masked] IsMasked, ");
-                cmdText.Append("  [graph_type] GraphType, ");
-                cmdText.Append("  [graph_type_desc] GraphTypeDesc ");
+                cmdText.Append("  [object_id], ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [column_id], ");
+                cmdText.Append("  [system_type_id], ");
+                cmdText.Append("  [user_type_id], ");
+                cmdText.Append("  [max_length], ");
+                cmdText.Append("  [precision], ");
+                cmdText.Append("  [scale], ");
+                cmdText.Append("  [collation_name], ");
+                cmdText.Append("  [is_nullable], ");
+                cmdText.Append("  [is_ansi_padded], ");
+                cmdText.Append("  [is_rowguidcol], ");
+                cmdText.Append("  [is_identity], ");
+                cmdText.Append("  [is_computed], ");
+                cmdText.Append("  [is_filestream], ");
+                cmdText.Append("  [is_replicated], ");
+                cmdText.Append("  [is_non_sql_subscribed], ");
+                cmdText.Append("  [is_merge_published], ");
+                cmdText.Append("  [is_dts_replicated], ");
+                cmdText.Append("  [is_xml_document], ");
+                cmdText.Append("  [xml_collection_id], ");
+                cmdText.Append("  [default_object_id], ");
+                cmdText.Append("  [rule_object_id], ");
+                cmdText.Append("  [is_sparse], ");
+                cmdText.Append("  [is_column_set], ");
+                cmdText.Append("  [generated_always_type], ");
+                cmdText.Append("  [generated_always_type_desc], ");
+                cmdText.Append("  [encryption_type], ");
+                cmdText.Append("  [encryption_type_desc], ");
+                cmdText.Append("  [encryption_algorithm_name], ");
+                cmdText.Append("  [column_encryption_key_id], ");
+                cmdText.Append("  [column_encryption_key_database_name], ");
+                cmdText.Append("  [is_hidden], ");
+                cmdText.Append("  [is_masked], ");
+                cmdText.Append("  [graph_type], ");
+                cmdText.Append("  [graph_type_desc] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[columns] ");
 
@@ -412,32 +406,32 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 var cmdText = new StringBuilder();
 
                 cmdText.Append(" select ");
-                cmdText.Append("  [name] Name, ");
-                cmdText.Append("  [object_id] ObjectId, ");
-                cmdText.Append("  [principal_id] PrincipalId, ");
-                cmdText.Append("  [schema_id] SchemaId, ");
-                cmdText.Append("  [parent_object_id] ParentObjectId, ");
-                cmdText.Append("  [type] Type, ");
-                cmdText.Append("  [type_desc] TypeDesc, ");
-                cmdText.Append("  [create_date] CreateDate, ");
-                cmdText.Append("  [modify_date] ModifyDate, ");
-                cmdText.Append("  [is_ms_shipped] IsMsShipped, ");
-                cmdText.Append("  [is_published] IsPublished, ");
-                cmdText.Append("  [is_schema_published] IsSchemaPublished, ");
-                cmdText.Append("  [start_value] StartValue, ");
-                cmdText.Append("  [increment] Increment, ");
-                cmdText.Append("  [minimum_value] MinimumValue, ");
-                cmdText.Append("  [maximum_value] MaximumValue, ");
-                cmdText.Append("  [is_cycling] IsCycling, ");
-                cmdText.Append("  [is_cached] IsCached, ");
-                cmdText.Append("  [cache_size] CacheSize, ");
-                cmdText.Append("  [system_type_id] SystemTypeId, ");
-                cmdText.Append("  [user_type_id] UserTypeId, ");
-                cmdText.Append("  [precision] Precision, ");
-                cmdText.Append("  [scale] Scale, ");
-                cmdText.Append("  [current_value] CurrentValue, ");
-                cmdText.Append("  [is_exhausted] IsExhausted, ");
-                cmdText.Append("  [last_used_value] LastUsedValue ");
+                cmdText.Append("  [name], ");
+                cmdText.Append("  [object_id], ");
+                cmdText.Append("  [principal_id], ");
+                cmdText.Append("  [schema_id], ");
+                cmdText.Append("  [parent_object_id], ");
+                cmdText.Append("  [type], ");
+                cmdText.Append("  [type_desc], ");
+                cmdText.Append("  [create_date], ");
+                cmdText.Append("  [modify_date], ");
+                cmdText.Append("  [is_ms_shipped], ");
+                cmdText.Append("  [is_published], ");
+                cmdText.Append("  [is_schema_published], ");
+                cmdText.Append("  [start_value], ");
+                cmdText.Append("  [increment], ");
+                cmdText.Append("  [minimum_value], ");
+                cmdText.Append("  [maximum_value], ");
+                cmdText.Append("  [is_cycling], ");
+                cmdText.Append("  [is_cached], ");
+                cmdText.Append("  [cache_size], ");
+                cmdText.Append("  [system_type_id], ");
+                cmdText.Append("  [user_type_id], ");
+                cmdText.Append("  [precision], ");
+                cmdText.Append("  [scale], ");
+                cmdText.Append("  [current_value], ");
+                cmdText.Append("  [is_exhausted], ");
+                cmdText.Append("  [last_used_value] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[sequences] ");
 
@@ -476,7 +470,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             Scale = reader.GetByte(22),
                             CurrentValue = reader[23],
                             IsExhausted = reader.GetBoolean(24),
-                            LastUsedValue = reader[25] is DBNull ? default(int?) : reader.GetInt32(25),
+                            LastUsedValue = reader[25] is DBNull ? default(int?) : reader.GetInt32(25)
                         };
                     }
                 }
