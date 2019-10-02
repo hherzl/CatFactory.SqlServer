@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build41</Version>
+    <Version>1.0.0-beta-sun-build42</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build41 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build42 Version:
 
-* Addition of tables, views and columns for SQL Server DOM
+* Addition of method to create script for database
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
