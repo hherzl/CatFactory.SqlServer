@@ -16,14 +16,7 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Blogging;
 
             // Act
-            var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
-            {
-                Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer",
-                ForceOverwrite = true
-            };
-
-            codeBuilder.CreateFile();
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
 
             // Assert
         }
@@ -65,14 +58,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
-            {
-                Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer",
-                ForceOverwrite = true
-            };
-
-            codeBuilder.CreateFile();
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
 
             // Assert
         }
@@ -83,10 +69,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var database = SqlServerDatabaseFactory.CreateWithDefaults("RothschildHouse");
 
-            database.ExtendedProperties.Add(new ExtendedProperty("MS_Description")
-            {
-                Value = "Database to storage RothschildHouse payments"
-            });
+            database.ExtendedProperties.Add(new ExtendedProperty("MS_Description", "Database to storage RothschildHouse payments"));
 
             var person = database
                 .DefineEntity(new
@@ -158,14 +141,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
-            {
-                Database = database,
-                OutputDirectory = "C:\\Temp\\CatFactory.SqlServer",
-                ForceOverwrite = true
-            };
-
-            codeBuilder.CreateFile();
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
         }
     }
 }

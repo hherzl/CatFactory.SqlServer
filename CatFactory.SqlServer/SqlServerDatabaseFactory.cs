@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
-using CatFactory.SqlServer.CodeFactory;
 using CatFactory.SqlServer.DocumentObjectModel.Queries;
 using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
@@ -43,24 +42,6 @@ namespace CatFactory.SqlServer
                 DatabaseTypeMaps = databaseTypeMaps ?? SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
                 NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
             };
-
-        /// <summary>
-        /// Creates a new script for database
-        /// </summary>
-        /// <param name="database">Instance of <see cref="Database"/> instance</param>
-        /// <param name="outputDirectory">Output directory</param>
-        /// <param name="forceOverwrite">Force overwrite</param>
-        public static void CreateDatabaseScript(Database database, string outputDirectory, bool forceOverwrite)
-        {
-            var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
-            {
-                Database = database,
-                OutputDirectory = outputDirectory,
-                ForceOverwrite = forceOverwrite
-            };
-
-            codeBuilder.CreateFile();
-        }
 
         /// <summary>
         /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
