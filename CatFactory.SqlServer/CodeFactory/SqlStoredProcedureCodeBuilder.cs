@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
 
@@ -63,62 +62,62 @@ namespace CatFactory.SqlServer.CodeFactory
         /// </summary>
         public override void Translating()
         {
-            Lines = new List<ILine>
-            {
-                new CodeLine(Code)
-            };
+            Lines = new List<ILine>();
+
+            Lines.AddRange(GetLinesForGetAllStoredProcedure());
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetLinesForGetStoredProcedure());
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetLinesForInsertIntoStoredProcedure());
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetDropProcedureLines(Database.GetProcedureName(Table, "Update")));
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetLinesForUpdateStoredProcedure());
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetDropProcedureLines(Database.GetProcedureName(Table, "Delete")));
+
+            Lines.Add(new EmptyLine());
+
+            Lines.AddRange(GetLinesForDeleteStoredProcedure());
         }
 
         /// <summary>
-        /// Gets the output code for current <see cref="SqlStoredProcedureCodeBuilder"/> instance
+        /// 
         /// </summary>
-        protected string Code
+        /// <param name="procedureName"></param>
+        /// <returns></returns>
+        protected IEnumerable<ILine> GetDropProcedureLines(string procedureName)
         {
-            get
-            {
-                var output = new StringBuilder();
+            yield return new CodeLine("if object_id('{0}', 'P') is not null", procedureName);
 
-                GetAllProcedure(output);
-                output.AppendLine();
+            yield return new CodeLine("{0}drop procedure {1}", Indent(1), procedureName);
 
-                GetProcedure(output);
-                output.AppendLine();
-
-                InsertProcedure(output);
-                output.AppendLine();
-
-                UpdateProcedure(output);
-                output.AppendLine();
-
-                DeleteProcedure(output);
-                output.AppendLine();
-
-                return output.ToString();
-            }
+            yield return new CodeLine("go");
         }
 
-        private void DropProcedure(StringBuilder output, string procedureName)
-        {
-            output.AppendFormat("if object_id('{0}', 'P') is not null", procedureName.Replace("[", string.Empty).Replace("]", string.Empty));
-            output.AppendLine();
-
-            output.AppendFormat("{0}drop procedure {1}", Indent(1), procedureName);
-            output.AppendLine();
-
-            output.AppendFormat("go");
-            output.AppendLine();
-        }
-
-        private void GetAllProcedure(StringBuilder output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ILine> GetLinesForGetAllStoredProcedure()
         {
             var procedureName = Database.GetProcedureName(Table, "GetAll");
 
-            DropProcedure(output, procedureName);
+            Lines.AddRange(GetDropProcedureLines(procedureName).ToList());
 
-            output.AppendLine();
+            Lines.Add(new EmptyLine());
 
-            output.AppendFormat("create procedure {0}", procedureName);
-            output.AppendLine();
+            yield return new CodeLine("create procedure {0}", procedureName);
 
             var constraints = Table.ForeignKeys.Where(constraint => constraint.Key != null && constraint.Key.Count == 1).ToList();
 
@@ -128,44 +127,27 @@ namespace CatFactory.SqlServer.CodeFactory
                 var columns = Table.GetColumnsFromConstraint(foreignKey).ToList();
 
                 if (columns.Count == 1)
-                {
-                    output.AppendFormat("{0}{1} {2} = null", Indent(1), Database.GetParameterName(columns.First()), columns.First().Type);
-
-                    if (i < constraints.Count - 1)
-                        output.Append(",");
-
-                    output.AppendLine();
-                }
+                    yield return new CodeLine("{0}{1} {2} = null{3}", Indent(1), Database.GetParameterName(columns.First()), columns.First().Type, i < constraints.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("as");
-            output.AppendLine();
+            yield return new CodeLine("as");
 
-            output.AppendFormat("{0}select", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}select", Indent(1));
 
             for (var i = 0; i < Table.Columns.Count; i++)
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
-
-                if (i < Table.Columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1}{2}", Indent(2), Database.GetObjectName(column), i < Table.Columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("{0}from", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}from", Indent(1));
 
-            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
-            output.AppendLine();
+            yield return new CodeLine("{0}{1}", Indent(2), Database.GetObjectName(Table));
 
             if (constraints.Count > 0)
             {
-                output.AppendFormat("{0}where", Indent(1));
-                output.AppendLine();
+                yield return new CodeLine("{0}where", Indent(1));
 
                 for (var i = 0; i < constraints.Count; i++)
                 {
@@ -173,31 +155,26 @@ namespace CatFactory.SqlServer.CodeFactory
                     var columns = Table.GetColumnsFromConstraint(foreignKey).ToList();
 
                     if (columns.Count == 1)
-                    {
-                        output.AppendFormat("{0}({1} is null or {2} = {1})", Indent(2), Database.GetParameterName(columns.First()), Database.GetParameterName(columns.First()));
-
-                        if (i < constraints.Count - 1)
-                            output.Append(" and");
-
-                        output.AppendLine();
-                    }
+                        yield return new CodeLine("{0}({1} is null or {2} = {1}){3}", Indent(2), Database.GetParameterName(columns.First()), Database.GetParameterName(columns.First()), i < constraints.Count - 1 ? " and" : string.Empty);
                 }
             }
 
-            output.AppendFormat("go");
-            output.AppendLine();
+            yield return new CodeLine("go");
         }
 
-        private void GetProcedure(StringBuilder output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ILine> GetLinesForGetStoredProcedure()
         {
             var procedureName = Database.GetProcedureName(Table, "Get");
 
-            DropProcedure(output, procedureName);
+            Lines.AddRange(GetDropProcedureLines(procedureName).ToList());
 
-            output.AppendLine();
+            Lines.Add(new EmptyLine());
 
-            output.AppendFormat("create procedure {0}", procedureName);
-            output.AppendLine();
+            yield return new CodeLine("create procedure {0}", procedureName);
 
             if (Table.PrimaryKey != null)
             {
@@ -207,38 +184,26 @@ namespace CatFactory.SqlServer.CodeFactory
 
                     var column = Table.GetColumnsFromConstraint(Table.PrimaryKey).First();
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
+                    yield return new CodeLine("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }
             }
 
-            output.AppendLine();
+            yield return new CodeLine("as");
 
-            output.AppendFormat("as");
-            output.AppendLine();
-
-            output.AppendFormat("{0}select", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}select", Indent(1));
 
             for (var i = 0; i < Table.Columns.Count; i++)
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
-
-                if (i < Table.Columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1}{2}", Indent(2), Database.GetObjectName(column), i < Table.Columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("{0}from", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}from", Indent(1));
 
-            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
-            output.AppendLine();
+            yield return new CodeLine("{0}{1}", Indent(2), Database.GetObjectName(Table));
 
-            output.AppendFormat("{0}where", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}where", Indent(1));
 
             if (Table.PrimaryKey != null)
             {
@@ -246,53 +211,39 @@ namespace CatFactory.SqlServer.CodeFactory
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
-
-                    if (i < Table.PrimaryKey.Key.Count - 1)
-                        output.Append(",");
-
-                    output.AppendLine();
+                    yield return new CodeLine("{0}{1} = {2}{3}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item), i < Table.PrimaryKey.Key.Count - 1 ? "," : string.Empty);
                 }
             }
 
-            output.AppendFormat("go");
-            output.AppendLine();
+            yield return new CodeLine("go");
         }
 
-        private string InsertProcedure(StringBuilder output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ILine> GetLinesForInsertIntoStoredProcedure()
         {
             var procedureName = Database.GetProcedureName(Table, "Add");
 
-            DropProcedure(output, procedureName);
+            Lines.AddRange(GetDropProcedureLines(procedureName));
 
-            output.AppendLine();
+            Lines.Add(new EmptyLine());
 
-            output.AppendFormat("create procedure {0}", procedureName);
-            output.AppendLine();
+            yield return new CodeLine("create procedure {0}", procedureName);
 
             for (var i = 0; i < Table.Columns.Count; i++)
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(column), GetType(column));
-
-                if (Table.Identity != null && Table.Identity.Name == column.Name)
-                    output.AppendFormat(" output");
-
-                if (i < Table.Columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1} {2} {3}{4}", Indent(1), Database.GetParameterName(column), GetType(column), Table.Identity != null && Table.Identity.Name == column.Name ? " output" : string.Empty, i < Table.Columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("as");
-            output.AppendLine();
+            yield return new CodeLine("as");
 
-            output.AppendFormat("{0}insert into {1}", Indent(1), Database.GetObjectName(Table));
-            output.AppendLine();
+            yield return new CodeLine("{0}insert into {1}", Indent(1), Database.GetObjectName(Table));
 
-            output.AppendFormat("{0}(", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}(", Indent(1));
 
             var columns = Table.GetColumnsWithNoIdentity().ToList();
 
@@ -300,86 +251,62 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(column));
-
-                if (i < columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1}{2}", Indent(2), Database.GetObjectName(column), i < columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("{0})", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0})", Indent(1));
 
-            output.AppendFormat("{0}values", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}values", Indent(1));
 
-            output.AppendFormat("{0}(", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}(", Indent(1));
 
             for (var i = 0; i < columns.Count; i++)
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1}", Indent(2), Database.GetParameterName(column));
-
-                if (i < columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1}{2}", Indent(2), Database.GetParameterName(column), i < columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("{0})", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0})", Indent(1));
 
             if (Table.Identity != null)
             {
-                output.AppendLine();
+                yield return new EmptyLine();
 
-                output.AppendFormat("{0}select {1} = scope_identity()", Indent(1), Database.GetParameterName(Table.Identity.Name));
-                output.AppendLine();
+                yield return new CodeLine("{0}select {1} = scope_identity()", Indent(1), Database.GetParameterName(Table.Identity.Name));
             }
 
-            output.AppendFormat("go");
-            output.AppendLine();
-
-            return output.ToString();
+            yield return new CodeLine("go");
         }
 
-        private string UpdateProcedure(StringBuilder output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ILine> GetLinesForUpdateStoredProcedure()
         {
             var procedureName = Database.GetProcedureName(Table, "Update");
 
-            DropProcedure(output, procedureName);
+            Lines.AddRange(GetDropProcedureLines(procedureName));
 
-            output.AppendLine();
+            Lines.Add(new EmptyLine());
 
-            output.AppendFormat("create procedure {0}", procedureName);
-            output.AppendLine();
+            yield return new CodeLine("create procedure {0}", procedureName);
 
             for (var i = 0; i < Table.Columns.Count; i++)
             {
                 var column = Table.Columns[i];
 
-                output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(column), GetType(column));
-
-                if (i < Table.Columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1} {2}{3}", Indent(1), Database.GetParameterName(column), GetType(column), i < Table.Columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("as");
-            output.AppendLine();
+            yield return new CodeLine("as");
 
-            output.AppendFormat("{0}update", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}update", Indent(1));
 
-            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
-            output.AppendLine();
+            yield return new CodeLine("{0}{1}", Indent(2), Database.GetObjectName(Table));
 
-            output.AppendFormat("{0}set", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}set", Indent(1));
 
             var columns = Table.GetColumnsFromConstraint(Table.PrimaryKey).ToList();
 
@@ -387,16 +314,10 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var column = columns[i];
 
-                output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(column), Database.GetParameterName(column));
-
-                if (i < columns.Count - 1)
-                    output.Append(",");
-
-                output.AppendLine();
+                yield return new CodeLine("{0}{1} = {2}{3}", Indent(2), Database.GetObjectName(column), Database.GetParameterName(column), i < columns.Count - 1 ? "," : string.Empty);
             }
 
-            output.AppendFormat("{0}where", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}where", Indent(1));
 
             if (Table.PrimaryKey != null)
             {
@@ -404,31 +325,26 @@ namespace CatFactory.SqlServer.CodeFactory
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
-
-                    if (i < Table.PrimaryKey.Key.Count - 1)
-                        output.Append(",");
-
-                    output.AppendLine();
+                    yield return new CodeLine("{0}{1} = {2}{3}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item), i < Table.PrimaryKey.Key.Count - 1 ? "," : string.Empty);
                 }
             }
 
-            output.AppendFormat("go");
-            output.AppendLine();
-
-            return output.ToString();
+            yield return new CodeLine("go");
         }
 
-        private string DeleteProcedure(StringBuilder output)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ILine> GetLinesForDeleteStoredProcedure()
         {
             var procedureName = Database.GetProcedureName(Table, "Delete");
 
-            DropProcedure(output, procedureName);
+            Lines.AddRange(GetDropProcedureLines(procedureName));
 
-            output.AppendLine();
+            Lines.Add(new EmptyLine());
 
-            output.AppendFormat("create procedure {0}", procedureName);
-            output.AppendLine();
+            yield return new CodeLine("create procedure {0}", procedureName);
 
             if (Table.PrimaryKey != null)
             {
@@ -438,23 +354,17 @@ namespace CatFactory.SqlServer.CodeFactory
 
                     var column = Table.GetColumnsFromConstraint(Table.PrimaryKey).First();
 
-                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
+                    yield return new CodeLine("{0}{1} {2}", Indent(1), Database.GetParameterName(key), GetType(column));
                 }
             }
 
-            output.AppendLine();
+            yield return new CodeLine("as");
 
-            output.AppendFormat("as");
-            output.AppendLine();
+            yield return new CodeLine("{0}delete from", Indent(1));
 
-            output.AppendFormat("{0}delete from", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}{1}", Indent(2), Database.GetObjectName(Table));
 
-            output.AppendFormat("{0}{1}", Indent(2), Database.GetObjectName(Table));
-            output.AppendLine();
-
-            output.AppendFormat("{0}where", Indent(1));
-            output.AppendLine();
+            yield return new CodeLine("{0}where", Indent(1));
 
             if (Table.PrimaryKey != null)
             {
@@ -462,19 +372,17 @@ namespace CatFactory.SqlServer.CodeFactory
                 {
                     var item = Table.PrimaryKey.Key[i];
 
-                    output.AppendFormat("{0}{1} = {2}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item));
-
-                    if (i < Table.PrimaryKey.Key.Count - 1)
-                        output.Append(",");
-
-                    output.AppendLine();
+                    yield return new CodeLine("{0}{1} = {2}{3}", Indent(2), Database.GetObjectName(item), Database.GetParameterName(item), i < Table.PrimaryKey.Key.Count - 1 ? "," : string.Empty);
                 }
             }
 
-            output.AppendFormat("go");
-            output.AppendLine();
-
-            return output.ToString();
+            yield return new CodeLine("go");
         }
+
+        /// <summary>
+        /// Gets the output code for current <see cref="SqlStoredProcedureCodeBuilder"/> instance
+        /// </summary>
+        protected string Code
+            => string.Empty;
     }
 }

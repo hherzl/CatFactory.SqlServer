@@ -13,6 +13,7 @@
 
 * Code refactor for create script method
 * Refactor for translate method in SqlServerDatabaseScriptCodeBuilder class
+* Refactor for translate method in SqlStoredProcedureCodeBuilder class
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
