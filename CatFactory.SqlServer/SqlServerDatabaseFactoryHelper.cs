@@ -95,7 +95,7 @@ namespace CatFactory.SqlServer
             parameter.Type = string.Concat(dictionary["Type"]);
             parameter.Length = short.Parse(string.Concat(dictionary["Length"]));
             parameter.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Prec"]));
-            parameter.ParamOrder = string.Concat(dictionary["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Param_order"]));
+            parameter.Order = string.Concat(dictionary["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Param_order"]));
             parameter.Collation = string.Concat(dictionary["Collation"]);
 
             return parameter;

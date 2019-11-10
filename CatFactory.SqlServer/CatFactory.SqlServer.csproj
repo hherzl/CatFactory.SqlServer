@@ -2,15 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build43</Version>
+    <Version>1.0.0-beta-sun-build44</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build43 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build44 Version:
 
+* Core package update
 * Code refactor for create script method
 * Refactor for translate method in SqlServerDatabaseScriptCodeBuilder class
 * Refactor for translate method in SqlStoredProcedureCodeBuilder class
@@ -26,9 +27,9 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build23" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build24" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.6.1" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
     </ItemGroup>
 
 </Project>

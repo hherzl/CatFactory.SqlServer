@@ -81,7 +81,7 @@ namespace CatFactory.SqlServer
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <returns>A <see cref="string"/> that represents the name for database object</returns>
-        public static string GetObjectName(this Database database, Column column)
+        public static string GetObjectName(this Database database, IColumn column)
             => database.NamingConvention.GetObjectName(column.Name);
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace CatFactory.SqlServer
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <returns>A <see cref="string"/> that represents the name for parameter</returns>
-        public static string GetParameterName(this Database database, Column column)
+        public static string GetParameterName(this Database database, IColumn column)
             => database.NamingConvention.GetParameterName(column.Name);
 
         /// <summary>

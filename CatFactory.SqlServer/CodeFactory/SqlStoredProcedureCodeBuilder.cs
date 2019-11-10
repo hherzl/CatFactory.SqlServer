@@ -45,7 +45,7 @@ namespace CatFactory.SqlServer.CodeFactory
         /// </summary>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <returns></returns>
-        protected virtual string GetType(Column column)
+        protected virtual string GetType(IColumn column)
         {
             var databaseTypes = Database.DatabaseTypeMaps;
 
@@ -378,11 +378,5 @@ namespace CatFactory.SqlServer.CodeFactory
 
             yield return new CodeLine("go");
         }
-
-        /// <summary>
-        /// Gets the output code for current <see cref="SqlStoredProcedureCodeBuilder"/> instance
-        /// </summary>
-        protected string Code
-            => string.Empty;
     }
 }

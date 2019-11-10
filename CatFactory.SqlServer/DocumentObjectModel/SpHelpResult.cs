@@ -8,7 +8,8 @@ namespace CatFactory.SqlServer.DocumentObjectModel
     /// </summary>
     public class SpHelpResult
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<IDictionary<string, object>> m_items;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<IDictionary<string, object>> m_items;
 
         /// <summary>
         /// Initializes a new instance of <see cref="SpHelpResult"/> class
