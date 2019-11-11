@@ -9,7 +9,8 @@ namespace CatFactory.SqlServer
     [DebuggerDisplay("Items={Items.Count}")]
     internal class DynamicQueryResult
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<IDictionary<string, object>> m_items;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<IDictionary<string, object>> m_items;
 
         /// <summary>
         /// Initializes a new instance of <see cref="DynamicQueryResult"/> class

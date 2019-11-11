@@ -9,9 +9,14 @@ namespace CatFactory.SqlServer
     /// </summary>
     public class DatabaseImportSettings
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_exclusions;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_exclusionTypes;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<string> m_extendedProperties;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_exclusions;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_exclusionTypes;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<string> m_extendedProperties;
 
         /// <summary>
         /// Initializes a new instance of <see cref="DatabaseImportSettings"/> class

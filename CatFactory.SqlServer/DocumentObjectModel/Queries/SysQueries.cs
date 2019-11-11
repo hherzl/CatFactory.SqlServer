@@ -7,15 +7,15 @@ using System.Text;
 namespace CatFactory.SqlServer.DocumentObjectModel.Queries
 {
     /// <summary>
-    /// Provides extension methods to read results from sys views
+    /// Provides extension methods to read results from sys views (e.g. sys.*)
     /// </summary>
     public static class SysQueries
     {
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.schemas' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysSchema"/> that contains all schemas in database</returns>
         public static IEnumerable<SysSchema> GetSysSchemas(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -49,10 +49,10 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         }
 
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.types' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysType"/> that contains all types in database</returns>
         public static IEnumerable<SysType> GetSysTypes(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -110,10 +110,10 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         }
 
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.tables' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysTable"/> that contains all tables in database</returns>
         public static IEnumerable<SysTable> GetSysTables(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -223,10 +223,10 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         }
 
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.views' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysView"/> that contains all views in database</returns>
         public static IEnumerable<SysView> GetSysViews(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -292,10 +292,10 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         }
 
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.columns' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysColumn"/> that contains all columns in database</returns>
         public static IEnumerable<SysColumn> GetSysColumns(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
@@ -395,10 +395,10 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         }
 
         /// <summary>
-        /// 
+        /// Gets an enumerator for 'sys.sequences' view result
         /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>An enumerator of <see cref="SysSequence"/> that contains all sequences in database</returns>
         public static IEnumerable<SysSequence> GetSysSequences(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())

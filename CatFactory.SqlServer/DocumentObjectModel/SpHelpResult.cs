@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace CatFactory.SqlServer.DocumentObjectModel
 {
     /// <summary>
-    /// 
+    /// Represents the result for execution of sp_help stored procedure in SQLServer
     /// </summary>
     public class SpHelpResult
     {

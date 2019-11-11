@@ -13,7 +13,7 @@ namespace CatFactory.SqlServer
     public static class SqlServerDatabaseFactoryHelper
     {
         /// <summary>
-        /// Add user defined data types for database
+        /// Adds user defined data types for database
         /// </summary>
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>

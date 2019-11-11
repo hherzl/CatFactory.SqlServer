@@ -35,8 +35,8 @@ namespace CatFactory.SqlServer
         /// <param name="databaseTypeMaps">Database type maps</param>
         /// <param name="namingConvention">Database naming convention</param>
         /// <returns>An instance of <see cref="Database"/> class</returns>
-        public static Database CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
-            => new Database
+        public static SqlServerDatabase CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
+            => new SqlServerDatabase
             {
                 Name = name,
                 DefaultSchema = defaultSchema,
@@ -115,7 +115,7 @@ namespace CatFactory.SqlServer
         {
             using (var connection = GetConnection())
             {
-                var database = new Database
+                var database = new SqlServerDatabase
                 {
                     DataSource = connection.DataSource,
                     Name = connection.Database,
@@ -275,6 +275,9 @@ namespace CatFactory.SqlServer
 
                     foreach (var sequence in GetSequences(connection, database.GetSequences()))
                     {
+                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
+                            continue;
+
                         database.Sequences.Add(sequence);
                     }
                 }
@@ -341,20 +344,20 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var reader = command.ExecuteReader())
                     {
-                        while (dataReader.NextResult())
+                        while (reader.NextResult())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (dataReader.Read())
+                            while (reader.Read())
                             {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
                                 var row = new Dictionary<string, object>();
 
                                 for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], dataReader.GetValue(i));
+                                    row.Add(names[i], reader.GetValue(i));
 
                                 queryResult.Items.Add(row);
                             }
@@ -429,36 +432,6 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// Adds a parameter in stored procedure from row dictionary
-        /// </summary>
-        /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
-        /// <param name="dictionary">Dictionary from data reader</param>
-        protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
-        {
-            storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
-        }
-
-        /// <summary>
-        /// Adds a parameter in scalar function from row dictionary
-        /// </summary>
-        /// <param name="scalarFunction">Instance of <see cref="ScalarFunction"/> class</param>
-        /// <param name="dictionary">Dictionary from data reader</param>
-        protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
-        {
-            scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
-        }
-
-        /// <summary>
-        /// Adds a parameter in table function from row dictionary
-        /// </summary>
-        /// <param name="tableFunction">Instance of <see cref="TableFunction"/> class</param>
-        /// <param name="dictionary">Dictionary from data reader</param>
-        protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
-        {
-            tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
-        }
-
-        /// <summary>
         /// Sets identity for table
         /// </summary>
         /// <param name="table">Instance of <see cref="Table"/> class</param>
@@ -482,6 +455,36 @@ namespace CatFactory.SqlServer
 
             if (string.Compare(identity, "No identity column defined.", true) != 0)
                 view.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+        }
+
+        /// <summary>
+        /// Adds a parameter in scalar function from row dictionary
+        /// </summary>
+        /// <param name="scalarFunction">Instance of <see cref="ScalarFunction"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
+        protected virtual void AddParameter(ScalarFunction scalarFunction, IDictionary<string, object> dictionary)
+        {
+            scalarFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        /// <summary>
+        /// Adds a parameter in table function from row dictionary
+        /// </summary>
+        /// <param name="tableFunction">Instance of <see cref="TableFunction"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
+        protected virtual void AddParameter(TableFunction tableFunction, IDictionary<string, object> dictionary)
+        {
+            tableFunction.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
+        }
+
+        /// <summary>
+        /// Adds a parameter in stored procedure from row dictionary
+        /// </summary>
+        /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
+        /// <param name="dictionary">Dictionary from data reader</param>
+        protected virtual void AddParameter(StoredProcedure storedProcedure, IDictionary<string, object> dictionary)
+        {
+            storedProcedure.Parameters.Add(SqlServerDatabaseFactoryHelper.GetParameter(dictionary));
         }
 
         /// <summary>
@@ -685,20 +688,20 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var reader = command.ExecuteReader())
                     {
-                        while (dataReader.NextResult())
+                        while (reader.NextResult())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (dataReader.Read())
+                            while (reader.Read())
                             {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
                                 var row = new Dictionary<string, object>();
 
                                 for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], dataReader.GetValue(i));
+                                    row.Add(names[i], reader.GetValue(i));
 
                                 queryResult.Items.Add(row);
                             }
@@ -855,20 +858,20 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var reader = command.ExecuteReader())
                     {
-                        while (dataReader.NextResult())
+                        while (reader.NextResult())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (dataReader.Read())
+                            while (reader.Read())
                             {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
                                 var row = new Dictionary<string, object>();
 
                                 for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], dataReader.GetValue(i));
+                                    row.Add(names[i], reader.GetValue(i));
 
                                 queryResult.Items.Add(row);
                             }
@@ -933,20 +936,20 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var reader = command.ExecuteReader())
                     {
-                        while (dataReader.NextResult())
+                        while (reader.NextResult())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (dataReader.Read())
+                            while (reader.Read())
                             {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
+                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
                                 var row = new Dictionary<string, object>();
 
                                 for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], dataReader.GetValue(i));
+                                    row.Add(names[i], reader.GetValue(i));
 
                                 queryResult.Items.Add(row);
                             }
@@ -991,10 +994,10 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// Gets scalar functions from database connection
+        /// Gets sequences from database connection
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <param name="sequences">Sequence of scalar functions</param>
+        /// <param name="sequences">Enumerator of sequences</param>
         /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
         protected virtual IEnumerable<Sequence> GetSequences(DbConnection connection, IEnumerable<DbObject> sequences)
         {

@@ -5,16 +5,16 @@ using System.Linq;
 namespace CatFactory.SqlServer.DocumentObjectModel.Queries
 {
     /// <summary>
-    /// 
+    /// Provides extension methods for execution of sp_help stored procedure
     /// </summary>
     public static class SpHelpHelper
     {
         /// <summary>
-        /// 
+        /// Gets the result of sp_help stored procedure execution for specified object
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="id">Object ID</param>
+        /// <returns>A <see cref="SpHelpResult"/> result that contains the definition of database object</returns>
         public static SpHelpResult SpHelp(this DbConnection connection, string id)
         {
             using (var command = connection.CreateCommand())

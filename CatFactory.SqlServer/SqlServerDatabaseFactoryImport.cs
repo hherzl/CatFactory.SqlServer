@@ -55,7 +55,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                var database = new Database
+                var database = new SqlServerDatabase
                 {
                     Name = connection.Database,
                     DefaultSchema = "dbo",
@@ -106,7 +106,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                var database = new Database
+                var database = new SqlServerDatabase
                 {
                     Name = connection.Database,
                     DefaultSchema = "dbo",
@@ -156,7 +156,7 @@ namespace CatFactory.SqlServer
             {
                 connection.Open();
 
-                var database = new Database
+                var database = new SqlServerDatabase
                 {
                     DataSource = connection.DataSource,
                     Catalog = connection.Database,

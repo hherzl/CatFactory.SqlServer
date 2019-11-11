@@ -126,5 +126,25 @@ namespace CatFactory.SqlServer.Tests
 
             Assert.True(sequences.Count > 0);
         }
+
+        [Fact]
+        public void TestGetFirstResultSetForCustOrdersOrdersStoredProcedure()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+
+            // Act
+
+            connection.Open();
+
+            var firstResultSet = connection.DmExecDescribeFirstResultSetForObject("CustOrdersOrders").ToList();
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(firstResultSet.Count > 0);
+        }
     }
 }
