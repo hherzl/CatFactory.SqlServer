@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
+using CatFactory.SqlServer.DocumentObjectModel;
 using CatFactory.SqlServer.DocumentObjectModel.Queries;
 
 namespace CatFactory.SqlServer
 {
     /// <summary>
-    /// Contains helper methods to import feature
+    /// Contains helper methods for import feature
     /// </summary>
     public static class SqlServerDatabaseFactoryHelper
     {
@@ -17,9 +19,9 @@ namespace CatFactory.SqlServer
         /// </summary>
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        public static void AddUserDefinedDataTypes(Database database, DbConnection connection)
+        public static async Task AddUserDefinedDataTypesAsync(Database database, DbConnection connection)
         {
-            var sysTypes = connection.GetSysTypes().ToList();
+            var sysTypes = await connection.GetSysTypesAsync();
 
             foreach (var type in sysTypes)
             {
@@ -51,7 +53,9 @@ namespace CatFactory.SqlServer
             if (dataReader.HasRows)
             {
                 for (var i = 0; i < dataReader.FieldCount; i++)
+                {
                     yield return dataReader.GetName(i);
+                }
             }
         }
 
@@ -73,9 +77,10 @@ namespace CatFactory.SqlServer
             column.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Prec"]));
             column.Scale = string.Concat(dictionary["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Scale"]));
             column.Nullable = string.Compare(string.Concat(dictionary["Nullable"]), "yes", true) == 0 ? true : false;
-            column.TrimTrailingBlanks = string.Concat(dictionary["TrimTrailingBlanks"]);
-            column.FixedLenNullInSource = string.Concat(dictionary["FixedLenNullInSource"]);
             column.Collation = string.Concat(dictionary["Collation"]);
+
+            column.ImportBag.TrimTrailingBlanks = string.Concat(dictionary["TrimTrailingBlanks"]);
+            column.ImportBag.FixedLenNullInSource = string.Concat(dictionary["FixedLenNullInSource"]);
 
             return column;
         }

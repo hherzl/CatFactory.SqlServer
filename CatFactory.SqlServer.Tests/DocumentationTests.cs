@@ -22,14 +22,14 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var database = (SqlServerDatabase)databaseFactory.Import();
             var table = database.FindTable("Production.Product");
             var view = database.FindView("HumanResources.vEmployee");
 
             // Assert
             Assert.True(database.ExtendedProperties.Count > 0);
-            Assert.True(table.ExtendedProperties.Count > 0);
-            Assert.True(view.ExtendedProperties.Count > 0);
+            Assert.True(table.ImportBag.ExtendedProperties.Count > 0);
+            Assert.True(view.ImportBag.ExtendedProperties.Count > 0);
         }
 
         [Fact]

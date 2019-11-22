@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CatFactory.SqlServer.DocumentObjectModel.Queries
 {
@@ -53,7 +55,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysType"/> that contains all types in database</returns>
-        public static IEnumerable<SysType> GetSysTypes(this DbConnection connection)
+        public static async Task<ICollection<SysType>> GetSysTypesAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -82,11 +84,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysType>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysType
+                        collection.Add(new SysType
                         {
                             Name = reader.GetString(0),
                             SystemTypeId = reader.GetByte(1),
@@ -103,9 +107,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             DefaultObjectId = reader.GetInt32(12),
                             RuleObjectId = reader.GetInt32(13),
                             IsTableType = reader.GetBoolean(14)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
 
@@ -399,7 +405,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysSequence"/> that contains all sequences in database</returns>
-        public static IEnumerable<SysSequence> GetSysSequences(this DbConnection connection)
+        public static async Task<ICollection<SysSequence>> GetSysSequencesAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -439,11 +445,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysSequence>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysSequence
+                        collection.Add(new SysSequence
                         {
                             Name = reader.GetString(0),
                             ObjectId = reader.GetInt32(1),
@@ -471,9 +479,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             CurrentValue = reader[23],
                             IsExhausted = reader.GetBoolean(24),
                             LastUsedValue = reader[25] is DBNull ? default(int?) : reader.GetInt32(25)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
     }

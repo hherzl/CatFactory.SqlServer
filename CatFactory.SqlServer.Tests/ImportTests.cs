@@ -80,7 +80,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var database = (SqlServerDatabase)databaseFactory.Import();
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -161,7 +161,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var database = (SqlServerDatabase)databaseFactory.Import();
 
             // Assert
             foreach (var table in database.Tables)
@@ -197,13 +197,13 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var database = (SqlServerDatabase)databaseFactory.Import();
 
             // Assert
             Assert.True(database.FindTable("Warehouse.StockItems").Columns.Count > 0);
             Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
             Assert.True(database.FindTable("Warehouse.StockItems").Defaults.Count > 0);
-            Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ComputedExpression == null);
+            Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ImportBag.ComputedExpression == null);
             Assert.True(database.Sequences.Count > 0);
         }
     }

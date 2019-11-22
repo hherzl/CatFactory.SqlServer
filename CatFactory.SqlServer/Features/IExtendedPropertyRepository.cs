@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CatFactory.ObjectRelationalMapping;
+using CatFactory.SqlServer.DocumentObjectModel;
 
 namespace CatFactory.SqlServer.Features
 {

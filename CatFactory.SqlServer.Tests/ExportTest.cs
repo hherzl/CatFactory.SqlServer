@@ -1,6 +1,6 @@
 ﻿using System;
-using CatFactory.ObjectRelationalMapping;
 using CatFactory.SqlServer.CodeFactory;
+using CatFactory.SqlServer.DocumentObjectModel;
 using CatFactory.SqlServer.ObjectRelationalMapping;
 using CatFactory.SqlServer.Tests.Models;
 using Xunit;

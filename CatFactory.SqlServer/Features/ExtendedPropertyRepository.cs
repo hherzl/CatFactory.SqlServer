@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using CatFactory.ObjectRelationalMapping;
+using CatFactory.SqlServer.DocumentObjectModel;
 
 namespace CatFactory.SqlServer.Features
 {

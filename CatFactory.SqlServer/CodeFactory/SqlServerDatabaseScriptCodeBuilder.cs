@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
+using CatFactory.SqlServer.DocumentObjectModel;
 
 namespace CatFactory.SqlServer.CodeFactory
 {
@@ -14,10 +15,10 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <summary>
         /// Creates a new script for database
         /// </summary>
-        /// <param name="database">Instance of <see cref="Database"/> instance</param>
+        /// <param name="database">Instance of <see cref="SqlServerDatabase"/> class</param>
         /// <param name="outputDirectory">Output directory</param>
         /// <param name="forceOverwrite">Force overwrite</param>
-        public static void CreateScript(Database database, string outputDirectory, bool forceOverwrite = false)
+        public static void CreateScript(SqlServerDatabase database, string outputDirectory, bool forceOverwrite = false)
         {
             var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
             {
@@ -52,7 +53,7 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <summary>
         /// Gets or sets the database
         /// </summary>
-        public Database Database { get; set; }
+        public SqlServerDatabase Database { get; set; }
 
         /// <summary>
         /// Translates object definition to a sequence of <see cref="ILine"/> interface
@@ -199,7 +200,7 @@ namespace CatFactory.SqlServer.CodeFactory
 
             yield return new EmptyLine();
 
-            foreach (var extendedProperty in table.ExtendedProperties)
+            foreach (ExtendedProperty extendedProperty in table.ImportBag.ExtendedProperties)
             {
                 yield return new CodeLine("exec [sp_addextendedproperty]");
                 yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
@@ -213,7 +214,7 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("go");
             }
 
-            var columnsWithExtendedProperties = table.Columns.Where(item => item.ExtendedProperties.Count > 0).ToList();
+            var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
 
             if (columnsWithExtendedProperties.Count > 0)
             {
@@ -221,7 +222,7 @@ namespace CatFactory.SqlServer.CodeFactory
                 {
                     var column = columnsWithExtendedProperties[i];
 
-                    foreach (var extendedProperty in column.ExtendedProperties)
+                    foreach (ExtendedProperty extendedProperty in column.ImportBag.ExtendedProperties)
                     {
                         yield return new CodeLine("exec [sp_addextendedproperty]");
                         yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);

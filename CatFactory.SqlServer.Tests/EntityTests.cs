@@ -59,7 +59,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.Student").Columns.Count == 4);
             Assert.False(database.FindTable("dbo.Student").Identity == null);
             Assert.False(database.FindTable("dbo.Student").PrimaryKey == null);
-            Assert.True(database.FindTable("dbo.Student")["MiddleName"].ExtendedProperties.Count == 1);
+            Assert.True(database.FindTable("dbo.Student")["MiddleName"].ImportBag.ExtendedProperties.Count == 1);
 
             Assert.True(database.FindTable("dbo.Course").Columns.Count == 2);
             Assert.False(database.FindTable("dbo.Course").Identity == null);

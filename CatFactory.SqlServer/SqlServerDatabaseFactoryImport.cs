@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,7 @@ namespace CatFactory.SqlServer
         /// <param name="connectionString">Connection string</param>
         /// <param name="tables">Table names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
-        public static Database ImportTables(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] tables)
+        public static async Task<Database> ImportTablesAsync(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] tables)
         {
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
@@ -53,7 +54,7 @@ namespace CatFactory.SqlServer
 
             using (var connection = databaseFactory.GetConnection())
             {
-                connection.Open();
+                await connection.OpenAsync();
 
                 var database = new SqlServerDatabase
                 {
@@ -65,11 +66,11 @@ namespace CatFactory.SqlServer
                 };
 
                 if (tables.Length == 0)
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)));
                 else
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => tables.Contains(item.FullName)).ToList());
+                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => tables.Contains(item.FullName)));
 
-                database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
+                database.Tables.AddRange(await databaseFactory.GetTablesAsync(connection, database.GetTables()));
 
                 return database;
             }
@@ -82,7 +83,7 @@ namespace CatFactory.SqlServer
         /// <param name="tables">Table names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
         public static Database ImportTables(string connectionString, params string[] tables)
-            => ImportTables(null, connectionString, tables);
+            => ImportTablesAsync(null, connectionString, tables).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports an existing database from SQL Server instance
@@ -91,7 +92,7 @@ namespace CatFactory.SqlServer
         /// <param name="connectionString">Connection string</param>
         /// <param name="views">View names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
-        public static Database ImportViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] views)
+        public static async Task<Database> ImportViewsAsync(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] views)
         {
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
@@ -104,7 +105,7 @@ namespace CatFactory.SqlServer
 
             using (var connection = databaseFactory.GetConnection())
             {
-                connection.Open();
+                await connection.OpenAsync();
 
                 var database = new SqlServerDatabase
                 {
@@ -116,9 +117,9 @@ namespace CatFactory.SqlServer
                 };
 
                 if (views.Length == 0)
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                    database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
                 else
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => views.Contains(item.FullName)).ToList());
+                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => views.Contains(item.FullName)).ToList());
 
                 database.Views.AddRange(databaseFactory.GetViews(connection, database.GetViews()).ToList());
 
@@ -133,7 +134,7 @@ namespace CatFactory.SqlServer
         /// <param name="views">View names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
         public static Database ImportViews(string connectionString, params string[] views)
-            => ImportViews(null, connectionString, views);
+            => ImportViewsAsync(null, connectionString, views).GetAwaiter().GetResult();
 
         /// <summary>
         /// Imports an existing database from SQL Server instance
@@ -142,7 +143,7 @@ namespace CatFactory.SqlServer
         /// <param name="connectionString">Connection string</param>
         /// <param name="names">Table or view names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
-        public static Database ImportTablesAndViews(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] names)
+        public static async Task<Database> ImportTablesAndViewsAsync(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] names)
         {
             var databaseFactory = new SqlServerDatabaseFactory(logger)
             {
@@ -158,8 +159,7 @@ namespace CatFactory.SqlServer
 
                 var database = new SqlServerDatabase
                 {
-                    DataSource = connection.DataSource,
-                    Catalog = connection.Database,
+                    ServerName = connection.DataSource,
                     Name = connection.Database,
                     DefaultSchema = "dbo",
                     SupportTransactions = true,
@@ -168,11 +168,11 @@ namespace CatFactory.SqlServer
                 };
 
                 if (names.Length == 0)
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).ToList());
+                    database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
                 else
-                    database.DbObjects.AddRange(databaseFactory.GetDbObjects(connection).Where(item => names.Contains(item.FullName)).ToList());
+                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => names.Contains(item.FullName)));
 
-                database.Tables.AddRange(databaseFactory.GetTables(connection, database.GetTables()).ToList());
+                database.Tables.AddRange(await databaseFactory.GetTablesAsync(connection, database.GetTables()));
 
                 database.Views.AddRange(databaseFactory.GetViews(connection, database.GetViews()).ToList());
 
@@ -187,6 +187,6 @@ namespace CatFactory.SqlServer
         /// <param name="names">Table or view names to include in import action</param>
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
         public static Database ImportTablesAndViews(string connectionString, params string[] names)
-            => ImportTablesAndViews(null, connectionString, names);
+            => ImportTablesAndViewsAsync(null, connectionString, names).GetAwaiter().GetResult();
     }
 }

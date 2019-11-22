@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using CatFactory.SqlServer.DocumentObjectModel.Queries;
 using Xunit;
 
@@ -28,7 +29,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetSysTypes()
+        public async Task TestGetSysTypesAsync()
         {
             // Arrange
 
@@ -36,9 +37,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var types = connection.GetSysTypes().ToList();
+            var types = await connection.GetSysTypesAsync();
 
             connection.Dispose();
 
@@ -108,7 +109,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetSysSequences()
+        public async Task TestGetSysSequencesAsync()
         {
             // Arrange
 
@@ -116,9 +117,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var sequences = connection.GetSysSequences().ToList();
+            var sequences = await connection.GetSysSequencesAsync();
 
             connection.Dispose();
 

@@ -11,10 +11,12 @@
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>1.0.0-beta-sun-build45 Version:
 
+* Core package update
 * Addition of XML comments
 * Refactor for DmExecDescribeFirstResultSetForObjectHelper class
 * Addition of ISqlServerDatabase interface
 * Addition of SqlServerDatabase class
+* Use of ImportBag property
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
@@ -27,7 +29,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build24" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build25" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
     </ItemGroup>

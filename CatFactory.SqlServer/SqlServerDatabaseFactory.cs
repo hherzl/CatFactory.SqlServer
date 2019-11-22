@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
+using CatFactory.SqlServer.DocumentObjectModel;
 using CatFactory.SqlServer.DocumentObjectModel.Queries;
 using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
@@ -17,9 +20,6 @@ namespace CatFactory.SqlServer
     /// </summary>
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private DatabaseImportSettings m_databaseImportSettings;
-
         /// <summary>
         /// Gets a instance for <see cref="Logger"/> class
         /// </summary>
@@ -43,6 +43,9 @@ namespace CatFactory.SqlServer
                 DatabaseTypeMaps = databaseTypeMaps ?? SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
                 NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
             };
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private DatabaseImportSettings m_databaseImportSettings;
 
         /// <summary>
         /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
@@ -111,13 +114,13 @@ namespace CatFactory.SqlServer
         /// Imports an existing database from SQL Server instance using database import settings
         /// </summary>
         /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
-        public virtual Database Import()
+        public virtual async Task<Database> ImportAsync()
         {
             using (var connection = GetConnection())
             {
                 var database = new SqlServerDatabase
                 {
-                    DataSource = connection.DataSource,
+                    ServerName = connection.DataSource,
                     Name = connection.Database,
                     DefaultSchema = "dbo",
                     SupportTransactions = true,
@@ -125,11 +128,11 @@ namespace CatFactory.SqlServer
                     NamingConvention = new SqlServerDatabaseNamingConvention()
                 };
 
-                connection.Open();
+                await connection.OpenAsync();
 
-                SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypes(database, connection);
+                await SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypesAsync(database, connection);
 
-                foreach (var dbObject in GetDbObjects(connection).ToList())
+                foreach (var dbObject in await GetDbObjectsAsync(connection))
                 {
                     if (DatabaseImportSettings.Exclusions.Contains(dbObject.FullName))
                         continue;
@@ -148,7 +151,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing tables for '{0}'...", database.Name);
 
-                    foreach (var table in GetTables(connection, database.GetTables()))
+                    foreach (var table in await GetTablesAsync(connection, database.GetTables()))
                     {
                         if (DatabaseImportSettings.Exclusions.Contains(table.FullName))
                             continue;
@@ -273,7 +276,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing sequences for '{0}'...", database.Name);
 
-                    foreach (var sequence in GetSequences(connection, database.GetSequences()))
+                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
                     {
                         if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
                             continue;
@@ -291,30 +294,41 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
+        /// Imports an existing database from SQL Server instance using database import settings
+        /// </summary>
+        /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
+        public virtual Database Import()
+            => ImportAsync().GetAwaiter().GetResult();
+
+        /// <summary>
         /// Gets database objects from connection
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>A sequence of <see cref="DbObject"/> class that represents objects in database</returns>
-        protected virtual IEnumerable<DbObject> GetDbObjects(DbConnection connection)
+        protected virtual async Task<ICollection<DbObject>> GetDbObjectsAsync(DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
                 command.Connection = connection;
                 command.CommandText = DatabaseImportSettings.ImportCommandText;
 
-                using (var dataReader = command.ExecuteReader())
+                using (var dataReader = await command.ExecuteReaderAsync())
                 {
-                    while (dataReader.Read())
+                    var collection = new Collection<DbObject>();
+
+                    while (await dataReader.ReadAsync())
                     {
-                        yield return new DbObject
+                        collection.Add(new DbObject
                         {
                             DataSource = connection.DataSource,
-                            Catalog = connection.Database,
+                            DatabaseName = connection.Database,
                             Schema = dataReader.GetString(0),
                             Name = dataReader.GetString(1),
                             Type = dataReader.GetString(2)
-                        };
+                        });
                     }
+
+                    return collection;
                 }
             }
         }
@@ -325,8 +339,10 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="tables">Sequence of <see cref="DbObject"/> that represents tables</param>
         /// <returns>A sequence of <see cref="Table"/></returns>
-        protected virtual IEnumerable<Table> GetTables(DbConnection connection, IEnumerable<DbObject> tables)
+        protected virtual async Task<ICollection<Table>> GetTablesAsync(DbConnection connection, IEnumerable<DbObject> tables)
         {
+            var collection = new Collection<Table>();
+
             foreach (var dbObject in tables)
             {
                 using (var command = connection.CreateCommand())
@@ -334,7 +350,7 @@ namespace CatFactory.SqlServer
                     var table = new Table
                     {
                         DataSource = connection.DataSource,
-                        Catalog = connection.Database,
+                        DatabaseName = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -344,13 +360,13 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (reader.NextResult())
+                        while (await reader.NextResultAsync())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
@@ -364,6 +380,9 @@ namespace CatFactory.SqlServer
 
                             queryResults.Add(queryResult);
                         }
+
+                        table.ImportBag.ConstraintDetails = new Collection<ConstraintDetail>();
+                        table.ImportBag.TableReferences = new Collection<TableReference>();
 
                         foreach (var result in queryResults)
                         {
@@ -386,10 +405,12 @@ namespace CatFactory.SqlServer
 
                         SetConstraintsFromConstraintDetails(table);
 
-                        yield return table;
+                        collection.Add(table);
                     }
                 }
             }
+
+            return collection;
         }
 
         /// <summary>
@@ -507,7 +528,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetRowGuidCol(Table table, IDictionary<string, object> dictionary)
         {
-            table.RowGuidCol = new RowGuidCol
+            table.ImportBag.RowGuidCol = new RowGuidCol
             {
                 Name = string.Concat(dictionary["RowGuidCol"])
             };
@@ -520,7 +541,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetRowGuidCol(View view, IDictionary<string, object> dictionary)
         {
-            view.RowGuidCol = new RowGuidCol
+            view.ImportBag.RowGuidCol = new RowGuidCol
             {
                 Name = string.Concat(dictionary["RowGuidCol"])
             };
@@ -562,10 +583,10 @@ namespace CatFactory.SqlServer
                 var column = table[columnName];
 
                 if (column != null)
-                    column.ComputedExpression = item.ConstraintKeys.Trim();
+                    column.ImportBag.ComputedExpression = item.ConstraintKeys.Trim();
             }
 
-            table.ConstraintDetails.Add(item);
+            table.ImportBag.ConstraintDetails.Add(item);
         }
 
         /// <summary>
@@ -574,7 +595,7 @@ namespace CatFactory.SqlServer
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         protected virtual void SetConstraintsFromConstraintDetails(Table table)
         {
-            foreach (var constraintDetail in table.ConstraintDetails)
+            foreach (ConstraintDetail constraintDetail in table.ImportBag.ConstraintDetails)
             {
                 if (constraintDetail.ConstraintType.Contains("CHECK"))
                 {
@@ -625,13 +646,13 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void AddTableReferenceToTable(Table table, IDictionary<string, object> dictionary)
         {
-            table.TableReferences.Add(new TableReference
+            table.ImportBag.TableReferences.Add(new TableReference
             {
                 ReferenceDescription = string.Concat(dictionary["Table is referenced by foreign key"]),
             });
         }
 
-        private void ImportExtendedProperties(DbConnection connection, Database database)
+        private void ImportExtendedProperties(DbConnection connection, SqlServerDatabase database)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
@@ -645,12 +666,13 @@ namespace CatFactory.SqlServer
         private void ImportExtendedProperties(DbConnection connection, Table table)
         {
             table.Type = "table";
+            table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
                 foreach (var extendedProperty in connection.GetExtendedProperties(table, name))
                 {
-                    table.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                    table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
@@ -659,9 +681,11 @@ namespace CatFactory.SqlServer
 
                 foreach (var column in table.Columns)
                 {
+                    column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
+
                     foreach (var extendedProperty in connection.GetExtendedProperties(table, column, name))
                     {
-                        column.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
@@ -712,7 +736,7 @@ namespace CatFactory.SqlServer
                         var view = new View
                         {
                             DataSource = connection.DataSource,
-                            Catalog = connection.Database,
+                            DatabaseName = connection.Database,
                             Schema = dbObject.Schema,
                             Name = dbObject.Name
                         };
@@ -741,23 +765,26 @@ namespace CatFactory.SqlServer
         private void ImportExtendedProperties(DbConnection connection, View view)
         {
             view.Type = "view";
+            view.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
                 foreach (var extendProperty in connection.GetExtendedProperties(view, name))
                 {
-                    view.ExtendedProperties.Add(new ExtendedProperty(extendProperty.Name, extendProperty.Value));
+                    view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendProperty.Name, extendProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        view.Description = extendProperty.Value;
+                        view.ImportBag.Description = extendProperty.Value;
                 }
 
                 foreach (var column in view.Columns)
                 {
+                    column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
+
                     foreach (var extendedProperty in connection.GetExtendedProperties(view, column, name))
                     {
-                        column.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
@@ -782,7 +809,7 @@ namespace CatFactory.SqlServer
                     var scalarFunction = new ScalarFunction
                     {
                         DataSource = connection.DataSource,
-                        Catalog = connection.Database,
+                        DatabaseName = connection.Database,
                         Schema = dbObject.Schema,
                         Name = dbObject.Name
                     };
@@ -882,7 +909,7 @@ namespace CatFactory.SqlServer
                         var tableFunction = new TableFunction
                         {
                             DataSource = connection.DataSource,
-                            Catalog = connection.Database,
+                            DatabaseName = connection.Database,
                             Schema = dbObject.Schema,
                             Name = dbObject.Name
                         };
@@ -960,7 +987,7 @@ namespace CatFactory.SqlServer
                         var storedProcedure = new StoredProcedure
                         {
                             DataSource = connection.DataSource,
-                            Catalog = connection.Database,
+                            DatabaseName = connection.Database,
                             Schema = dbObject.Schema,
                             Name = dbObject.Name
                         };
@@ -999,13 +1026,13 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="sequences">Enumerator of sequences</param>
         /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
-        protected virtual IEnumerable<Sequence> GetSequences(DbConnection connection, IEnumerable<DbObject> sequences)
+        protected virtual async Task<ICollection<Sequence>> GetSequencesAsync(DbConnection connection, IEnumerable<DbObject> sequences)
         {
-            var sysSequences = connection.GetSysSequences().ToList();
+            var sysSequences = await connection.GetSysSequencesAsync();
 
             var sysSchemas = connection.GetSysSchemas().ToList();
 
-            var sysTypes = connection.GetSysTypes().ToList();
+            var sysTypes = await connection.GetSysTypesAsync();
 
             var summary =
                 from sysSequence in sysSequences
@@ -1027,6 +1054,8 @@ namespace CatFactory.SqlServer
 
             var databaseTypeMaps = SqlServerDatabaseTypeMaps.DatabaseTypeMaps;
 
+            var collection = new Collection<Sequence>();
+
             foreach (var dbObject in sequences)
             {
                 var record = summary.FirstOrDefault(item => item.Schema == dbObject.Schema && item.Name == dbObject.Name);
@@ -1036,39 +1065,9 @@ namespace CatFactory.SqlServer
 
                 var sequenceDatabaseTypeMap = databaseTypeMaps.First(item => item.DatabaseType == record.Type);
 
-                if (sequenceDatabaseTypeMap.GetClrType() == typeof(int))
+                if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
                 {
-                    yield return new Int32Sequence
-                    {
-                        Name = record.Name,
-                        Schema = record.Schema,
-                        StartValue = (int)record.StartValue,
-                        MinimumValue = (int)record.MinimumValue,
-                        MaximumValue = (int)record.MaximumValue,
-                        CurrentValue = (int)record.CurrentValue,
-                        Increment = (int)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
-                    };
-                }
-                if (sequenceDatabaseTypeMap.GetClrType() == typeof(long))
-                {
-                    yield return new Int64Sequence
-                    {
-                        Name = record.Name,
-                        Schema = record.Schema,
-                        StartValue = (long)record.StartValue,
-                        MinimumValue = (long)record.MinimumValue,
-                        MaximumValue = (long)record.MaximumValue,
-                        CurrentValue = (long)record.CurrentValue,
-                        Increment = (long)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
-                    };
-                }
-                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
-                {
-                    yield return new Int16Sequence
+                    collection.Add(new Int16Sequence
                     {
                         Name = record.Name,
                         Schema = record.Schema,
@@ -1079,11 +1078,41 @@ namespace CatFactory.SqlServer
                         Increment = (short)record.Increment,
                         IsCached = (bool)record.IsCached,
                         IsCycling = (bool)record.IsCycling
-                    };
+                    });
+                }
+                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(int))
+                {
+                    collection.Add(new Int32Sequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (int)record.StartValue,
+                        MinimumValue = (int)record.MinimumValue,
+                        MaximumValue = (int)record.MaximumValue,
+                        CurrentValue = (int)record.CurrentValue,
+                        Increment = (int)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    });
+                }
+                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(long))
+                {
+                    collection.Add(new Int64Sequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (long)record.StartValue,
+                        MinimumValue = (long)record.MinimumValue,
+                        MaximumValue = (long)record.MaximumValue,
+                        CurrentValue = (long)record.CurrentValue,
+                        Increment = (long)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    });
                 }
                 else if (sequenceDatabaseTypeMap.GetClrType() == typeof(decimal))
                 {
-                    yield return new DecimalSequence
+                    collection.Add(new DecimalSequence
                     {
                         Name = record.Name,
                         Schema = record.Schema,
@@ -1094,9 +1123,11 @@ namespace CatFactory.SqlServer
                         Increment = (decimal)record.Increment,
                         IsCached = (bool)record.IsCached,
                         IsCycling = (bool)record.IsCycling
-                    };
+                    });
                 }
             }
+
+            return collection;
         }
     }
 }
