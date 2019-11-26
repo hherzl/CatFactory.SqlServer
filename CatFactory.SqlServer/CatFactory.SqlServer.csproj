@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build45</Version>
+    <Version>1.0.0-beta-sun-build46</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build45 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build46 Version:
 
 * Core package update
 * Addition of XML comments
@@ -29,7 +29,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build25" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build26" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
     </ItemGroup>
