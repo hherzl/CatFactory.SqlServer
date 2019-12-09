@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -142,18 +143,22 @@ namespace CatFactory.SqlServer
         /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>A sequence of <see cref="FirstResultSetForObject"/> class</returns>
-        public static IEnumerable<FirstResultSetForObject> GetFirstResultSetForObject(StoredProcedure storedProcedure, DbConnection connection)
+        public static async Task<ICollection<FirstResultSetForObject>> GetFirstResultSetForObjectAsync(StoredProcedure storedProcedure, DbConnection connection)
         {
-            foreach (var item in connection.DmExecDescribeFirstResultSetForObject(storedProcedure.FullName))
+            var collection = new Collection<FirstResultSetForObject>();
+
+            foreach (var item in await connection.DmExecDescribeFirstResultSetForObjectAsync(storedProcedure.FullName))
             {
-                yield return new FirstResultSetForObject
+                collection.Add(new FirstResultSetForObject
                 {
                     ColumnOrdinal = item.ColumnOrdinal,
                     Name = item.Name,
                     IsNullable = item.IsNullable,
                     SystemTypeName = item.SystemTypeName
-                };
+                });
             }
+
+            return collection;
         }
     }
 }

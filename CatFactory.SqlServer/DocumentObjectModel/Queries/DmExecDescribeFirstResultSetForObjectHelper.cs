@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CatFactory.SqlServer.DocumentObjectModel.Queries
 {
@@ -18,7 +20,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// <param name="objectName">Object name</param>
         /// <param name="browseInformationMode">Browse information mode</param>
         /// <returns>An enumerator of <see cref="DmExecDescribeFirstResultSetForObject"/> class</returns>
-        public static IEnumerable<DmExecDescribeFirstResultSetForObject> DmExecDescribeFirstResultSetForObject(this DbConnection connection, string objectName, byte? browseInformationMode = null)
+        public static async Task<ICollection<DmExecDescribeFirstResultSetForObject>> DmExecDescribeFirstResultSetForObjectAsync(this DbConnection connection, string objectName, byte? browseInformationMode = null)
         {
             using (var command = connection.CreateCommand())
             {
@@ -74,11 +76,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<DmExecDescribeFirstResultSetForObject>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new DmExecDescribeFirstResultSetForObject
+                        collection.Add(new DmExecDescribeFirstResultSetForObject
                         {
                             IsHidden = reader[0] is DBNull ? false : reader.GetBoolean(0),
                             ColumnOrdinal = reader[1] is DBNull ? 0 : reader.GetInt32(1),
@@ -121,9 +125,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             ErrorMessage = reader[38] is DBNull ? string.Empty : reader.GetString(38),
                             ErrorType = reader[39] is DBNull ? 0 : reader.GetInt32(39),
                             ErrorTypeDesc = reader[40] is DBNull ? string.Empty : reader.GetString(40)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
     }

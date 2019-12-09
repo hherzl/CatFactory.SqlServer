@@ -1,5 +1,4 @@
 ﻿using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
 using CatFactory.SqlServer.DocumentObjectModel.Queries;
 using Xunit;
@@ -9,7 +8,7 @@ namespace CatFactory.SqlServer.Tests
     public class DocumentObjectModelTests
     {
         [Fact]
-        public void TestGetSysSchemas()
+        public async Task TestGetSysSchemasAsync()
         {
             // Arrange
 
@@ -17,9 +16,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var types = connection.GetSysSchemas().ToList();
+            var types = await connection.GetSysSchemasAsync();
 
             connection.Dispose();
 
@@ -49,7 +48,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetSysTables()
+        public async Task TestGetSysTablesAsync()
         {
             // Arrange
 
@@ -57,9 +56,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var tables = connection.GetSysTables().ToList();
+            var tables = await connection.GetSysTablesAsync();
 
             connection.Dispose();
 
@@ -69,7 +68,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetSysViews()
+        public async Task TestGetSysViewsAsync()
         {
             // Arrange
 
@@ -77,9 +76,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var views = connection.GetSysViews().ToList();
+            var views = await connection.GetSysViewsAsync();
 
             connection.Dispose();
 
@@ -89,7 +88,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetSysColumns()
+        public async Task TestGetSysColumnsAsync()
         {
             // Arrange
 
@@ -97,9 +96,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var columns = connection.GetSysColumns().ToList();
+            var columns = await connection.GetSysColumnsAsync();
 
             connection.Dispose();
 
@@ -129,7 +128,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void TestGetFirstResultSetForCustOrdersOrdersStoredProcedure()
+        public async Task TestGetFirstResultSetForCustOrdersOrdersStoredProcedureAsync()
         {
             // Arrange
 
@@ -137,9 +136,9 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var firstResultSet = connection.DmExecDescribeFirstResultSetForObject("CustOrdersOrders").ToList();
+            var firstResultSet = await connection.DmExecDescribeFirstResultSetForObjectAsync("CustOrdersOrders");
 
             connection.Dispose();
 

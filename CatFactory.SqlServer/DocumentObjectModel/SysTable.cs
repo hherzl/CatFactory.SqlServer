@@ -80,12 +80,12 @@ namespace CatFactory.SqlServer.DocumentObjectModel
         public int? LobDataSpaceId { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the file stream data space Id
         /// </summary>
         public int? FilestreamDataSpaceId { get; set; }
 
         /// <summary>
-        /// 
+        /// Gets or sets the max column Id used
         /// </summary>
         public int? MaxColumnIdUsed { get; set; }
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build46</Version>
+    <Version>1.0.0-beta-sun-build47</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
@@ -11,12 +11,7 @@
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>1.0.0-beta-sun-build46 Version:
 
-* Core package update
-* Addition of XML comments
-* Refactor for DmExecDescribeFirstResultSetForObjectHelper class
-* Addition of ISqlServerDatabase interface
-* Addition of SqlServerDatabase class
-* Use of ImportBag property
+* Code refactory: change all methods to async operations for Document Object Model queries
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>

@@ -18,7 +18,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysSchema"/> that contains all schemas in database</returns>
-        public static IEnumerable<SysSchema> GetSysSchemas(this DbConnection connection)
+        public static async Task<ICollection<SysSchema>> GetSysSchemasAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -35,18 +35,22 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysSchema>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysSchema
+                        collection.Add(new SysSchema
                         {
                             Name = reader.GetString(0),
                             PrincipalId = reader.GetInt32(1),
                             SchemaId = reader.GetInt32(2)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
 
@@ -120,7 +124,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysTable"/> that contains all tables in database</returns>
-        public static IEnumerable<SysTable> GetSysTables(this DbConnection connection)
+        public static async Task<ICollection<SysTable>> GetSysTablesAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -175,11 +179,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysTable>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysTable
+                        collection.Add(new SysTable
                         {
                             Name = reader.GetString(0),
                             ObjectId = reader.GetInt32(1),
@@ -222,9 +228,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             HistoryRetentionPeriodUnitDesc = reader[38] is DBNull ? string.Empty : reader.GetString(38),
                             IsNode = reader.GetBoolean(39),
                             IsEdge = reader.GetBoolean(40)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
 
@@ -233,7 +241,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysView"/> that contains all views in database</returns>
-        public static IEnumerable<SysView> GetSysViews(this DbConnection connection)
+        public static async Task<ICollection<SysView>> GetSysViewsAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -266,11 +274,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysView>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysView
+                        collection.Add(new SysView
                         {
                             Name = reader.GetString(0),
                             ObjectId = reader.GetInt32(1),
@@ -291,9 +301,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             WithCheckOption = reader.GetBoolean(16),
                             IsDateCorrelationView = reader.GetBoolean(17),
                             IsTrackedByCdc = reader[18] is DBNull ? false : reader.GetBoolean(18)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
 
@@ -302,7 +314,7 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <returns>An enumerator of <see cref="SysColumn"/> that contains all columns in database</returns>
-        public static IEnumerable<SysColumn> GetSysColumns(this DbConnection connection)
+        public static async Task<ICollection<SysColumn>> GetSysColumnsAsync(this DbConnection connection)
         {
             using (var command = connection.CreateCommand())
             {
@@ -352,11 +364,13 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
 
-                using (var reader = command.ExecuteReader())
+                var collection = new Collection<SysColumn>();
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
-                        yield return new SysColumn
+                        collection.Add(new SysColumn
                         {
                             ObjectId = reader.GetInt32(0),
                             Name = reader[1] is DBNull ? string.Empty : reader.GetString(1),
@@ -394,9 +408,11 @@ namespace CatFactory.SqlServer.DocumentObjectModel.Queries
                             IsMasked = reader[33] is DBNull ? false : reader.GetBoolean(33),
                             GraphType = reader[34] is DBNull ? 0 : reader.GetInt32(34),
                             GraphTypeDesc = reader[35] is DBNull ? string.Empty : reader.GetString(35)
-                        };
+                        });
                     }
                 }
+
+                return collection;
             }
         }
 

@@ -209,7 +209,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var storedProcedure in database.StoredProcedures)
                     {
-                        foreach (var firstResultSet in SqlServerDatabaseFactoryHelper.GetFirstResultSetForObject(storedProcedure, connection))
+                        foreach (var firstResultSet in await SqlServerDatabaseFactoryHelper.GetFirstResultSetForObjectAsync(storedProcedure, connection))
                         {
                             storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
                         }
@@ -1030,7 +1030,7 @@ namespace CatFactory.SqlServer
         {
             var sysSequences = await connection.GetSysSequencesAsync();
 
-            var sysSchemas = connection.GetSysSchemas().ToList();
+            var sysSchemas = await connection.GetSysSchemasAsync();
 
             var sysTypes = await connection.GetSysTypesAsync();
 
