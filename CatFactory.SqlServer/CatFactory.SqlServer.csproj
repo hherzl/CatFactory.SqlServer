@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build46 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build47 Version:
 
 * Code refactory: change all methods to async operations for Document Object Model queries
 
