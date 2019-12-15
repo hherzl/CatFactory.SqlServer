@@ -52,252 +52,26 @@ There will be a lot of improvements for CatFactory on road:
 
 ## Concepts behind CatFactory
 
-### Database Type Map
+    Database Type
+    Project Selection
+    Event Handlers to Scaffold
+    Database Object Model
+    Import Bag
 
-One of things I don't like to get equivalent between SQL data type for CLR is use magic strings, after of review the more "fancy" way to resolve a type equivalence is to have a class that allows to know the equivalence between SQL data type and CLR type.
-
-This concept was created from this matrix: [`SQL Server Data Type Mappings`](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql-server-data-type-mappings).
-
-Using this matrix as reference, now CatFactory has a class named DatabaseTypeMap. Database class contains a property with all mappings named DatebaseTypeMaps, so this property is filled by Import feature for SQL Server package.
-
-```csharp
-public class DatabaseTypeMap
-{
-    public string DatabaseType { get; set; }
-
-    public bool AllowsLengthInDeclaration { get; set; }
-
-    public bool AllowsPrecInDeclaration { get; set; }
-
-    public bool AllowsScaleInDeclaration { get; set; }
-
-    public string ClrFullNameType { get; set; }
-
-    public bool HasClrFullNameType { get; }
-
-    public string ClrAliasType { get; set; }
-
-    public bool HasClrAliasType { get; }
-
-    public bool AllowClrNullable { get; set; }
-
-    public DbType DbTypeEnum { get; set; }
-
-    public bool IsUserDefined { get; set; }
-
-    public string ParentDatabaseType { get; set; }
-
-    public string Collation { get; set; }
-}
-```
-
-DatabaseTypeMap is the class to represent database type definition, for database instance we need to create a collection of DatabaseTypeMap class to have a matrix to resolve data types.
-
-Suppose there is a class with name DatabaseTypeMapList, this class has a property to get data types. Once we have imported an existing database we can resolve data types:
-
-Resolve without extension methods:
-
-```csharp
-// Get mappings
-var dataTypes = database.DatabaseTypeMaps;
-
-// Resolve CLR type
-var mapsForString = dataTypes.Where(item => item.ClrType == typeof(string)).ToList();
-
-// Resolve SQL Server type
-var mapForVarchar = dataTypes.FirstOrDefault(item => item.DatabaseType == "varchar");
-```
-
-Resolve with extension methods:
-
-```csharp
-// Get database type
-var varcharDataType = database.ResolveType("varchar");
-
-// Resolve CLR
-var mapForVarchar = varcharDataType.GetClrType();
-```
-
-SQL Server allows to define data types, suppose the database instance has a data type defined by user with name Flag, Flag data type is a bit, bool in C#. Import method retrieve user data types, so in DatabaseTypeMaps collection we can search the parent data type for Flag:
-
-### Project Selection
-
-A project selection is a limit to apply settings for objects that match with pattern.
-
-GlobalSelection is the default selection for project, contains a default instance of settings.
-
-Patterns:
-
-|Pattern|Scope|
-|-------|-----|
-|Sales.OrderHeader|Applies for specific object with name Sales.OrderHeader|
-|Sales.\*|Applies for all objects inside of Sales schema|
-|\*.OrderHeader|Applies for all objects with name Order with no matter schema|
-|\*.\*|Applies for all objects, this is the global selection|
-
-Sample:
-
-```csharp
-// Apply settings for Project
-project.GlobalSelection(settings =>
-{
-    settings.ForceOverwrite = true;
-    settings.AuditEntity = new AuditEntity("CreationUser", "CreationDateTime", "LastUpdateUser", "LastUpdateDateTime");
-    settings.ConcurrencyToken = "Timestamp";
-});
-
-// Apply settings for specific object
-project.Select("Sales.OrderHeader", settings =>
-{
-    settings.EntitiesWithDataContracts = true;
-});
-```
-
-### Event Handlers to Scaffold
-
-In order to provide a more flexible way to scaffold, there are two delegates in CatFactory, one to perform an action before of scaffolding and another one to handle and action after of scaffolding.
-
-```csharp
-// Add event handlers to before and after of scaffold
-
-project.ScaffoldingDefinition += (source, args) =>
-{
-    // Add code to perform operations with code builder instance before to create code file
-};
-
-project.ScaffoldedDefinition += (source, args) =>
-{
-    // Add code to perform operations after of create code file
-};
-```
+Read more on: [`Concepts behind CatFactory`](https://github.com/hherzl/CatFactory/wiki/Concepts-behind-CatFactory)
 
 ## Packages
 
-### CatFactory
+    CatFactory
+    CatFactory.SqlServer
+    CatFactory.PostgreSql
+    CatFactory.NetCore
+    CatFactory.EntityFrameworkCore
+    CatFactory.AspNetCore
+    CatFactory.Dapper
+    CatFactory.TypeScript
 
-This package provides all definitions for CatFactory engine, this is the core for child packages.
-
-#### Namespaces
-
-**CodeFactory**: Contains objects to perform code generation.
-
-**Diagnostics**: Contains objects for diagnostics.
-
-**Markup**: Contains objects for markup languages.
-
-**ObjectOrientedProgramming**: Contains objects to modeling definitions: classes, interfaces and enums.
-
-**ObjectRelationalMapping**: Contains objects for ORM: database, tables, views, scalar functions, table functions and stored procedures.
-
-### CatFactory.SqlServer
-
-This packages contains logic to import existing databases from SQL Server instances.
-
-|Object|Supported|
-|------|---------|
-|Tables|Yes|
-|Views|Yes|
-|Scalar Functions|Yes|
-|Table Functions|Yes|
-|Stored Procedures|Yes|
-|Sequences|Yes|
-|Extended Properties|Yes|
-|Data Types|Yes|
-
-### CatFactory.NetCore
-
-This package contains code builders and definitions for .NET Core (C#).
-
-|Object|Members|Supported|
-|------|-------|---------|
-|Struct|All|Not yet|
-|Interface|Inheritance|Yes|
-|Interface|Events|Yes|
-|Interface|Properties|Yes|
-|Interface|Methods|Yes|
-|Class|Inheritance|Yes|
-|Class|Events|Yes|
-|Class|Fields|Yes|
-|Class|Properties|Yes|
-|Class|Methods|Yes|
-|Enum|Options|Yes|
-
-### CatFactory.EntityFrameworkCore
-
-This package provides scaffolding for Entity Framework Core.
-
-|Object|Supported|
-|------|---------|
-|Class for table|Yes|
-|Class for view|Yes|
-|Class for table function|Yes|
-|Class for stored procedure result|Not yet|
-|Class for DbContext|Yes|
-|Class for entity configuration (table)|Yes|
-|Class for entity configuration (view)|Yes|
-|Interface for Repository|Yes|
-|Class for Repository|Yes|
-|Method for scalar function invocation|Yes|
-|Method for table function invocation|Yes|
-|Method for stored procedure invocation|Not yet|
-
-#### Entity Framework Core 2 Feature Chart
-
-|Category|Feature|Supported|
-|--------|-------|---------|
-|Modeling|Table splitting|Not yet|
-|Modeling|Owned types|Not yet|
-|Modeling|Model-level query filters|Not yet|
-|Modeling|Database scalar function mapping|Not yet|
-|Modeling|Self-contained type configuration for code first|Not yet|
-|High Performance|DbContext pooling|Not yet|
-|High Performance|Explicitly compiled queries|Not yet|
-
-[`New features in EF Core 2.0`](https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-2.0)
-
-### CatFactory.AspNetCore
-
-This package provides scaffolding for Asp .NET Core.
-
-|Feature|Supported|
-|-------|---------|
-|Controllers|Yes|
-|Requests|Yes|
-|Responses|Yes|
-|Scaffold Client|Not yet|
-|Help Page for Web API|Not yet|
-|Unit Tests|Not yet|
-|Integration Tests|Not yet|
-
-### CatFactory.Dapper
-
-This package provides scaffolding for Dapper.
-
-|Object|Supported|
-|------|---------|
-|Table|Yes|
-|View|Yes|
-|Scalar Function|Yes|
-|Table Function|Yes|
-|Stored Procedures|Yes|
-|Sequences|Yes|
-
-### CatFactory.TypeScript
-
-This package provides scaffolding for Type Script.
-
-|Object|Feature|Supported|
-|------|-------|---------|
-|Interface|Inheritance|Yes|
-|Interface|Fields|Yes|
-|Interface|Properties|Yes|
-|Interface|Methods|Yes|
-|Class|Inheritance|Yes|
-|Class|Fields|Yes|
-|Class|Constructors|Yes|
-|Class|Properties|Yes|
-|Class|Methods|Yes|
-|Module|Methods|Yes|
+Read more on: [`Packages Features Chart`](https://github.com/hherzl/CatFactory/wiki/Packages-Features-Chart)
 
 ## History
 
