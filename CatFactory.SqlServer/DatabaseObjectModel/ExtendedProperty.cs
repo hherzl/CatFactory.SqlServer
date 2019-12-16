@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace CatFactory.SqlServer.DocumentObjectModel
+namespace CatFactory.SqlServer.DatabaseObjectModel
 {
     /// <summary>
     /// Represents an extended property for a database object

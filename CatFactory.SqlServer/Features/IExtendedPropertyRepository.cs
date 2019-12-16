@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.Features
 {
     /// <summary>
-    /// Contains operations to manipulate extended properties
+    /// Contains operations to read and write extended properties
     /// </summary>
     public interface IExtendedPropertyRepository
     {

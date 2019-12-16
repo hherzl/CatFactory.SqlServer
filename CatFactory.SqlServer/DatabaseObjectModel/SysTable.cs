@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CatFactory.SqlServer.DocumentObjectModel
+namespace CatFactory.SqlServer.DatabaseObjectModel
 {
     /// <summary>
     /// Represents the model for sys.tables view

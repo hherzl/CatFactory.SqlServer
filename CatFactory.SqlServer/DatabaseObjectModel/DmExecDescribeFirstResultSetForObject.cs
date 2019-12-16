@@ -1,4 +1,4 @@
-﻿namespace CatFactory.SqlServer.DocumentObjectModel
+﻿namespace CatFactory.SqlServer.DatabaseObjectModel
 {
     /// <summary>
     /// Represents the result of [sys].[dm_exec_describe_first_result_set_for_object] stored procedure

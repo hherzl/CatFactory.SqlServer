@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -6,11 +7,11 @@ namespace CatFactory.SqlServer.Tests
     public class ImportTests
     {
         [Fact]
-        public void ImportOnlineStoreDatabaseTest()
+        public async Task ImportOnlineStoreDatabase()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .Import("server=(local);database=OnlineStore;integrated security=yes;");
+            var database = await SqlServerDatabaseFactory
+                .ImportAsync("server=(local);database=OnlineStore;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -25,11 +26,11 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportTablesFromOnlineStoreDatabaseTest()
+        public async Task ImportTablesFromOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportTables("server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
+            var database = await SqlServerDatabaseFactory
+                .ImportTablesAsync("server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -43,11 +44,11 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportNorthwindDatabaseTest()
+        public async Task ImportNorthwindDatabaseAsync()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .Import("server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+            var database = await SqlServerDatabaseFactory
+                .ImportAsync("server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -65,7 +66,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void FullImportNorthwindDatabaseTest()
+        public async Task FullImportNorthwindDatabaseAsync()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
@@ -80,7 +81,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = (SqlServerDatabase)databaseFactory.Import();
+            var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -99,11 +100,11 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportTablesFromNorthwindDatabaseTest()
+        public async Task ImportTablesFromNorthwindDatabaseAsync()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportTables("server=(local);database=Northwind;integrated security=yes;");
+            var database = await SqlServerDatabaseFactory
+                .ImportTablesAsync("server=(local);database=Northwind;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -111,11 +112,11 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportNorthwindViews()
+        public async Task ImportNorthwindViewsAsync()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportViews("server=(local);database=Northwind;integrated security=yes;");
+            var database = await SqlServerDatabaseFactory
+                .ImportViewsAsync("server=(local);database=Northwind;integrated security=yes;");
 
             // Assert
             Assert.True(database.Tables.Count == 0);
@@ -123,15 +124,11 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportTablesAndViewsFromNorthwindTest()
+        public async Task ImportTablesAndViewsFromNorthwindAsync()
         {
             // Arrange and Act
-            var database = SqlServerDatabaseFactory
-                .ImportTablesAndViews("server=(local);database=Northwind;integrated security=yes;",
-                "dbo.Orders",
-                "dbo.Order Details",
-                "dbo.Category Sales for 1997",
-                "dbo.Product Sales for 1997");
+            var database = await SqlServerDatabaseFactory
+                .ImportTablesAndViewsAsync("server=(local);database=Northwind;integrated security=yes;", "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -142,7 +139,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportAdventureWorksDatabase()
+        public async Task ImportAdventureWorksDatabaseAsync()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
@@ -161,7 +158,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = (SqlServerDatabase)databaseFactory.Import();
+            var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
 
             // Assert
             foreach (var table in database.Tables)
@@ -184,7 +181,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void ImportWideWorldImportersDatabase()
+        public async Task ImportWideWorldImportersDatabaseAsync()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
@@ -197,7 +194,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = (SqlServerDatabase)databaseFactory.Import();
+            var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
 
             // Assert
             Assert.True(database.FindTable("Warehouse.StockItems").Columns.Count > 0);

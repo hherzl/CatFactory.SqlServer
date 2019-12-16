@@ -1,11 +1,11 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
-using CatFactory.SqlServer.DocumentObjectModel.Queries;
+using CatFactory.SqlServer.DatabaseObjectModel.Queries;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public class DocumentObjectModelTests
+    public class DatabaseObjectModelTests
     {
         [Fact]
         public async Task TestGetSysSchemasAsync()
@@ -145,6 +145,26 @@ namespace CatFactory.SqlServer.Tests
             // Assert
 
             Assert.True(firstResultSet.Count > 0);
+        }
+
+        [Fact]
+        public async Task TestSpHelpForTableAsync()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+
+            // Act
+
+            await connection.OpenAsync();
+
+            var spHelpResult = await connection.SpHelpAsync("Products");
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.False(spHelpResult == null);
         }
     }
 }

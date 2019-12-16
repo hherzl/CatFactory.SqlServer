@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using CatFactory.ObjectRelationalMapping;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.ObjectRelationalMapping
 {

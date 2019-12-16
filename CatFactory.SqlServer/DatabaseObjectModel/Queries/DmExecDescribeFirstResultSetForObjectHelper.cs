@@ -6,7 +6,7 @@ using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CatFactory.SqlServer.DocumentObjectModel.Queries
+namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 {
     /// <summary>
     /// Contains extension methods for sys.dm_exec_describe_first_result_set_for_object execution

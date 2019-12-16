@@ -6,12 +6,12 @@ using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CatFactory.SqlServer.DocumentObjectModel.Queries
+namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 {
     /// <summary>
     /// Provides extension methods to read results from sys views (e.g. sys.*)
     /// </summary>
-    public static class SysQueries
+    public static class SysQueriesHelper
     {
         /// <summary>
         /// Gets an enumerator for 'sys.schemas' view result

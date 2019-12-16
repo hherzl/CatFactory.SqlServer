@@ -8,8 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
-using CatFactory.SqlServer.DocumentObjectModel;
-using CatFactory.SqlServer.DocumentObjectModel.Queries;
+using CatFactory.SqlServer.DatabaseObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel.Queries;
 using CatFactory.SqlServer.Features;
 using Microsoft.Extensions.Logging;
 
@@ -26,23 +26,6 @@ namespace CatFactory.SqlServer
         /// <returns>An instance for <see cref="SqlServerDatabaseFactory"/> class</returns>
         public static ILogger<SqlServerDatabaseFactory> GetLogger()
             => LoggingHelper.GetLogger<SqlServerDatabaseFactory>();
-
-        /// <summary>
-        /// Gets a database with default values (Schema and DatabaseTypeMaps)
-        /// </summary>
-        /// <param name="name">Name</param>
-        /// <param name="defaultSchema">Default schema</param>
-        /// <param name="databaseTypeMaps">Database type maps</param>
-        /// <param name="namingConvention">Database naming convention</param>
-        /// <returns>An instance of <see cref="Database"/> class</returns>
-        public static SqlServerDatabase CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
-            => new SqlServerDatabase
-            {
-                Name = name,
-                DefaultSchema = defaultSchema,
-                DatabaseTypeMaps = databaseTypeMaps ?? SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
-                NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
-            };
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DatabaseImportSettings m_databaseImportSettings;
@@ -118,15 +101,9 @@ namespace CatFactory.SqlServer
         {
             using (var connection = GetConnection())
             {
-                var database = new SqlServerDatabase
-                {
-                    ServerName = connection.DataSource,
-                    Name = connection.Database,
-                    DefaultSchema = "dbo",
-                    SupportTransactions = true,
-                    DatabaseTypeMaps = DatabaseTypeMaps.ToList(),
-                    NamingConvention = new SqlServerDatabaseNamingConvention()
-                };
+                var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+
+                database.ServerName = connection.DataSource;
 
                 await connection.OpenAsync();
 
@@ -144,7 +121,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing extended properties for database...");
 
-                    ImportExtendedProperties(connection, database);
+                    await ImportExtendedPropertiesAsync(connection, database);
                 }
 
                 if (DatabaseImportSettings.ImportTables)
@@ -174,7 +151,7 @@ namespace CatFactory.SqlServer
                 {
                     Logger?.LogInformation("Importing views for '{0}'...", database.Name);
 
-                    foreach (var view in GetViews(connection, database.GetViews()))
+                    foreach (var view in await GetViewsAsync(connection, database.GetViews()))
                     {
                         if (DatabaseImportSettings.Exclusions.Contains(view.FullName))
                             continue;
@@ -193,11 +170,70 @@ namespace CatFactory.SqlServer
                     }
                 }
 
+                if (DatabaseImportSettings.ImportScalarFunctions)
+                {
+                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
+
+                    foreach (var scalarFunction in await GetScalarFunctionsAsync(connection, database.GetScalarFunctions()))
+                    {
+                        if (DatabaseImportSettings.Exclusions.Contains(scalarFunction.FullName))
+                            continue;
+
+                        database.ScalarFunctions.Add(scalarFunction);
+                    }
+
+                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                    {
+                        Logger?.LogInformation("Importing extended properties for scalar functions...");
+
+                        foreach (var scalarFunction in database.ScalarFunctions)
+                        {
+                            ImportExtendedProperties(connection, scalarFunction);
+                        }
+                    }
+                }
+
+                if (DatabaseImportSettings.ImportTableFunctions)
+                {
+                    Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
+
+                    foreach (var tableFunction in await GetTableFunctionsAsync(connection, database.GetTableFunctions()))
+                    {
+                        if (DatabaseImportSettings.Exclusions.Contains(tableFunction.FullName))
+                            continue;
+
+                        database.TableFunctions.Add(tableFunction);
+                    }
+
+                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                    {
+                        Logger?.LogInformation("Importing extended properties for table functions...");
+
+                        foreach (var tableFunction in database.TableFunctions)
+                        {
+                            ImportExtendedProperties(connection, tableFunction);
+                        }
+                    }
+                }
+
+                if (DatabaseImportSettings.ImportSequences)
+                {
+                    Logger?.LogInformation("Importing sequences for '{0}'...", database.Name);
+
+                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
+                    {
+                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
+                            continue;
+
+                        database.Sequences.Add(sequence);
+                    }
+                }
+
                 if (DatabaseImportSettings.ImportStoredProcedures)
                 {
                     Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
 
-                    foreach (var storedProcedure in GetStoredProcedures(connection, database.GetStoredProcedures()))
+                    foreach (var storedProcedure in await GetStoredProceduresAsync(connection, database.GetStoredProcedures()))
                     {
                         if (DatabaseImportSettings.Exclusions.Contains(storedProcedure.FullName))
                             continue;
@@ -223,65 +259,6 @@ namespace CatFactory.SqlServer
                         {
                             ImportExtendedProperties(connection, storedProcedure);
                         }
-                    }
-                }
-
-                if (DatabaseImportSettings.ImportTableFunctions)
-                {
-                    Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
-
-                    foreach (var tableFunction in GetTableFunctions(connection, database.GetTableFunctions()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(tableFunction.FullName))
-                            continue;
-
-                        database.TableFunctions.Add(tableFunction);
-                    }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for table functions...");
-
-                        foreach (var tableFunction in database.TableFunctions)
-                        {
-                            ImportExtendedProperties(connection, tableFunction);
-                        }
-                    }
-                }
-
-                if (DatabaseImportSettings.ImportScalarFunctions)
-                {
-                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
-
-                    foreach (var scalarFunction in GetScalarFunctions(connection, database.GetScalarFunctions()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(scalarFunction.FullName))
-                            continue;
-
-                        database.ScalarFunctions.Add(scalarFunction);
-                    }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for scalar functions...");
-
-                        foreach (var scalarFunction in database.ScalarFunctions)
-                        {
-                            ImportExtendedProperties(connection, scalarFunction);
-                        }
-                    }
-                }
-
-                if (DatabaseImportSettings.ImportSequences)
-                {
-                    Logger?.LogInformation("Importing sequences for '{0}'...", database.Name);
-
-                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
-                            continue;
-
-                        database.Sequences.Add(sequence);
                     }
                 }
 
@@ -652,13 +629,13 @@ namespace CatFactory.SqlServer
             });
         }
 
-        private void ImportExtendedProperties(DbConnection connection, SqlServerDatabase database)
+        private async Task ImportExtendedPropertiesAsync(DbConnection connection, SqlServerDatabase database)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(name))
+                foreach (var exProperty in await connection.FnListExtendedPropertyAsync(new ExtendedProperty(name)))
                 {
-                    database.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                    database.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
                 }
             }
         }
@@ -670,26 +647,26 @@ namespace CatFactory.SqlServer
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(table, name))
+                foreach (var exProperty in connection.GetExtendedProperties(table, name))
                 {
-                    table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                    table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        table.Description = extendedProperty.Value;
+                        table.Description = exProperty.Value;
                 }
 
                 foreach (var column in table.Columns)
                 {
                     column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
-                    foreach (var extendedProperty in connection.GetExtendedProperties(table, column, name))
+                    foreach (var exProperty in connection.GetExtendedProperties(table, column, name))
                     {
-                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
-                            column.Description = extendedProperty.Value;
+                            column.Description = exProperty.Value;
                     }
                 }
             }
@@ -701,8 +678,10 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="views">Sequence of views</param>
         /// <returns>A sequence of <see cref="View"/> that represents existing views in database</returns>
-        protected virtual IEnumerable<View> GetViews(DbConnection connection, IEnumerable<DbObject> views)
+        protected virtual async Task<ICollection<View>> GetViewsAsync(DbConnection connection, IEnumerable<DbObject> views)
         {
+            var collection = new Collection<View>();
+
             foreach (var dbObject in views)
             {
                 using (var command = connection.CreateCommand())
@@ -712,13 +691,13 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (reader.NextResult())
+                        while (await reader.NextResultAsync())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
@@ -756,10 +735,12 @@ namespace CatFactory.SqlServer
                             }
                         }
 
-                        yield return view;
+                        collection.Add(view);
                     }
                 }
             }
+
+            return collection;
         }
 
         private void ImportExtendedProperties(DbConnection connection, View view)
@@ -769,26 +750,26 @@ namespace CatFactory.SqlServer
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendProperty in connection.GetExtendedProperties(view, name))
+                foreach (var exProperty in connection.GetExtendedProperties(view, name))
                 {
-                    view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendProperty.Name, extendProperty.Value));
+                    view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        view.ImportBag.Description = extendProperty.Value;
+                        view.ImportBag.Description = exProperty.Value;
                 }
 
                 foreach (var column in view.Columns)
                 {
                     column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
-                    foreach (var extendedProperty in connection.GetExtendedProperties(view, column, name))
+                    foreach (var exProperty in connection.GetExtendedProperties(view, column, name))
                     {
-                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(extendedProperty.Name, extendedProperty.Value));
+                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                         // todo: Remove this token
                         if (name == "MS_Description")
-                            column.Description = extendedProperty.Value;
+                            column.Description = exProperty.Value;
                     }
                 }
             }
@@ -800,8 +781,10 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="scalarFunctions">Sequence of scalar functions</param>
         /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
-        protected virtual IEnumerable<ScalarFunction> GetScalarFunctions(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
+        protected virtual async Task<ICollection<ScalarFunction>> GetScalarFunctionsAsync(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
+            var collection = new Collection<ScalarFunction>();
+
             foreach (var dbObject in scalarFunctions)
             {
                 using (var command = connection.CreateCommand())
@@ -819,13 +802,13 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var dataReader = command.ExecuteReader())
+                    using (var dataReader = await command.ExecuteReaderAsync())
                     {
-                        while (dataReader.NextResult())
+                        while (await dataReader.NextResultAsync())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (dataReader.Read())
+                            while (await dataReader.ReadAsync())
                             {
                                 var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
@@ -849,21 +832,23 @@ namespace CatFactory.SqlServer
                             }
                         }
 
-                        yield return scalarFunction;
+                        collection.Add(scalarFunction);
                     }
                 }
             }
+
+            return collection;
         }
 
         private void ImportExtendedProperties(DbConnection connection, ScalarFunction scalarFunction)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(scalarFunction, name))
+                foreach (var exProperty in connection.GetExtendedProperties(scalarFunction, name))
                 {
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        scalarFunction.Description = extendedProperty.Value;
+                        scalarFunction.Description = exProperty.Value;
                 }
             }
         }
@@ -874,8 +859,10 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="tableFunctions">Sequence of table functions</param>
         /// <returns>A sequence of <see cref="TableFunction"/> that represents existing views in database</returns>
-        protected virtual IEnumerable<TableFunction> GetTableFunctions(DbConnection connection, IEnumerable<DbObject> tableFunctions)
+        protected virtual async Task<ICollection<TableFunction>> GetTableFunctionsAsync(DbConnection connection, IEnumerable<DbObject> tableFunctions)
         {
+            var collection = new Collection<TableFunction>();
+
             foreach (var dbObject in tableFunctions)
             {
                 using (var command = connection.CreateCommand())
@@ -885,13 +872,13 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (reader.NextResult())
+                        while (await reader.NextResultAsync())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
@@ -927,21 +914,23 @@ namespace CatFactory.SqlServer
                             }
                         }
 
-                        yield return tableFunction;
+                        collection.Add(tableFunction);
                     }
                 }
             }
+
+            return collection;
         }
 
         private void ImportExtendedProperties(DbConnection connection, TableFunction tableFunction)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(tableFunction, name))
+                foreach (var exProperty in connection.GetExtendedProperties(tableFunction, name))
                 {
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        tableFunction.Description = extendedProperty.Value;
+                        tableFunction.Description = exProperty.Value;
                 }
             }
         }
@@ -952,8 +941,10 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="storedProcedures">Sequence of stored procedures</param>
         /// <returns>A sequence of <see cref="StoredProcedure"/> that represents existing views in database</returns>
-        protected virtual IEnumerable<StoredProcedure> GetStoredProcedures(DbConnection connection, IEnumerable<DbObject> storedProcedures)
+        protected virtual async Task<ICollection<StoredProcedure>> GetStoredProceduresAsync(DbConnection connection, IEnumerable<DbObject> storedProcedures)
         {
+            var collection = new Collection<StoredProcedure>();
+
             foreach (var dbObject in storedProcedures)
             {
                 using (var command = connection.CreateCommand())
@@ -963,13 +954,13 @@ namespace CatFactory.SqlServer
 
                     var queryResults = new List<DynamicQueryResult>();
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (reader.NextResult())
+                        while (await reader.NextResultAsync())
                         {
                             var queryResult = new DynamicQueryResult();
 
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
@@ -1001,21 +992,23 @@ namespace CatFactory.SqlServer
                             }
                         }
 
-                        yield return storedProcedure;
+                        collection.Add(storedProcedure);
                     }
                 }
             }
+
+            return collection;
         }
 
         private void ImportExtendedProperties(DbConnection connection, StoredProcedure storedProcedure)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var extendedProperty in connection.GetExtendedProperties(storedProcedure, name))
+                foreach (var exProperty in connection.GetExtendedProperties(storedProcedure, name))
                 {
                     // todo: Remove this token
                     if (name == "MS_Description")
-                        storedProcedure.Description = extendedProperty.Value;
+                        storedProcedure.Description = exProperty.Value;
                 }
             }
         }

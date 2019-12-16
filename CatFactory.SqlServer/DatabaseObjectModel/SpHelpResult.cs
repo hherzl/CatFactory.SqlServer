@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace CatFactory.SqlServer.DocumentObjectModel
+namespace CatFactory.SqlServer.DatabaseObjectModel
 {
     /// <summary>
     /// Represents the result for execution of sp_help stored procedure in SQLServer

@@ -6,10 +6,10 @@ namespace CatFactory.SqlServer.Tests
     public class EntityTests
     {
         [Fact]
-        public void TestDefinitionForCollegeEntities()
+        public void CreateDefinitionForCollegeEntities()
         {
             // Arrange
-            var database = SqlServerDatabaseFactory.CreateWithDefaults("College");
+            var database = SqlServerDatabase.CreateWithDefaults("College");
 
             // Act
             var student = database

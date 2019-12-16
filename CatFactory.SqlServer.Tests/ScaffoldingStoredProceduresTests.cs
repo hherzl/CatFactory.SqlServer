@@ -1,4 +1,5 @@
-﻿using CatFactory.SqlServer.CodeFactory;
+﻿using System.Threading.Tasks;
+using CatFactory.SqlServer.CodeFactory;
 using CatFactory.SqlServer.Tests.Models;
 using Xunit;
 
@@ -7,10 +8,11 @@ namespace CatFactory.SqlServer.Tests
     public class ScaffoldingStoredProceduresTests
     {
         [Fact]
-        public void ScaffoldProceduresFromExistingDatabaseTest()
+        public async Task ScaffoldProceduresFromExistingDatabaseAsync()
         {
             // Arrange
-            var database = SqlServerDatabaseFactory.Import("server=(local);database=OnlineStore;integrated security=yes;");
+            var database = await SqlServerDatabaseFactory
+                .ImportAsync("server=(local);database=OnlineStore;integrated security=yes;");
 
             // Act
             foreach (var table in database.Tables)

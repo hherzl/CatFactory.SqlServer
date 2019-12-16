@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using CatFactory.ObjectRelationalMapping;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.Features
 {

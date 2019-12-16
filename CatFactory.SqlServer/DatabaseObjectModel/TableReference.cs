@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CatFactory.SqlServer.DocumentObjectModel
+namespace CatFactory.SqlServer.DatabaseObjectModel
 {
     /// <summary>
     /// Represents a reference for user table

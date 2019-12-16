@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.Features
 {
     /// <summary>
-    /// Implements operations to manipulate extended properties
+    /// Implements operations to read and write extended properties
     /// </summary>
     public class ExtendedPropertyRepository : IExtendedPropertyRepository
     {
@@ -23,14 +23,7 @@ namespace CatFactory.SqlServer.Features
             Connection = connection;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="sqlDbType"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        protected virtual SqlParameter GetParameter(string name, SqlDbType sqlDbType, string value)
+        private SqlParameter GetParameter(string name, SqlDbType sqlDbType, string value)
         {
             var parameter = new SqlParameter(name, sqlDbType);
 

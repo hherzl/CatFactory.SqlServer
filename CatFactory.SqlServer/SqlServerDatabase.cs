@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer
 {
@@ -11,6 +12,24 @@ namespace CatFactory.SqlServer
     /// </summary>
     public class SqlServerDatabase : Database, ISqlServerDatabase
     {
+        /// <summary>
+        /// Gets a database with default values (Default schema, support transactions, database type maps and naming convention)
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="defaultSchema">Default schema</param>
+        /// <param name="databaseTypeMaps">Database type maps</param>
+        /// <param name="namingConvention">Database naming convention</param>
+        /// <returns>An instance of <see cref="Database"/> class</returns>
+        public static SqlServerDatabase CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
+            => new SqlServerDatabase
+            {
+                Name = name,
+                DefaultSchema = defaultSchema,
+                SupportTransactions = true,
+                DatabaseTypeMaps = databaseTypeMaps ?? SqlServerDatabaseTypeMaps.DatabaseTypeMaps.ToList(),
+                NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
+            };
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<ExtendedProperty> m_extendedProperties;
 

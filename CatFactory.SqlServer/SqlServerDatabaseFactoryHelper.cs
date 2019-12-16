@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
-using CatFactory.SqlServer.DocumentObjectModel;
-using CatFactory.SqlServer.DocumentObjectModel.Queries;
+using CatFactory.SqlServer.DatabaseObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel.Queries;
 
 namespace CatFactory.SqlServer
 {
@@ -69,12 +69,12 @@ namespace CatFactory.SqlServer
         {
             var column = new Column
             {
-                Name = string.Concat(dictionary["Column_name"])
+                Name = string.Concat(dictionary["Column_name"]),
+                Type = string.Concat(dictionary["Type"]),
+                Computed = string.Concat(dictionary["Computed"]),
+                Length = int.Parse(string.Concat(dictionary["Length"]))
             };
 
-            column.Type = string.Concat(dictionary["Type"]);
-            column.Computed = string.Concat(dictionary["Computed"]);
-            column.Length = int.Parse(string.Concat(dictionary["Length"]));
             column.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Prec"]));
             column.Scale = string.Concat(dictionary["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Scale"]));
             column.Nullable = string.Compare(string.Concat(dictionary["Nullable"]), "yes", true) == 0 ? true : false;
@@ -95,11 +95,11 @@ namespace CatFactory.SqlServer
         {
             var parameter = new Parameter
             {
-                Name = string.Concat(dictionary["Parameter_name"])
+                Name = string.Concat(dictionary["Parameter_name"]),
+                Type = string.Concat(dictionary["Type"]),
+                Length = short.Parse(string.Concat(dictionary["Length"]))
             };
 
-            parameter.Type = string.Concat(dictionary["Type"]);
-            parameter.Length = short.Parse(string.Concat(dictionary["Length"]));
             parameter.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Prec"]));
             parameter.Order = string.Concat(dictionary["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Param_order"]));
             parameter.Collation = string.Concat(dictionary["Collation"]);

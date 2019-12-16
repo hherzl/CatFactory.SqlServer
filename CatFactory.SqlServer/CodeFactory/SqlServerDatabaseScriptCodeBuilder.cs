@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using CatFactory.CodeFactory;
 using CatFactory.ObjectRelationalMapping;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.CodeFactory
 {

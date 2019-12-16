@@ -1,6 +1,6 @@
 ﻿using System;
 using CatFactory.SqlServer.CodeFactory;
-using CatFactory.SqlServer.DocumentObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel;
 using CatFactory.SqlServer.ObjectRelationalMapping;
 using CatFactory.SqlServer.Tests.Models;
 using Xunit;
@@ -25,7 +25,7 @@ namespace CatFactory.SqlServer.Tests
         public void TestCollegeExportScript()
         {
             // Arrange
-            var database = SqlServerDatabaseFactory.CreateWithDefaults("College");
+            var database = SqlServerDatabase.CreateWithDefaults("College");
 
             var student = database
                 .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
@@ -67,7 +67,7 @@ namespace CatFactory.SqlServer.Tests
         public void TestDefinitionForRothschildHouseEntities()
         {
             // Arrange
-            var database = SqlServerDatabaseFactory.CreateWithDefaults("RothschildHouse");
+            var database = SqlServerDatabase.CreateWithDefaults("RothschildHouse");
 
             database.ExtendedProperties.Add(new ExtendedProperty("MS_Description", "Database to storage RothschildHouse payments"));
 
