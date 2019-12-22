@@ -126,7 +126,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportTables)
                 {
-                    Logger?.LogInformation("Importing tables for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing tables for '{0}' database...", database.Name);
 
                     foreach (var table in await GetTablesAsync(connection, database.GetTables()))
                     {
@@ -149,7 +149,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportViews)
                 {
-                    Logger?.LogInformation("Importing views for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing views for '{0}' database...", database.Name);
 
                     foreach (var view in await GetViewsAsync(connection, database.GetViews()))
                     {
@@ -172,7 +172,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportScalarFunctions)
                 {
-                    Logger?.LogInformation("Importing scalar functions for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing scalar functions for '{0}' database...", database.Name);
 
                     foreach (var scalarFunction in await GetScalarFunctionsAsync(connection, database.GetScalarFunctions()))
                     {
@@ -195,7 +195,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportTableFunctions)
                 {
-                    Logger?.LogInformation("Importing table functions for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing table functions for '{0}' database...", database.Name);
 
                     foreach (var tableFunction in await GetTableFunctionsAsync(connection, database.GetTableFunctions()))
                     {
@@ -218,7 +218,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportSequences)
                 {
-                    Logger?.LogInformation("Importing sequences for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing sequences for '{0}' database...", database.Name);
 
                     foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
                     {
@@ -231,7 +231,7 @@ namespace CatFactory.SqlServer
 
                 if (DatabaseImportSettings.ImportStoredProcedures)
                 {
-                    Logger?.LogInformation("Importing stored procedures for '{0}'...", database.Name);
+                    Logger?.LogInformation("Importing stored procedures for '{0}' database...", database.Name);
 
                     foreach (var storedProcedure in await GetStoredProceduresAsync(connection, database.GetStoredProcedures()))
                     {
@@ -241,13 +241,18 @@ namespace CatFactory.SqlServer
                         database.StoredProcedures.Add(storedProcedure);
                     }
 
-                    Logger?.LogInformation("Getting first result sets for stored procedures...");
+                    Logger?.LogInformation("Getting result sets for stored procedures...");
 
                     foreach (var storedProcedure in database.StoredProcedures)
                     {
                         foreach (var firstResultSet in await SqlServerDatabaseFactoryHelper.GetFirstResultSetForObjectAsync(storedProcedure, connection))
                         {
                             storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
+                        }
+
+                        foreach (var resultSet in await SqlServerDatabaseFactoryHelper.GetResultSetsAsync(storedProcedure, connection))
+                        {
+                            storedProcedure.ResultSets.Add(resultSet);
                         }
                     }
 
@@ -260,6 +265,8 @@ namespace CatFactory.SqlServer
                             ImportExtendedProperties(connection, storedProcedure);
                         }
                     }
+
+                    database.ImportBag.StoredProcedures = database.StoredProcedures;
                 }
 
                 connection.Close();
@@ -1051,14 +1058,30 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in sequences)
             {
-                var record = summary.FirstOrDefault(item => item.Schema == dbObject.Schema && item.Name == dbObject.Name);
+                var record = summary
+                    .FirstOrDefault(item => item.Schema == dbObject.Schema && item.Name == dbObject.Name);
 
                 if (record == null)
                     continue;
 
-                var sequenceDatabaseTypeMap = databaseTypeMaps.First(item => item.DatabaseType == record.Type);
+                var sequenceDatabaseTypeMap = databaseTypeMaps
+                    .First(item => item.DatabaseType == record.Type);
 
-                if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
+                if (sequenceDatabaseTypeMap.GetClrType() == typeof(byte))
+                {
+                    collection.Add(new ByteSequence
+                    {
+                        Name = record.Name,
+                        Schema = record.Schema,
+                        StartValue = (byte)record.StartValue,
+                        MinimumValue = (byte)record.MinimumValue,
+                        MaximumValue = (byte)record.MaximumValue,
+                        CurrentValue = (byte)record.CurrentValue,
+                        Increment = (byte)record.Increment,
+                        IsCached = (bool)record.IsCached,
+                        IsCycling = (bool)record.IsCycling
+                    });
+                } else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
                 {
                     collection.Add(new Int16Sequence
                     {

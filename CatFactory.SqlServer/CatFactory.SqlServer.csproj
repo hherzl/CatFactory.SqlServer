@@ -2,19 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build48</Version>
+    <Version>1.0.0-beta-sun-build49</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build48 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build49 Version:
 
-* Code refactor: change DocumentObjectModel namespace to DatabaseObjectModel
-* Code refactor: change all import operations to async operations
-* Code improvement: Addition of CreateWithDefaults static method in SqlServerDatabase class
-* Additio of FnListExtendedPropertyHelper class to Database Object Model to read extended properties
+* Core package update
 
 Usage:
 
@@ -31,9 +28,9 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build26" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build27" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     </ItemGroup>
 
 </Project>

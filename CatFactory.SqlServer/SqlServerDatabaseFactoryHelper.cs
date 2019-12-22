@@ -29,7 +29,8 @@ namespace CatFactory.SqlServer
                 if (type.IsUserDefined == false)
                     continue;
 
-                var parent = sysTypes.FirstOrDefault(item => item.IsUserDefined == false && item.SystemTypeId == type.SystemTypeId);
+                var parent = sysTypes
+                    .FirstOrDefault(item => item.IsUserDefined == false && item.SystemTypeId == type.SystemTypeId);
 
                 if (parent == null)
                     continue;
@@ -155,6 +156,33 @@ namespace CatFactory.SqlServer
                     Name = item.Name,
                     IsNullable = item.IsNullable,
                     SystemTypeName = item.SystemTypeName
+                });
+            }
+
+            return collection;
+        }
+
+        /// <summary>
+        /// Gets the result sets for stored procedure
+        /// </summary>
+        /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <returns>A sequence of <see cref="ResultSet"/> class</returns>
+        public static async Task<ICollection<ResultSet>> GetResultSetsAsync(StoredProcedure storedProcedure, DbConnection connection)
+        {
+            var collection = new Collection<ResultSet>();
+
+            foreach (var item in await connection.DmExecDescribeFirstResultSetForObjectAsync(storedProcedure.FullName))
+            {
+                collection.Add(new ResultSet
+                {
+                    Name = item.Name,
+                    Nullable = item.IsNullable,
+                    Length = item.MaxLength,
+                    Prec = item.Precision,
+                    Scale = item.Scale,
+                    Collation = item.CollationName,
+                    Type = item.SystemTypeName
                 });
             }
 

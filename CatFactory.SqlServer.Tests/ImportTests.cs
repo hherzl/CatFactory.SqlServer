@@ -7,7 +7,7 @@ namespace CatFactory.SqlServer.Tests
     public class ImportTests
     {
         [Fact]
-        public async Task ImportOnlineStoreDatabase()
+        public async Task ImportOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
@@ -96,7 +96,7 @@ namespace CatFactory.SqlServer.Tests
 
             Assert.True(database.StoredProcedures.Count > 0);
 
-            Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").FirstResultSetsForObject.Count > 0);
+            Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").ResultSets.Count > 0);
         }
 
         [Fact]
@@ -177,7 +177,7 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindView("Production.vProductAndDescription").Indexes.Count > 0);
 
             Assert.True(database.TableFunctions.FirstOrDefault(item => item.FullName == "dbo.ufnGetContactInformation").Parameters.Count == 1);
-            Assert.True(database.StoredProcedures.FirstOrDefault(item => item.FullName == "HumanResources.uspUpdateEmployeeHireInfo").FirstResultSetsForObject.Count == 0);
+            Assert.True(database.StoredProcedures.FirstOrDefault(item => item.FullName == "HumanResources.uspUpdateEmployeeHireInfo").ResultSets.Count == 0);
         }
 
         [Fact]
@@ -198,9 +198,10 @@ namespace CatFactory.SqlServer.Tests
 
             // Assert
             Assert.True(database.FindTable("Warehouse.StockItems").Columns.Count > 0);
-            Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
             Assert.True(database.FindTable("Warehouse.StockItems").Defaults.Count > 0);
+            Assert.True(database.FindTable("Warehouse.StockItems")["Tags"].Computed == "yes");
             Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ImportBag.ComputedExpression == null);
+
             Assert.True(database.Sequences.Count > 0);
         }
     }

@@ -57,14 +57,14 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
                 command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
                 command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
 
-                using (var dataReader = await command.ExecuteReaderAsync())
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    while (await dataReader.ReadAsync())
+                    while (await reader.ReadAsync())
                     {
                         collection.Add(new ExtendedProperty
                         {
-                            Name = dataReader.GetString(2),
-                            Value = dataReader.GetString(3)
+                            Name = reader.GetString(2),
+                            Value = reader.GetString(3)
                         });
                     }
                 }
