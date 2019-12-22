@@ -192,7 +192,7 @@ namespace CatFactory.SqlServer
                         }
                     }
 
-                    database.ImportBag.ScalarFunctions = database.TableFunctions;
+                    database.ImportBag.ScalarFunctions = database.ScalarFunctions;
                 }
 
                 if (DatabaseImportSettings.ImportTableFunctions)
@@ -218,21 +218,6 @@ namespace CatFactory.SqlServer
                     }
 
                     database.ImportBag.TableFunctions = database.TableFunctions;
-                }
-
-                if (DatabaseImportSettings.ImportSequences)
-                {
-                    Logger?.LogInformation("Importing sequences for '{0}' database...", database.Name);
-
-                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
-                            continue;
-
-                        database.Sequences.Add(sequence);
-                    }
-
-                    database.ImportBag.Sequences = database.Sequences;
                 }
 
                 if (DatabaseImportSettings.ImportStoredProcedures)
@@ -273,6 +258,21 @@ namespace CatFactory.SqlServer
                     }
 
                     database.ImportBag.StoredProcedures = database.StoredProcedures;
+                }
+
+                if (DatabaseImportSettings.ImportSequences)
+                {
+                    Logger?.LogInformation("Importing sequences for '{0}' database...", database.Name);
+
+                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
+                    {
+                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
+                            continue;
+
+                        database.Sequences.Add(sequence);
+                    }
+
+                    database.ImportBag.Sequences = database.Sequences;
                 }
 
                 connection.Close();
