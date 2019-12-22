@@ -191,6 +191,8 @@ namespace CatFactory.SqlServer
                             ImportExtendedProperties(connection, scalarFunction);
                         }
                     }
+
+                    database.ImportBag.ScalarFunctions = database.TableFunctions;
                 }
 
                 if (DatabaseImportSettings.ImportTableFunctions)
@@ -214,6 +216,8 @@ namespace CatFactory.SqlServer
                             ImportExtendedProperties(connection, tableFunction);
                         }
                     }
+
+                    database.ImportBag.TableFunctions = database.TableFunctions;
                 }
 
                 if (DatabaseImportSettings.ImportSequences)
@@ -227,6 +231,8 @@ namespace CatFactory.SqlServer
 
                         database.Sequences.Add(sequence);
                     }
+
+                    database.ImportBag.Sequences = database.Sequences;
                 }
 
                 if (DatabaseImportSettings.ImportStoredProcedures)

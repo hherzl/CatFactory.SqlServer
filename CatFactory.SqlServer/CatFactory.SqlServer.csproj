@@ -12,6 +12,7 @@
     <PackageReleaseNotes>1.0.0-beta-sun-build49 Version:
 
 * Core package update
+* Addition of exclusive database objects in import bag
 
 Usage:
 
