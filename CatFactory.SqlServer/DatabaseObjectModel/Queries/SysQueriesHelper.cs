@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -58,8 +59,11 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
         /// Gets an enumerator for 'sys.types' view result
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="name">Name for sys.type</param>
+        /// <param name="schemaId">Schema ID</param>
+        /// <param name="isUserDefined">Is user defined</param>
         /// <returns>An enumerator of <see cref="SysType"/> that contains all types in database</returns>
-        public static async Task<ICollection<SysType>> GetSysTypesAsync(this DbConnection connection)
+        public static async Task<ICollection<SysType>> GetSysTypesAsync(this DbConnection connection, string name = "", int? schemaId = null, bool? isUserDefined = null)
         {
             using (var command = connection.CreateCommand())
             {
@@ -83,10 +87,17 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
                 cmdText.Append("  [is_table_type] ");
                 cmdText.Append(" from ");
                 cmdText.Append("  [sys].[types] ");
+                cmdText.Append(" where ");
+                cmdText.Append("  (@name is null or [sys].[types].[name] like @name) ");
+                cmdText.Append("  and (@schemaId is null or [sys].[types].[schema_id] = @schemaId) ");
+                cmdText.Append("  and (@isUserDefined is null or [sys].[types].[is_user_defined] = @isUserDefined) ");
 
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
                 command.CommandText = cmdText.ToString();
+                command.Parameters.Add(new SqlParameter("@name", string.IsNullOrEmpty(name) ? (object)DBNull.Value : name));
+                command.Parameters.Add(new SqlParameter("@schemaId", schemaId ?? (object)DBNull.Value));
+                command.Parameters.Add(new SqlParameter("@isUserDefined", isUserDefined ?? (object)DBNull.Value));
 
                 var collection = new Collection<SysType>();
 

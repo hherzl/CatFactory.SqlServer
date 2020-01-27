@@ -14,7 +14,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
     public static class EntityHelper
     {
 #pragma warning disable CS1591
-        public static EntityResult<TModel> DefineEntity<TModel>(this Database database, TModel model) where TModel : class
+        public static EntityResult<TModel> DefineEntity<TModel>(this SqlServerDatabase database, TModel model) where TModel : class
         {
             var result = new EntityResult<TModel>
             {
@@ -33,12 +33,25 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             {
                 var propType = property.PropertyType;
 
-                var types = database.GetDatabaseTypeMaps(propType).ToList();
+                var defType = database.DefaultTypeMaps.FirstOrDefault(item => item.Type == propType);
+
+                var type = string.Empty;
+
+                if (defType == null)
+                {
+                    var types = database.GetDatabaseTypeMaps(propType).ToList();
+
+                    type = types.Count == 0 ? "" : types.First().DatabaseType;
+                }
+                else
+                {
+                    type = defType.DatabaseType;
+                }
 
                 result.Table.Columns.Add(new Column
                 {
                     Name = property.Name,
-                    Type = types.Count == 0 ? "" : types.First().DatabaseType
+                    Type = type
                 });
 
                 result.Table.Columns.Last().ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
@@ -87,8 +100,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             }
         }
 
-        [Obsolete("Use SetNaming method")]
-        public static EntityResult<TModel> SetName<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
+        public static EntityResult<TModel> SetNaming<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
         {
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
@@ -96,7 +108,8 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> SetNaming<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
+        [Obsolete("Use SetNaming method")]
+        public static EntityResult<TModel> SetName<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
         {
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
@@ -141,7 +154,6 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
         public static EntityResult<TModel> AddExtendedProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string name, string value) where TModel : class
         {
-
             result.Table[GetPropertyName(selector)].ImportBag.ExtendedProperties.Add(new ExtendedProperty(name, value));
 
             return result;
@@ -160,7 +172,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             result.Table.PrimaryKey = new PrimaryKey
             {
-                ConstraintName = result.Database.NamingConvention.GetPrimaryKeyConstraintName(result.Table, names.ToArray()),
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetPrimaryKeyConstraintName(result.Table, names.ToArray()),
                 Key = names
             };
 
@@ -173,7 +185,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             result.Table.Uniques.Add(new Unique
             {
-                ConstraintName = string.IsNullOrEmpty(constraintName) ? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()) : constraintName,
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
                 Key = names
             });
 
@@ -186,7 +198,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             result.Table.ForeignKeys.Add(new ForeignKey
             {
-                ConstraintName = string.IsNullOrEmpty(constraintName) ? result.Database.NamingConvention.GetForeignKeyConstraintName(result.Table, names.ToArray(), table) : constraintName,
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetForeignKeyConstraintName(result.Table, names.ToArray(), table),
                 Key = GetPropertyNames(selector).ToList(),
                 References = table.FullName
             });
@@ -194,9 +206,32 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        //public static List<TModel> CreateList<TModel>(this TModel obj) where TModel : class
+        public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
+        {
+            var names = GetPropertyNames(selector).ToList();
+
+            result.Table.Defaults.Add(new Default
+            {
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, names.First()),
+                Value = value
+            });
+
+            return result;
+        }
+
+        // todo: Fix the definition for check contraint in Core module
+
+        //public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
         //{
-        //    return new List<TModel>();
+        //    var names = GetPropertyNames(selector).ToList();
+
+        //    result.Table.Checks.Add(new Check
+        //    {
+        //        ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
+        //        Key = names
+        //    });
+
+        //    return result;
         //}
     }
 #pragma warning restore CS1591

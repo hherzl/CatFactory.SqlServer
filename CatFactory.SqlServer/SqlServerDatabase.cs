@@ -4,6 +4,7 @@ using System.Linq;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
 using CatFactory.SqlServer.DatabaseObjectModel;
+using CatFactory.SqlServer.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer
 {
@@ -44,6 +45,9 @@ namespace CatFactory.SqlServer
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<Sequence> m_sequences;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<DefaultTypeMap> m_defaultTypeMaps;
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlServerDatabase"/> class
@@ -96,6 +100,15 @@ namespace CatFactory.SqlServer
         {
             get => m_sequences ?? (m_sequences = new List<Sequence>());
             set => m_sequences = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the default type maps
+        /// </summary>
+        public List<DefaultTypeMap> DefaultTypeMaps
+        {
+            get => m_defaultTypeMaps ?? (m_defaultTypeMaps = new List<DefaultTypeMap>());
+            set => m_defaultTypeMaps = value;
         }
     }
 }

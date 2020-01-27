@@ -10,29 +10,31 @@ namespace CatFactory.SqlServer.Tests
     public class ExportTest
     {
         [Fact]
-        public void TestBloggingExportScript()
+        public void ExportBloggingScript()
         {
             // Arrange
             var database = Databases.Blogging;
 
             // Act
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
 
             // Assert
         }
 
         [Fact]
-        public void TestCollegeExportScript()
+        public void ExportCollegeScript()
         {
             // Arrange
             var database = SqlServerDatabase.CreateWithDefaults("College");
 
+            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+
             var student = database
                 .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
                 .SetNaming("Student")
-                .SetColumnFor(p => p.FirstName, type: "nvarchar", length: 10)
-                .SetColumnFor(p => p.MiddleName, type: "nvarchar", length: 10, nullable: true)
-                .SetColumnFor(p => p.LastName, type: "nvarchar", length: 10)
+                .SetColumnFor(p => p.FirstName, length: 15)
+                .SetColumnFor(p => p.MiddleName, length: 15, nullable: true)
+                .SetColumnFor(p => p.LastName, length: 15)
                 .SetIdentity(p => p.StudentId)
                 .SetPrimaryKey(e => e.StudentId)
                 .AddExtendedProperty(p => p.FirstName, "MS_Description", "First name")
@@ -42,7 +44,7 @@ namespace CatFactory.SqlServer.Tests
             var course = database
                 .DefineEntity(new { CourseId = 0, Name = "" })
                 .SetNaming("Course")
-                .SetColumnFor(e => e.Name, type: "nvarchar", length: 255)
+                .SetColumnFor(e => e.Name, length: 255)
                 .SetIdentity(e => e.CourseId, seed: 1000, increment: 1000)
                 .SetPrimaryKey(e => e.CourseId)
                 .AddUnique(e => e.Name);
@@ -58,18 +60,20 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
 
             // Assert
         }
 
         [Fact]
-        public void TestDefinitionForRothschildHouseEntities()
+        public void ExportDefinitionForRothschildHouseEntities()
         {
             // Arrange
             var database = SqlServerDatabase.CreateWithDefaults("RothschildHouse");
 
             database.ExtendedProperties.Add(new ExtendedProperty("MS_Description", "Database to storage RothschildHouse payments"));
+
+            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
 
             var person = database
                 .DefineEntity(new
@@ -81,12 +85,12 @@ namespace CatFactory.SqlServer.Tests
                     FullName = "",
                     BirthDate = DateTime.Now
                 })
-                .SetNaming("Person")
-                .SetColumnFor(p => p.GivenName, type: "nvarchar", length: 10)
-                .SetColumnFor(p => p.FamilyName, type: "nvarchar", length: 10)
-                .SetColumnFor(p => p.FullName, type: "nvarchar", length: 30)
+                .SetNaming("Person", "People")
+                .SetColumnFor(p => p.GivenName, length: 10)
+                .SetColumnFor(p => p.MiddleName, length: 10, nullable: true)
+                .SetColumnFor(p => p.FamilyName, length: 10)
+                .SetColumnFor(p => p.FullName, length: 30)
                 .SetPrimaryKey(p => p.PersonID)
-                .SetColumnFor(p => p.MiddleName, type: "nvarchar", length: 10, nullable: true)
                 .AddExtendedProperty("MS_Description", "Person catalog")
                 .AddExtendedProperty(p => p.GivenName, "MS_Description", "Given name")
                 .AddExtendedProperty(p => p.MiddleName, "MS_Description", "Middle name")
@@ -105,7 +109,7 @@ namespace CatFactory.SqlServer.Tests
                     ExpirationDate = DateTime.Now,
                     Cvv = DateTime.Now
                 })
-                .SetNaming("CreditCard")
+                .SetNaming("CreditCard", "Payment")
                 .SetColumnFor(p => p.CardType, type: "nvarchar", length: 20)
                 .SetColumnFor(p => p.CardNumber, type: "nvarchar", length: 20)
                 .SetColumnFor(p => p.Last4Digits, type: "nvarchar", length: 4)
@@ -129,7 +133,7 @@ namespace CatFactory.SqlServer.Tests
                     Amount = 0m,
                     PaymentDateTime = DateTime.Now
                 })
-                .SetNaming("PaymentTransaction")
+                .SetNaming("PaymentTransaction", "Payment")
                 .SetColumnFor(p => p.Amount, prec: 10, scale: 4)
                 .SetPrimaryKey(p => p.CreditCardID)
                 .AddForeignKey(p => p.CreditCardID, creditCard.Table)
@@ -141,7 +145,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, "C:\\Temp\\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
         }
     }
 }

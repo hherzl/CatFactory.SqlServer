@@ -49,6 +49,15 @@ namespace CatFactory.SqlServer
             => string.Join("_", "PK", table.Schema, table.Name);
 
         /// <summary>
+        /// Gets the name for unique constraint
+        /// </summary>
+        /// <param name="table">Table</param>
+        /// <param name="key">Key for constraint</param>
+        /// <returns>A string as constraint's name</returns>
+        public virtual string GetUniqueConstraintName(ITable table, string[] key)
+            => string.Join("_", "UQ", table.Schema, table.Name, string.Join("_", key));
+
+        /// <summary>
         /// Gets the name for foreign key constraint
         /// </summary>
         /// <param name="table">Table</param>
@@ -59,12 +68,21 @@ namespace CatFactory.SqlServer
             => string.Join("_", "FK", table.Schema, table.Name, string.Join("_", key), references.Schema, references.Name);
 
         /// <summary>
-        /// Gets the name for unique constraint
+        /// Gets the name for default constraint
         /// </summary>
         /// <param name="table">Table</param>
         /// <param name="key">Key for constraint</param>
         /// <returns>A string as constraint's name</returns>
-        public virtual string GetUniqueConstraintName(ITable table, string[] key)
-            => string.Join("_", "U", table.Schema, table.Name, string.Join("_", key));
+        public virtual string GetDefaultConstraintName(ITable table, string key)
+            => string.Join("_", "DF", table.Schema, table.Name, key);
+
+        /// <summary>
+        /// Gets the name for check constraint
+        /// </summary>
+        /// <param name="table">Table</param>
+        /// <param name="key">Key for constraint</param>
+        /// <returns>A string as constraint's name</returns>
+        public virtual string GetCheckConstraintName(ITable table, string key)
+            => string.Join("_", "CK", table.Schema, table.Name, key);
     }
 }

@@ -155,7 +155,7 @@ namespace CatFactory.SqlServer.CodeFactory
                     var columns = Table.GetColumnsFromConstraint(foreignKey).ToList();
 
                     if (columns.Count == 1)
-                        yield return new CodeLine("{0}({1} is null or {2} = {1}){3}", Indent(2), Database.GetParameterName(columns.First()), Database.GetParameterName(columns.First()), i < constraints.Count - 1 ? " and" : string.Empty);
+                        yield return new CodeLine("{0}({1} is null or {2} = {1}){3}", Indent(2), Database.GetParameterName(columns.First()), Database.NamingConvention.GetObjectName(columns.First().Name), i < constraints.Count - 1 ? " and" : string.Empty);
                 }
             }
 

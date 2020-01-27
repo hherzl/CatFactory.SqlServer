@@ -11,18 +11,24 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var database = SqlServerDatabase.CreateWithDefaults("College");
 
+            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+
             // Act
             var student = database
                 .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
                 .SetNaming("Student")
-                .SetColumnFor(e => e.FirstName, type: "nvarchar", length: 10)
-                    .AddExtendedProperty(e => e.FirstName, "MS_Description", "First name")
-                .SetColumnFor(e => e.MiddleName, type: "nvarchar", length: 10, nullable: true)
-                    .AddExtendedProperty(e => e.MiddleName, "MS_Description", "Middle name")
-                .SetColumnFor(e => e.LastName, type: "nvarchar", length: 10)
-                    .AddExtendedProperty(e => e.LastName, "MS_Description", "Last name")
+                .SetColumnFor(e => e.FirstName, length: 10)
+                .SetColumnFor(e => e.MiddleName, length: 10, nullable: true)
+                .SetColumnFor(e => e.LastName, length: 10)
                 .SetIdentity(e => e.StudentId)
-                .SetPrimaryKey(e => e.StudentId);
+                .SetPrimaryKey(e => e.StudentId)
+                ;
+
+            student
+                .AddExtendedProperty(e => e.FirstName, "MS_Description", "First name")
+                .AddExtendedProperty(e => e.MiddleName, "MS_Description", "Middle name")
+                .AddExtendedProperty(e => e.LastName, "MS_Description", "Last name")
+                ;
 
             var course = database
                 .DefineEntity(new { CourseId = 0, Name = "" })
@@ -30,7 +36,8 @@ namespace CatFactory.SqlServer.Tests
                 .SetColumnFor(e => e.Name, type: "nvarchar", length: 255)
                 .SetIdentity(e => e.CourseId)
                 .SetPrimaryKey(e => e.CourseId)
-                .AddUnique(e => e.Name);
+                .AddUnique(e => e.Name)
+                ;
 
             var courseStudent = database
                 .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
@@ -39,7 +46,8 @@ namespace CatFactory.SqlServer.Tests
                 .SetPrimaryKey(e => e.CourseStudentId)
                 .AddUnique(e => new { e.CourseId, e.StudentId })
                 .AddForeignKey(e => e.CourseId, course.Table)
-                .AddForeignKey(e => e.StudentId, student.Table);
+                .AddForeignKey(e => e.StudentId, student.Table)
+                ;
 
             // Assert
             Assert.True(student.Table.Columns.Count == 4);
@@ -52,6 +60,7 @@ namespace CatFactory.SqlServer.Tests
 
             Assert.True(courseStudent.Table.Columns.Count == 3);
             Assert.False(courseStudent.Table.PrimaryKey == null);
+            Assert.False(courseStudent.Table.PrimaryKey.Key.Count == 2);
             Assert.False(courseStudent.Table.Identity == null);
 
             Assert.True(database.Tables.Count == 3);
@@ -69,6 +78,33 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.CourseStudent").Columns.Count == 3);
             Assert.False(database.FindTable("dbo.CourseStudent").Identity == null);
             Assert.False(database.FindTable("dbo.CourseStudent").PrimaryKey == null);
+        }
+
+        [Fact]
+        public void CreateDefinitionForCMSEntities()
+        {
+            // Arrange
+            var database = SqlServerDatabase.CreateWithDefaults("CMS");
+
+            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+
+            // Act
+            var blog = database
+                .DefineEntity(new { BlogId = (short)0, Name = "" })
+                .SetNaming("Blog", "WebSite")
+                .SetColumnFor(e => e.Name, length: 100)
+                .SetIdentity(e => e.BlogId)
+                .SetPrimaryKey(e => e.BlogId)
+                ;
+
+            var post = database
+                .DefineEntity(new { PostId = 0, BlogId = (short)0, Title = "", Content = "" })
+                .SetNaming("Post", "WebSite")
+                .SetColumnFor(e => e.Title, length: 100)
+                .SetIdentity(e => e.BlogId)
+                .SetPrimaryKey(e => e.BlogId)
+                .AddForeignKey(e => e.BlogId, blog.Table)
+                ;
         }
     }
 }

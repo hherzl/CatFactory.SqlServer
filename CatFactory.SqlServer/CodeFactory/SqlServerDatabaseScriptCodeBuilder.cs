@@ -136,9 +136,6 @@ namespace CatFactory.SqlServer.CodeFactory
                     continue;
 
                 yield return new CodeLine("create schema {0}", Database.GetObjectName(schema));
-
-                yield return new EmptyLine();
-
                 yield return new CodeLine("go");
 
                 yield return new EmptyLine();
@@ -212,6 +209,7 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("{0}@level2type = null,", Indent(1));
                 yield return new CodeLine("{0}@level2name = null", Indent(1));
                 yield return new CodeLine("go");
+                yield return new EmptyLine();
             }
 
             var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();

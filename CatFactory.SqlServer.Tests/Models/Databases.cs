@@ -62,7 +62,8 @@ namespace CatFactory.SqlServer.Tests.Models
 
                 database
                     .AddDbObjectsFromTables()
-                    .SetPrimaryKeyForTables().LinkTables()
+                    .SetPrimaryKeyForTables()
+                    .LinkTables()
                     .AddColumnsForTables(new Column[]
                     {
                         new Column { Name = "CreationUser", Type = "varchar", Length = 50 },

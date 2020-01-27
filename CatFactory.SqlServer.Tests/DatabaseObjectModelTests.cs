@@ -8,7 +8,7 @@ namespace CatFactory.SqlServer.Tests
     public class DatabaseObjectModelTests
     {
         [Fact]
-        public async Task TestGetSysSchemasAsync()
+        public async Task GetSysSchemasAsync()
         {
             // Arrange
 
@@ -28,7 +28,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetSysTypesAsync()
+        public async Task GetSysTypesAsync()
         {
             // Arrange
 
@@ -48,7 +48,47 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetSysTablesAsync()
+        public async Task GetSysTypesBySchemaIdAsync()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+
+            // Act
+
+            await connection.OpenAsync();
+
+            var types = await connection.GetSysTypesAsync(schemaId: 14);
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(types.Count > 0);
+        }
+
+        [Fact]
+        public async Task GetSysTypesDefinedByUserAsync()
+        {
+            // Arrange
+
+            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+
+            // Act
+
+            await connection.OpenAsync();
+
+            var types = await connection.GetSysTypesAsync(isUserDefined: true);
+
+            connection.Dispose();
+
+            // Assert
+
+            Assert.True(types.Count == 4);
+        }
+
+        [Fact]
+        public async Task GetSysTablesAsync()
         {
             // Arrange
 
@@ -68,7 +108,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetSysViewsAsync()
+        public async Task GetSysViewsAsync()
         {
             // Arrange
 
@@ -88,7 +128,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetSysColumnsAsync()
+        public async Task GetSysColumnsAsync()
         {
             // Arrange
 
@@ -108,7 +148,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetSysSequencesAsync()
+        public async Task GetSysSequencesAsync()
         {
             // Arrange
 
@@ -128,7 +168,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestGetFirstResultSetForCustOrdersOrdersStoredProcedureAsync()
+        public async Task GetFirstResultSetForCustOrdersOrdersStoredProcedureAsync()
         {
             // Arrange
 
@@ -148,7 +188,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task TestSpHelpForTableAsync()
+        public async Task SpHelpForTableAsync()
         {
             // Arrange
 

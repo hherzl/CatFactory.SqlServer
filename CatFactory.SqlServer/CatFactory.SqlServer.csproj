@@ -2,18 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build50</Version>
+    <Version>1.0.0-beta-sun-build51</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build50 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build51 Version:
 
 * Core package update
-* Addition of exclusive database objects in import bag
-* Fix in addition of scalar functions for import bag
+* Addition of methods to get name for default and check constraints
 
 Usage:
 
@@ -30,7 +29,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build27" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build28" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     </ItemGroup>
