@@ -236,7 +236,7 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var column = Table.Columns[i];
 
-                yield return new CodeLine("{0}{1} {2} {3}{4}", Indent(1), Database.GetParameterName(column), GetType(column), Table.Identity != null && Table.Identity.Name == column.Name ? " output" : string.Empty, i < Table.Columns.Count - 1 ? "," : string.Empty);
+                yield return new CodeLine("{0}{1} {2}{3}{4}", Indent(1), Database.GetParameterName(column), GetType(column), Table.Identity != null && Table.Identity.Name == column.Name ? " output" : string.Empty, i < Table.Columns.Count - 1 ? "," : string.Empty);
             }
 
             yield return new CodeLine("as");

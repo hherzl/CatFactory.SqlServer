@@ -15,11 +15,12 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
             var student = database
-                .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
+                .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "", Gender = "" })
                 .SetNaming("Student")
                 .SetColumnFor(e => e.FirstName, length: 10)
                 .SetColumnFor(e => e.MiddleName, length: 10, nullable: true)
                 .SetColumnFor(e => e.LastName, length: 10)
+                .SetColumnFor(e => e.Gender, length: 1)
                 .SetIdentity(e => e.StudentId)
                 .SetPrimaryKey(e => e.StudentId)
                 ;
@@ -50,7 +51,7 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             // Assert
-            Assert.True(student.Table.Columns.Count == 4);
+            Assert.True(student.Table.Columns.Count == 5);
             Assert.False(student.Table.PrimaryKey == null);
             Assert.False(student.Table.Identity == null);
 
@@ -65,7 +66,7 @@ namespace CatFactory.SqlServer.Tests
 
             Assert.True(database.Tables.Count == 3);
 
-            Assert.True(database.FindTable("dbo.Student").Columns.Count == 4);
+            Assert.True(database.FindTable("dbo.Student").Columns.Count == 5);
             Assert.False(database.FindTable("dbo.Student").Identity == null);
             Assert.False(database.FindTable("dbo.Student").PrimaryKey == null);
             Assert.True(database.FindTable("dbo.Student")["MiddleName"].ImportBag.ExtendedProperties.Count == 1);
@@ -105,6 +106,18 @@ namespace CatFactory.SqlServer.Tests
                 .SetPrimaryKey(e => e.BlogId)
                 .AddForeignKey(e => e.BlogId, blog.Table)
                 ;
+
+            // Assert
+            Assert.True(blog.Table.Columns.Count == 2);
+            Assert.False(blog.Table.PrimaryKey == null);
+            Assert.False(blog.Table.Identity == null);
+            Assert.True(blog.Table["Name"].Length == 100);
+
+            Assert.True(post.Table.Columns.Count == 4);
+            Assert.False(post.Table.PrimaryKey == null);
+            Assert.False(post.Table.Identity == null);
+            Assert.True(post.Table["Title"].Length == 100);
+            Assert.True(post.Table["Content"].Length == 0);
         }
     }
 }

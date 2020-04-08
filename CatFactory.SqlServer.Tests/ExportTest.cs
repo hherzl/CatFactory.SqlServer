@@ -107,7 +107,7 @@ namespace CatFactory.SqlServer.Tests
                     CardNumber = "",
                     Last4Digits = "",
                     ExpirationDate = DateTime.Now,
-                    Cvv = DateTime.Now
+                    Cvv = ""
                 })
                 .SetNaming("CreditCard", "Payment")
                 .SetColumnFor(p => p.CardType, type: "nvarchar", length: 20)
