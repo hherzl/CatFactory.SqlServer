@@ -30,7 +30,7 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     <ItemGroup>
         <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build28" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     </ItemGroup>
 
 </Project>
