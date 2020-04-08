@@ -8,7 +8,11 @@ namespace CatFactory.SqlServer
     {
         public static SqlServerDatabase AddDefaultTypeMapFor(this SqlServerDatabase database, Type type, string databaseType)
         {
-            database.DefaultTypeMaps.Add(new DefaultTypeMap { Type = type, DatabaseType = databaseType });
+            database.DefaultTypeMaps.Add(new DefaultTypeMap
+            {
+                Type = type,
+                DatabaseType = databaseType
+            });
 
             return database;
         }

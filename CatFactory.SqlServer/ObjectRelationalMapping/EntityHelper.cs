@@ -69,7 +69,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             if (memberExpression == null)
             {
                 if (selector.Body is UnaryExpression unaryExpression)
-                    memberExpression = unaryExpression.Operand as MemberExpression;
+                    memberExpression = (MemberExpression)unaryExpression.Operand;
             }
 
             return memberExpression.Member.Name;
@@ -81,7 +81,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             {
                 foreach (Expression argument in newExpression.Arguments)
                 {
-                    var prop = argument as MemberExpression;
+                    var prop = (MemberExpression)argument;
 
                     yield return prop.Member.Name;
                 }
@@ -93,7 +93,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
                 if (memberExpression == null)
                 {
                     if (selector.Body is UnaryExpression unaryExpression)
-                        memberExpression = unaryExpression.Operand as MemberExpression;
+                        memberExpression = (MemberExpression)unaryExpression.Operand;
                 }
 
                 yield return memberExpression.Member.Name;
@@ -117,54 +117,6 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, string>> selector, string type = "", int length = 0, bool nullable = false, string collation = "") where TModel : class
-        {
-            var column = new Column
-            {
-                Name = GetPropertyName(selector)
-            };
-
-            if (result.Table.Columns.Contains(column))
-            {
-                if (!string.IsNullOrEmpty(type))
-                    result.Table[column.Name].Type = type;
-
-                result.Table[column.Name].Length = length;
-                result.Table[column.Name].Nullable = nullable;
-
-                if (!string.IsNullOrEmpty(collation))
-                    result.Table[column.Name].Collation = collation;
-            }
-            else
-            {
-                result.Table.Columns.Add(column);
-            }
-
-            return result;
-        }
-
-        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, DateTime>> selector, string type = "", bool nullable = false) where TModel : class
-        {
-            var column = new Column
-            {
-                Name = GetPropertyName(selector)
-            };
-
-            if (result.Table.Columns.Contains(column))
-            {
-                if (!string.IsNullOrEmpty(type))
-                    result.Table[column.Name].Type = type;
-
-                result.Table[column.Name].Nullable = nullable;
-            }
-            else
-            {
-                result.Table.Columns.Add(column);
-            }
-
-            return result;
-        }
-
         public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, bool>> selector, string type = "", bool nullable = false) where TModel : class
         {
             var column = new Column
@@ -177,78 +129,6 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
                 if (!string.IsNullOrEmpty(type))
                     result.Table[column.Name].Type = type;
 
-                result.Table[column.Name].Nullable = nullable;
-            }
-            else
-            {
-                result.Table.Columns.Add(column);
-            }
-
-            return result;
-        }
-
-        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, float>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
-        {
-            var column = new Column
-            {
-                Name = GetPropertyName(selector)
-            };
-
-            if (result.Table.Columns.Contains(column))
-            {
-                if (!string.IsNullOrEmpty(type))
-                    result.Table[column.Name].Type = type;
-
-                result.Table[column.Name].Prec = prec;
-                result.Table[column.Name].Scale = scale;
-                result.Table[column.Name].Nullable = nullable;
-            }
-            else
-            {
-                result.Table.Columns.Add(column);
-            }
-
-            return result;
-        }
-
-        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, double>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
-        {
-            var column = new Column
-            {
-                Name = GetPropertyName(selector)
-            };
-
-            if (result.Table.Columns.Contains(column))
-            {
-                if (!string.IsNullOrEmpty(type))
-                    result.Table[column.Name].Type = type;
-
-                result.Table[column.Name].Prec = prec;
-                result.Table[column.Name].Scale = scale;
-                result.Table[column.Name].Nullable = nullable;
-            }
-            else
-            {
-                result.Table.Columns.Add(column);
-            }
-
-            return result;
-        }
-
-        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, decimal>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
-        {
-            var column = new Column
-            {
-                Name = GetPropertyName(selector)
-            };
-
-            if (result.Table.Columns.Contains(column))
-            {
-                if (!string.IsNullOrEmpty(type))
-                    result.Table[column.Name].Type = type;
-
-                result.Table[column.Name].Prec = prec;
-                result.Table[column.Name].Scale = scale;
                 result.Table[column.Name].Nullable = nullable;
             }
             else
@@ -303,21 +183,193 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> AddExtendedProperty<TModel>(this EntityResult<TModel> result, string name, string value) where TModel : class
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, DateTime>> selector, string type = "", bool nullable = false) where TModel : class
         {
-            result.Table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(name, value));
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
 
             return result;
         }
 
-        public static EntityResult<TModel> AddExtendedProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string name, string value) where TModel : class
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, decimal>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
         {
-            result.Table[GetPropertyName(selector)].ImportBag.ExtendedProperties.Add(new ExtendedProperty(name, value));
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Prec = prec;
+                result.Table[column.Name].Scale = scale;
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
 
             return result;
         }
 
-        public static EntityResult<TModel> SetIdentity<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, short>> selector, short seed = 1, short increment = 1) where TModel : class
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, double>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Prec = prec;
+                result.Table[column.Name].Scale = scale;
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, float>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Prec = prec;
+                result.Table[column.Name].Scale = scale;
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, int>> selector, string type = "", bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, long>> selector, string type = "", bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, short>> selector, string type = "", bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Nullable = nullable;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, string>> selector, string type = "", int length = 0, bool nullable = false, string collation = "") where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+            {
+                if (!string.IsNullOrEmpty(type))
+                    result.Table[column.Name].Type = type;
+
+                result.Table[column.Name].Length = length;
+                result.Table[column.Name].Nullable = nullable;
+
+                if (!string.IsNullOrEmpty(collation))
+                    result.Table[column.Name].Collation = collation;
+            }
+            else
+            {
+                result.Table.Columns.Add(column);
+            }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetIdentity<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, decimal>> selector, int seed = 1, int increment = 1) where TModel : class
         {
             result.Table.Identity = new Identity(GetPropertyName(selector), seed, increment);
 
@@ -338,6 +390,13 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
+        public static EntityResult<TModel> SetIdentity<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, short>> selector, int seed = 1, int increment = 1) where TModel : class
+        {
+            result.Table.Identity = new Identity(GetPropertyName(selector), seed, increment);
+
+            return result;
+        }
+
         public static EntityResult<TModel> SetPrimaryKey<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
         {
             var names = GetPropertyNames(selector).ToList();
@@ -351,14 +410,29 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> AddUnique<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
+        // todo: Fix the definition for check contraint in Core module
+
+        //public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
+        //{
+        //    var names = GetPropertyNames(selector).ToList();
+
+        //    result.Table.Checks.Add(new Check
+        //    {
+        //        ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
+        //        Key = names
+        //    });
+
+        //    return result;
+        //}
+
+        public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
         {
             var names = GetPropertyNames(selector).ToList();
 
-            result.Table.Uniques.Add(new Unique
+            result.Table.Defaults.Add(new Default
             {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
-                Key = names
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, names.First()),
+                Value = value
             });
 
             return result;
@@ -378,33 +452,32 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
+        public static EntityResult<TModel> AddUnique<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
         {
             var names = GetPropertyNames(selector).ToList();
 
-            result.Table.Defaults.Add(new Default
+            result.Table.Uniques.Add(new Unique
             {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, names.First()),
-                Value = value
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
+                Key = names
             });
 
             return result;
         }
 
-        // todo: Fix the definition for check contraint in Core module
+        public static EntityResult<TModel> AddExtendedProperty<TModel>(this EntityResult<TModel> result, string name, string value) where TModel : class
+        {
+            result.Table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(name, value));
 
-        //public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
-        //{
-        //    var names = GetPropertyNames(selector).ToList();
+            return result;
+        }
 
-        //    result.Table.Checks.Add(new Check
-        //    {
-        //        ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
-        //        Key = names
-        //    });
+        public static EntityResult<TModel> AddExtendedProperty<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string name, string value) where TModel : class
+        {
+            result.Table[GetPropertyName(selector)].ImportBag.ExtendedProperties.Add(new ExtendedProperty(name, value));
 
-        //    return result;
-        //}
+            return result;
+        }
     }
 #pragma warning restore CS1591
 }
