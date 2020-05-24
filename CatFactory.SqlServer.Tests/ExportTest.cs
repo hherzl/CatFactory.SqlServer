@@ -41,6 +41,10 @@ namespace CatFactory.SqlServer.Tests
                 .AddExtendedProperty(p => p.MiddleName, "MS_Description", "Middle name")
                 .AddExtendedProperty(p => p.LastName, "MS_Description", "Last name");
 
+            student.Data.Add(new { StudentId = 0, FirstName = "Carlo", MiddleName = "H", LastName = "Herzl" });
+
+            // todo: add sql transcriber => translate results from select to code (c#)
+
             var course = database
                 .DefineEntity(new { CourseId = 0, Name = "" })
                 .SetNaming("Course")
@@ -60,7 +64,7 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
 
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
 
             // Assert
         }

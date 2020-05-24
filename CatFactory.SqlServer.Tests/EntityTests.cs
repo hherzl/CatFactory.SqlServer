@@ -51,19 +51,7 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             // Assert
-            Assert.True(student.Table.Columns.Count == 5);
-            Assert.False(student.Table.PrimaryKey == null);
-            Assert.False(student.Table.Identity == null);
-
-            Assert.True(course.Table.Columns.Count == 2);
-            Assert.False(course.Table.PrimaryKey == null);
-            Assert.False(course.Table.Identity == null);
-
-            Assert.True(courseStudent.Table.Columns.Count == 3);
-            Assert.False(courseStudent.Table.PrimaryKey == null);
-            Assert.False(courseStudent.Table.PrimaryKey.Key.Count == 2);
-            Assert.False(courseStudent.Table.Identity == null);
-
+            Assert.True(database.DbObjects.Count == 3);
             Assert.True(database.Tables.Count == 3);
 
             Assert.True(database.FindTable("dbo.Student").Columns.Count == 5);
@@ -79,6 +67,19 @@ namespace CatFactory.SqlServer.Tests
             Assert.True(database.FindTable("dbo.CourseStudent").Columns.Count == 3);
             Assert.False(database.FindTable("dbo.CourseStudent").Identity == null);
             Assert.False(database.FindTable("dbo.CourseStudent").PrimaryKey == null);
+
+            Assert.True(student.Table.Columns.Count == 5);
+            Assert.False(student.Table.PrimaryKey == null);
+            Assert.False(student.Table.Identity == null);
+
+            Assert.True(course.Table.Columns.Count == 2);
+            Assert.False(course.Table.PrimaryKey == null);
+            Assert.False(course.Table.Identity == null);
+
+            Assert.True(courseStudent.Table.Columns.Count == 3);
+            Assert.False(courseStudent.Table.PrimaryKey == null);
+            Assert.False(courseStudent.Table.PrimaryKey.Key.Count == 2);
+            Assert.False(courseStudent.Table.Identity == null);
         }
 
         [Fact]
@@ -108,6 +109,9 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             // Assert
+            Assert.True(database.DbObjects.Count == 2);
+            Assert.True(database.Tables.Count == 2);
+
             Assert.True(blog.Table.Columns.Count == 2);
             Assert.False(blog.Table.PrimaryKey == null);
             Assert.False(blog.Table.Identity == null);
