@@ -18,13 +18,15 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <param name="database">Instance of <see cref="SqlServerDatabase"/> class</param>
         /// <param name="outputDirectory">Output directory</param>
         /// <param name="forceOverwrite">Force overwrite</param>
-        public static void CreateScript(SqlServerDatabase database, string outputDirectory, bool forceOverwrite = false)
+        /// <param name="addDrop">Add drop statement</param>
+        public static void CreateScript(SqlServerDatabase database, string outputDirectory, bool forceOverwrite = false, bool addDrop = false)
         {
             var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
             {
                 Database = database,
                 OutputDirectory = outputDirectory,
-                ForceOverwrite = forceOverwrite
+                ForceOverwrite = forceOverwrite,
+                AddDrop = addDrop
             };
 
             codeBuilder.CreateFile();
@@ -56,6 +58,11 @@ namespace CatFactory.SqlServer.CodeFactory
         public SqlServerDatabase Database { get; set; }
 
         /// <summary>
+        /// Indicates if script includes [drop] statements in script
+        /// </summary>
+        public bool AddDrop { get; set; }
+
+        /// <summary>
         /// Translates object definition to a sequence of <see cref="ILine"/> interface
         /// </summary>
         public override void Translating()
@@ -67,6 +74,16 @@ namespace CatFactory.SqlServer.CodeFactory
             Lines.AddRange(AddDatabaseExtendedProperties());
 
             Lines.AddRange(AddDatabaseSchemas());
+
+            if (AddDrop)
+            {
+                for (var i = Database.Tables.Count - 1; i >= 0; i--)
+                {
+                    var table = Database.Tables[i];
+
+                    Lines.AddRange(DropTable(table));
+                }
+            }
 
             foreach (var table in Database.Tables)
             {
@@ -83,13 +100,11 @@ namespace CatFactory.SqlServer.CodeFactory
         protected virtual IEnumerable<ILine> AddDatabaseCreation()
         {
             yield return new CodeLine("create database {0}", Database.GetObjectName(Database.Name));
-
             yield return new CodeLine("go");
 
             yield return new EmptyLine();
 
             yield return new CodeLine("use {0}", Database.GetObjectName(Database.Name));
-
             yield return new CodeLine("go");
 
             yield return new EmptyLine();
@@ -140,6 +155,18 @@ namespace CatFactory.SqlServer.CodeFactory
 
                 yield return new EmptyLine();
             }
+        }
+
+        /// <summary>
+        /// Gets code lines for drop table
+        /// </summary>
+        /// <param name="table">Instance of <see cref="Table"/></param>
+        /// <returns>A sequence of <see cref="ILine"/> that represents the table dropping</returns>
+        protected virtual IEnumerable<ILine> DropTable(Table table)
+        {
+            yield return new CodeLine("drop table {0}", Database.NamingConvention.GetObjectName(table.Schema, table.Name));
+            yield return new CodeLine("go");
+            yield return new EmptyLine();
         }
 
         /// <summary>
@@ -256,7 +283,6 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
 
                 yield return new CodeLine("{0}primary key ({1})", Indent(1), string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
-
                 yield return new CodeLine("go");
 
                 yield return new EmptyLine();
@@ -269,7 +295,6 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
 
                 yield return new CodeLine("{0}unique ({1})", Indent(1), string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
-
                 yield return new CodeLine("go");
 
                 yield return new EmptyLine();
@@ -294,7 +319,6 @@ namespace CatFactory.SqlServer.CodeFactory
                         yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
 
                         yield return new CodeLine("{0}foreign key ({1}) references {2}", Indent(1), string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
-
                         yield return new CodeLine("go");
 
                         yield return new EmptyLine();

@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build54</Version>
+    <Version>1.0.0-beta-sun-build55</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build54 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build55 Version:
 
-* Addition of methods for property nullable types
+* Fix for issue 3: Entity Result doesn't add table in DB objects list
 
 Usage:
 

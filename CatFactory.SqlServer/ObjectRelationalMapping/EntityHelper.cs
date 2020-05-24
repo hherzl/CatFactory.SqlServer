@@ -59,6 +59,8 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             database.Tables.Add(result.Table);
 
+            database.DbObjects.Add(new DbObject { Schema = result.Table.Schema, Name = result.Table.Name });
+
             return result;
         }
 
