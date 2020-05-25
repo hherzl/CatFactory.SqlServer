@@ -18,13 +18,13 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         {
             var result = new EntityResult<TModel>
             {
-                Model = model,
                 Table = new Table
                 {
                     Schema = database.DefaultSchema,
                     Name = model.GetType().Name
                 },
-                Database = database
+                Database = database,
+                Model = model
             };
 
             result.Table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
@@ -59,7 +59,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
             database.Tables.Add(result.Table);
 
-            database.DbObjects.Add(new DbObject { Schema = result.Table.Schema, Name = result.Table.Name });
+            database.DbObjects.Add(new DbObject(result.Table.Schema, result.Table.Name));
 
             return result;
         }
@@ -672,15 +672,27 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> AddForeignKey<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, Table table, string constraintName = null) where TModel : class
+        public static EntityResult<TModel> AddForeignKey<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, Table references, string constraintName = null) where TModel : class
         {
             var names = GetPropertyNames(selector).ToList();
 
+            if (references.PrimaryKey == null)
+                throw new ObjectRelationMappingException(string.Format("The '{0}.{1}' table doesn't have a definition for primary key", references.Schema, references.Name));
+
+            if (names.Count == 1 && references.PrimaryKey?.Key.Count == 1)
+            {
+                var fk = result.Table[names.First()];
+                var pk = references.GetColumnsFromConstraint(references.PrimaryKey).First();
+
+                if (fk.Type != pk.Type)
+                    throw new ObjectRelationMappingException(string.Format("The columns '{0}' and '{1}' have different data types: '{2}', '{3}'", fk.Name, pk.Name, fk.Type, pk.Type));
+            }
+
             result.Table.ForeignKeys.Add(new ForeignKey
             {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetForeignKeyConstraintName(result.Table, names.ToArray(), table),
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetForeignKeyConstraintName(result.Table, names.ToArray(), references),
                 Key = GetPropertyNames(selector).ToList(),
-                References = table.FullName
+                References = references.FullName
             });
 
             return result;
