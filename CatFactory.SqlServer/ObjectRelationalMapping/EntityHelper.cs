@@ -18,13 +18,13 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         {
             var result = new EntityResult<TModel>
             {
-                Model = model,
                 Table = new Table
                 {
                     Schema = database.DefaultSchema,
                     Name = model.GetType().Name
                 },
-                Database = database
+                Database = database,
+                Model = model
             };
 
             result.Table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
@@ -58,8 +58,6 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             }
 
             database.Tables.Add(result.Table);
-
-            database.DbObjects.Add(new DbObject { Schema = result.Table.Schema, Name = result.Table.Name });
 
             return result;
         }
@@ -107,6 +105,8 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
 
+            result.Database.DbObjects.Add(new DbObject(result.Table.Schema, result.Table.Name));
+
             return result;
         }
 
@@ -115,6 +115,8 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         {
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
+
+            result.Database.DbObjects.Add(new DbObject(result.Table.Schema, result.Table.Name));
 
             return result;
         }
