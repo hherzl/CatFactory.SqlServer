@@ -40,6 +40,10 @@ namespace CatFactory.SqlServer.Tests
                 .AddUnique(e => e.Name)
                 ;
 
+            course
+                .AddExtendedProperty(e => e.Name, "MS_Description", "Course name")
+                ;
+
             var courseStudent = database
                 .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
                 .SetNaming("CourseStudent")
@@ -50,9 +54,18 @@ namespace CatFactory.SqlServer.Tests
                 .AddForeignKey(e => e.StudentId, student.Table)
                 ;
 
+            courseStudent
+                .AddExtendedProperty(e => e.CourseId, "MS_Description", "Course Id")
+                .AddExtendedProperty(e => e.CourseId, "MS_Description", "Student Id")
+                ;
+
             // Assert
             Assert.True(database.DbObjects.Count == 3);
             Assert.True(database.Tables.Count == 3);
+
+            Assert.True(database.DbObjects[0].FullName == "dbo.Student");
+            Assert.True(database.DbObjects[1].FullName == "dbo.Course");
+            Assert.True(database.DbObjects[2].FullName == "dbo.CourseStudent");
 
             Assert.True(database.FindTable("dbo.Student").Columns.Count == 5);
             Assert.False(database.FindTable("dbo.Student").Identity == null);
