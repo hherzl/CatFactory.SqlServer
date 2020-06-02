@@ -88,7 +88,15 @@ namespace CatFactory.SqlServer.CodeFactory
             foreach (var table in Database.Tables)
             {
                 Lines.AddRange(AddTable(table));
+            }
 
+            foreach (var table in Database.Tables)
+            {
+                Lines.AddRange(AddTableExtendedProperties(table));
+            }
+
+            foreach (var table in Database.Tables)
+            {
                 Lines.AddRange(AddConstraints(table));
             }
         }
@@ -219,11 +227,17 @@ namespace CatFactory.SqlServer.CodeFactory
             }
 
             yield return new CodeLine(")");
-
             yield return new CodeLine("go");
-
             yield return new EmptyLine();
+        }
 
+        /// <summary>
+        /// Gets code lines for table extended properties
+        /// </summary>
+        /// <param name="table">Instance of <see cref="Table"/></param>
+        /// <returns>A sequence of <see cref="ILine"/> that represents the table dropping</returns>
+        protected virtual IEnumerable<ILine> AddTableExtendedProperties(Table table)
+        {
             foreach (ExtendedProperty extendedProperty in table.ImportBag.ExtendedProperties)
             {
                 yield return new CodeLine("exec [sp_addextendedproperty]");
@@ -237,6 +251,11 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("{0}@level2name = null", Indent(1));
                 yield return new CodeLine("go");
                 yield return new EmptyLine();
+            }
+
+            for (var i = 0; i < table.Columns.Count; i++)
+            {
+                
             }
 
             var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
@@ -264,6 +283,16 @@ namespace CatFactory.SqlServer.CodeFactory
                 }
             }
         }
+
+        ///// <summary>
+        ///// Gets code lines for table extended properties
+        ///// </summary>
+        ///// <param name="table">Instance of <see cref="Table"/>class</param>
+        ///// <param name="column">Instance of <see cref="Column"/> class</param>
+        ///// <returns>A sequence of <see cref="ILine"/> that represents the table dropping</returns>
+        //protected virtual IEnumerable<ILine> AddTableExtendedProperties(Table table, Column column)
+        //{
+        //}
 
         /// <summary>
         /// Gets code lines for table constraints
