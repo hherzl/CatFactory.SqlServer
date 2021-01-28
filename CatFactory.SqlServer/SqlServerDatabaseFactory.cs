@@ -595,7 +595,7 @@ namespace CatFactory.SqlServer
                 {
                     var column = constraintDetail.ConstraintType.Replace("DEFAULT on column ", string.Empty).Trim();
 
-                    table.Defaults.Add(new Default(constraintDetail.ConstraintName, new string[] { column })
+                    table.Defaults.Add(new Default(constraintDetail.ConstraintName, column)
                     {
                         Value = constraintDetail.ConstraintKeys
                     });
