@@ -18,15 +18,15 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <param name="database">Instance of <see cref="SqlServerDatabase"/> class</param>
         /// <param name="outputDirectory">Output directory</param>
         /// <param name="forceOverwrite">Force overwrite</param>
-        /// <param name="addDrop">Add drop statement</param>
-        public static void CreateScript(SqlServerDatabase database, string outputDirectory, bool forceOverwrite = false, bool addDrop = false)
+        /// <param name="addDropIfExists">Add drop if exists statement</param>
+        public static void CreateScript(SqlServerDatabase database, string outputDirectory, bool forceOverwrite = false, bool addDropIfExists = false)
         {
             var codeBuilder = new SqlServerDatabaseScriptCodeBuilder
             {
                 Database = database,
                 OutputDirectory = outputDirectory,
                 ForceOverwrite = forceOverwrite,
-                AddDrop = addDrop
+                AddDropIfExists = addDropIfExists
             };
 
             codeBuilder.CreateFile();
@@ -60,7 +60,7 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <summary>
         /// Indicates if script includes [drop] statements in script
         /// </summary>
-        public bool AddDrop { get; set; }
+        public bool AddDropIfExists { get; set; }
 
         /// <summary>
         /// Translates object definition to a sequence of <see cref="ILine"/> interface
@@ -75,13 +75,13 @@ namespace CatFactory.SqlServer.CodeFactory
 
             Lines.AddRange(AddDatabaseSchemas());
 
-            if (AddDrop)
+            if (AddDropIfExists)
             {
                 for (var i = Database.Tables.Count - 1; i >= 0; i--)
                 {
                     var table = Database.Tables[i];
 
-                    Lines.AddRange(DropTable(table));
+                    Lines.AddRange(DropTableIfExists(table));
                 }
             }
 
@@ -166,13 +166,14 @@ namespace CatFactory.SqlServer.CodeFactory
         }
 
         /// <summary>
-        /// Gets code lines for drop table
+        /// Gets code lines for drop table if exists
         /// </summary>
         /// <param name="table">Instance of <see cref="Table"/></param>
         /// <returns>A sequence of <see cref="ILine"/> that represents the table dropping</returns>
-        protected virtual IEnumerable<ILine> DropTable(Table table)
+        protected virtual IEnumerable<ILine> DropTableIfExists(Table table)
         {
-            yield return new CodeLine("drop table {0}", Database.NamingConvention.GetObjectName(table.Schema, table.Name));
+            yield return new CodeLine("if object_id('{0}') is not null", table.FullName);
+            yield return new CodeLine("{0}drop table {1}", Indent(1), Database.NamingConvention.GetObjectName(table.Schema, table.Name));
             yield return new CodeLine("go");
             yield return new EmptyLine();
         }
