@@ -2,20 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-beta-sun-build58</Version>
+    <Version>1.0.0-beta-sun-build60</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build58 Version:
+    <PackageReleaseNotes>1.0.0-beta-sun-build60 Version:
 
-* Fix for issue 9: Apply group for sections in create database script
+ Core package update
 
 Usage:
 
-var database = await SqlServerDatabaseFactory.ImportAsync("Your connection string!");
+ var database = await SqlServerDatabaseFactory.ImportAsync("Your connection string!");
 
 Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
 </PackageReleaseNotes>
@@ -28,9 +28,9 @@ Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build28" />
+        <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build29" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     </ItemGroup>
 
 </Project>

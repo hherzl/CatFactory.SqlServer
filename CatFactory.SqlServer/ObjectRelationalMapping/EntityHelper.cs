@@ -275,6 +275,36 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, DateTimeOffset>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, DateTimeOffset?>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
+
+            return result;
+        }
+
         public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, decimal>> selector, string type = "", short prec = 0, short scale = 0, bool nullable = false) where TModel : class
         {
             var column = new Column
@@ -415,6 +445,36 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             {
                 result.Table.Columns.Add(column);
             }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, Guid>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, Guid?>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
 
             return result;
         }
@@ -573,6 +633,36 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             {
                 result.Table.Columns.Add(column);
             }
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, TimeSpan>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
+
+            return result;
+        }
+
+        public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, TimeSpan?>> selector, bool nullable = false) where TModel : class
+        {
+            var column = new Column
+            {
+                Name = GetPropertyName(selector)
+            };
+
+            if (result.Table.Columns.Contains(column))
+                result.Table[column.Name].Nullable = nullable;
+            else
+                result.Table.Columns.Add(column);
 
             return result;
         }
