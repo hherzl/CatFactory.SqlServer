@@ -21,7 +21,7 @@ namespace CatFactory.SqlServer.Tests
                 {
                     Database = database,
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresFromExistingDatabase",
+                    OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromExistingDatabase",
                     ForceOverwrite = true
                 };
 
@@ -44,7 +44,7 @@ namespace CatFactory.SqlServer.Tests
                 {
                     Database = database,
                     Table = table,
-                    OutputDirectory = "C:\\Temp\\CatFactory.SqlServer\\StoredProceduresFromMockingDatabase",
+                    OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromMockingDatabase",
                     ForceOverwrite = true
                 };
 

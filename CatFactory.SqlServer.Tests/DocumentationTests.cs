@@ -6,10 +6,10 @@ namespace CatFactory.SqlServer.Tests
     public class DocumentationTests
     {
         [Fact]
-        public void TestGetExtendedProperties()
+        public void GetExtendedProperties()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -22,21 +22,21 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = (SqlServerDatabase)databaseFactory.Import();
-            var table = database.FindTable("Production.Product");
-            var view = database.FindView("HumanResources.vEmployee");
+            var db = (SqlServerDatabase)dbFactory.Import();
+            var table = db.FindTable("Production.Product");
+            var view = db.FindView("HumanResources.vEmployee");
 
             // Assert
-            Assert.True(database.ExtendedProperties.Count > 0);
+            Assert.True(db.ExtendedProperties.Count > 0);
             Assert.True(table.ImportBag.ExtendedProperties.Count > 0);
             Assert.True(view.ImportBag.ExtendedProperties.Count > 0);
         }
 
         [Fact]
-        public void TestAddExtendedPropertiesForDatabase()
+        public void AddExtendedPropertiesForDatabase()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -49,19 +49,19 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var db = dbFactory.Import();
 
-            databaseFactory.DropExtendedPropertyIfExists("MS_Description");
-            databaseFactory.AddExtendedProperty(database, "MS_Description", "Online store");
+            dbFactory.DropExtendedPropertyIfExists("MS_Description");
+            dbFactory.AddExtendedProperty(db, "MS_Description", "Online store");
 
             // Assert
         }
 
         [Fact]
-        public void TestAddExtendedPropertiesForTable()
+        public void AddExtendedPropertiesForTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -74,20 +74,20 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, "MS_Description");
-            databaseFactory.AddExtendedProperty(table, "MS_Description", "Products catalog");
+            dbFactory.DropExtendedPropertyIfExists(table, "MS_Description");
+            dbFactory.AddExtendedProperty(table, "MS_Description", "Products catalog");
 
             // Assert
         }
 
         [Fact]
-        public void TestAddExtendedPropertiesForColumnFromTable()
+        public void AddExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -100,20 +100,20 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
+            dbFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
 
             // Assert
         }
 
         [Fact]
-        public void TestAddExtendedPropertiesForView()
+        public void AddExtendedPropertiesForView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -126,20 +126,20 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("Sales.OrderSummary");
+            var db = dbFactory.Import();
+            var view = db.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, "MS_Description");
-            databaseFactory.AddExtendedProperty(view, "MS_Description", "Summary for orders");
+            dbFactory.DropExtendedPropertyIfExists(view, "MS_Description");
+            dbFactory.AddExtendedProperty(view, "MS_Description", "Summary for orders");
 
             // Assert
         }
 
         [Fact]
-        public void TestAddExtendedPropertiesForColumnFromView()
+        public void AddExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -152,18 +152,18 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("Sales.OrderSummary");
+            var db = dbFactory.Import();
+            var view = db.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
-            databaseFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
+            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
+            dbFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
         }
 
         [Fact]
-        public void TestUpdateExtendedPropertiesForDatabase()
+        public void UpdateExtendedPropertiesForDatabase()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -176,20 +176,20 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var db = dbFactory.Import();
 
-            databaseFactory.DropExtendedPropertyIfExists("MS_Description");
-            databaseFactory.AddExtendedProperty(database, "MS_Description", "Online store");
-            databaseFactory.UpdateExtendedProperty(database, "MS_Description", "Online store (Update)");
+            dbFactory.DropExtendedPropertyIfExists("MS_Description");
+            dbFactory.AddExtendedProperty(db, "MS_Description", "Online store");
+            dbFactory.UpdateExtendedProperty(db, "MS_Description", "Online store (Update)");
 
             // Assert
         }
 
         [Fact]
-        public void TestUpdateExtendedPropertiesForTable()
+        public void UpdateExtendedPropertiesForTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -202,21 +202,21 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, "MS_Description");
-            databaseFactory.AddExtendedProperty(table, "MS_Description", "Products catalog");
-            databaseFactory.UpdateExtendedProperty(table, "MS_Description", "Products catalog (Update)");
+            dbFactory.DropExtendedPropertyIfExists(table, "MS_Description");
+            dbFactory.AddExtendedProperty(table, "MS_Description", "Products catalog");
+            dbFactory.UpdateExtendedProperty(table, "MS_Description", "Products catalog (Update)");
 
             // Assert
         }
 
         [Fact]
-        public void TestUpdateExtendedPropertiesForColumnFromTable()
+        public void UpdateExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -229,21 +229,21 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
-            databaseFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
-            databaseFactory.UpdateExtendedProperty(table, table["ID"], "MS_Description", "ID for product (Update)");
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
+            dbFactory.AddExtendedProperty(table, table["ID"], "MS_Description", "ID for product");
+            dbFactory.UpdateExtendedProperty(table, table["ID"], "MS_Description", "ID for product (Update)");
 
             // Assert
         }
 
         [Fact]
-        public void TestUpdateExtendedPropertiesForView()
+        public void UpdateExtendedPropertiesForView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -256,21 +256,21 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("Sales.OrderSummary");
+            var db = dbFactory.Import();
+            var view = db.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, "MS_Description");
-            databaseFactory.AddExtendedProperty(view, "MS_Description", "Summary for orders");
-            databaseFactory.UpdateExtendedProperty(view, "MS_Description", "Summary for orders (Update)");
+            dbFactory.DropExtendedPropertyIfExists(view, "MS_Description");
+            dbFactory.AddExtendedProperty(view, "MS_Description", "Summary for orders");
+            dbFactory.UpdateExtendedProperty(view, "MS_Description", "Summary for orders (Update)");
 
             // Assert
         }
 
         [Fact]
-        public void TestUpdateExtendedPropertiesForColumnFromView()
+        public void UpdateExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -283,19 +283,19 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("Sales.OrderSummary");
+            var db = dbFactory.Import();
+            var view = db.FindView("Sales.OrderSummary");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
-            databaseFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
-            databaseFactory.UpdateExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
+            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");
+            dbFactory.AddExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
+            dbFactory.UpdateExtendedProperty(view, view["CustomerName"], "MS_Description", "Name for customer (CompanyName)");
         }
 
         [Fact]
-        public void TestDropExtendedPropertiesForDatabase()
+        public void DropExtendedPropertiesForDatabase()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -308,18 +308,18 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
+            var db = dbFactory.Import();
 
-            databaseFactory.DropExtendedPropertyIfExists("MS_Description");
+            dbFactory.DropExtendedPropertyIfExists("MS_Description");
 
             // Assert
         }
 
         [Fact]
-        public void TestDropExtendedPropertiesForTable()
+        public void DropExtendedPropertiesForTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -332,19 +332,19 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, "MS_Description");
+            dbFactory.DropExtendedPropertyIfExists(table, "MS_Description");
 
             // Assert
         }
 
         [Fact]
-        public void TestDropExtendedPropertiesForColumnFromTable()
+        public void DropExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -357,19 +357,19 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var table = database.FindTable("Warehouse.Product");
+            var db = dbFactory.Import();
+            var table = db.FindTable("Warehouse.Product");
 
-            databaseFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], "MS_Description");
 
             // Assert
         }
 
         [Fact]
-        public void TestDropExtendedPropertiesForView()
+        public void DropExtendedPropertiesForView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -382,19 +382,19 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("HumanResources.EmployeeInfo");
+            var db = dbFactory.Import();
+            var view = db.FindView("HumanResources.EmployeeInfo");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, "MS_Description");
+            dbFactory.DropExtendedPropertyIfExists(view, "MS_Description");
 
             // Assert
         }
 
         [Fact]
-        public void TestDropExtendedPropertiesForColumnFromView()
+        public void DropExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            var dbFactory = new SqlServerDatabaseFactory
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
@@ -407,10 +407,10 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var database = databaseFactory.Import();
-            var view = database.FindView("HumanResources.EmployeeInfo");
+            var db = dbFactory.Import();
+            var view = db.FindView("HumanResources.EmployeeInfo");
 
-            databaseFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], "MS_Description");
+            dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], "MS_Description");
         }
     }
 }

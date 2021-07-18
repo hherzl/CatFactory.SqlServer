@@ -9,7 +9,7 @@ namespace CatFactory.SqlServer.Tests
     public class SerializationTests
     {
         [Fact]
-        public void SerializeMockDatabaseToXmlTest()
+        public void SerializeMockDatabaseToXml()
         {
             // Arrange
             var database = Databases.Blogging;
@@ -17,13 +17,13 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var output = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Blogging.xml", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.xml", output);
 
             // Assert
         }
 
         [Fact]
-        public void SerializeMockDatabaseToJsonTest()
+        public void SerializeMockDatabaseToJson()
         {
             // Arrange
             var database = Databases.Blogging;
@@ -31,13 +31,13 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\Blogging.json", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.json", output);
 
             // Assert
         }
 
         [Fact]
-        public void SerializeAdventureWorks2017DatabaseToXmlTest()
+        public void SerializeAdventureWorks2017DatabaseToXml()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
@@ -61,13 +61,13 @@ namespace CatFactory.SqlServer.Tests
 
             var output = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.xml", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.xml", output);
 
             // Assert
         }
 
         [Fact]
-        public void SerializeAdventureWorks2017DatabaseToJsonTest()
+        public void SerializeAdventureWorks2017DatabaseToJson()
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory
@@ -91,7 +91,7 @@ namespace CatFactory.SqlServer.Tests
 
             var output = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText("C:\\Temp\\CatFactory.SqlServer\\AdventureWorks2017.json", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.json", output);
 
             // Assert
         }

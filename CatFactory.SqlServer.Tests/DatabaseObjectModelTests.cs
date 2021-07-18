@@ -12,19 +12,17 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
-            var types = await connection.GetSysSchemasAsync();
-
-            connection.Dispose();
+            var schemas = await connection.GetSysSchemasAsync();
 
             // Assert
 
-            Assert.True(types.Count > 0);
+            Assert.True(schemas.Count > 0);
         }
 
         [Fact]
@@ -32,15 +30,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var types = await connection.GetSysTypesAsync();
-
-            connection.Dispose();
 
             // Assert
 
@@ -52,15 +48,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var types = await connection.GetSysTypesAsync(schemaId: 14);
-
-            connection.Dispose();
 
             // Assert
 
@@ -72,15 +66,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var types = await connection.GetSysTypesAsync(isUserDefined: true);
-
-            connection.Dispose();
 
             // Assert
 
@@ -92,15 +84,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var tables = await connection.GetSysTablesAsync();
-
-            connection.Dispose();
 
             // Assert
 
@@ -112,15 +102,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var views = await connection.GetSysViewsAsync();
-
-            connection.Dispose();
 
             // Assert
 
@@ -132,15 +120,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var columns = await connection.GetSysColumnsAsync();
-
-            connection.Dispose();
 
             // Assert
 
@@ -152,15 +138,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var sequences = await connection.GetSysSequencesAsync();
-
-            connection.Dispose();
 
             // Assert
 
@@ -172,15 +156,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var firstResultSet = await connection.DmExecDescribeFirstResultSetForObjectAsync("CustOrdersOrders");
-
-            connection.Dispose();
 
             // Assert
 
@@ -192,15 +174,13 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
 
-            var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
 
             // Act
 
             await connection.OpenAsync();
 
             var spHelpResult = await connection.SpHelpAsync("Products");
-
-            connection.Dispose();
 
             // Assert
 
