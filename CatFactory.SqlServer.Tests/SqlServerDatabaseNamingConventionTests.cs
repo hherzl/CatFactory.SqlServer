@@ -6,7 +6,7 @@ namespace CatFactory.SqlServer.Tests
     public class SqlServerDatabaseNamingConventionTests
     {
         [Fact]
-        public void TestConstraintNames()
+        public void CheckConstraintNames()
         {
             // Arrange
             var database = new SqlServerDatabase();
@@ -43,10 +43,12 @@ namespace CatFactory.SqlServer.Tests
 
             database.Tables.Add(productTable);
 
+            var nm = database.NamingConvention;
+
             // Act
-            var primaryKeyName = database.NamingConvention.GetPrimaryKeyConstraintName(productTable, new string[] { "ProductID" });
-            var uniqueName = database.NamingConvention.GetUniqueConstraintName(productTable, new string[] { "ProductName" });
-            var foreignKeyName = database.NamingConvention.GetForeignKeyConstraintName(productTable, new string[] { "ProductCategoryID" }, productCategoryTable);
+            var primaryKeyName = nm.GetPrimaryKeyConstraintName(productTable, new string[] { "ProductID" });
+            var uniqueName = nm.GetUniqueConstraintName(productTable, new string[] { "ProductName" });
+            var foreignKeyName = nm.GetForeignKeyConstraintName(productTable, new string[] { "ProductCategoryID" }, productCategoryTable);
 
             // Assert
             Assert.True(primaryKeyName == "PK_dbo_Product");

@@ -1,4 +1,5 @@
-﻿using CatFactory.SqlServer.ObjectRelationalMapping;
+﻿using CatFactory.ObjectRelationalMapping;
+using CatFactory.SqlServer.ObjectRelationalMapping;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -9,13 +10,20 @@ namespace CatFactory.SqlServer.Tests
         public void CreateDefinitionForCollegeEntities()
         {
             // Arrange
-            var database = SqlServerDatabase.CreateWithDefaults("College");
+            var db = SqlServerDatabase.CreateWithDefaults("College");
 
-            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+            db.AddDefaultTypeMapFor(typeof(string), "nvarchar");
 
             // Act
-            var student = database
-                .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "", Gender = "" })
+            var student = db
+                .DefineEntity(new
+                {
+                    StudentId = 0,
+                    FirstName = "",
+                    MiddleName = "",
+                    LastName = "",
+                    Gender = ""
+                })
                 .SetNaming("Student")
                 .SetColumnFor(e => e.FirstName, length: 10)
                 .SetColumnFor(e => e.MiddleName, length: 10, nullable: true)
@@ -31,7 +39,7 @@ namespace CatFactory.SqlServer.Tests
                 .AddExtendedProperty(e => e.LastName, "MS_Description", "Last name")
                 ;
 
-            var course = database
+            var course = db
                 .DefineEntity(new { CourseId = 0, Name = "" })
                 .SetNaming("Course")
                 .SetColumnFor(e => e.Name, type: "nvarchar", length: 255)
@@ -44,7 +52,7 @@ namespace CatFactory.SqlServer.Tests
                 .AddExtendedProperty(e => e.Name, "MS_Description", "Course name")
                 ;
 
-            var courseStudent = database
+            var courseStudent = db
                 .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
                 .SetNaming("CourseStudent")
                 .SetIdentity(e => e.CourseStudentId)
@@ -60,26 +68,26 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             // Assert
-            Assert.True(database.DbObjects.Count == 3);
-            Assert.True(database.Tables.Count == 3);
+            Assert.True(db.DbObjects.Count == 3);
+            Assert.True(db.Tables.Count == 3);
 
-            Assert.True(database.DbObjects[0].FullName == "dbo.Student");
-            Assert.True(database.DbObjects[1].FullName == "dbo.Course");
-            Assert.True(database.DbObjects[2].FullName == "dbo.CourseStudent");
+            Assert.True(db.DbObjects[0].FullName == "dbo.Student");
+            Assert.True(db.DbObjects[1].FullName == "dbo.Course");
+            Assert.True(db.DbObjects[2].FullName == "dbo.CourseStudent");
 
-            Assert.True(database.FindTable("dbo.Student").Columns.Count == 5);
-            Assert.False(database.FindTable("dbo.Student").Identity == null);
-            Assert.False(database.FindTable("dbo.Student").PrimaryKey == null);
-            Assert.True(database.FindTable("dbo.Student")["MiddleName"].ImportBag.ExtendedProperties.Count == 1);
+            Assert.True(db.FindTable("dbo.Student").Columns.Count == 5);
+            Assert.False(db.FindTable("dbo.Student").Identity == null);
+            Assert.False(db.FindTable("dbo.Student").PrimaryKey == null);
+            Assert.True(db.FindTable("dbo.Student")["MiddleName"].ImportBag.ExtendedProperties.Count == 1);
 
-            Assert.True(database.FindTable("dbo.Course").Columns.Count == 2);
-            Assert.False(database.FindTable("dbo.Course").Identity == null);
-            Assert.False(database.FindTable("dbo.Course").PrimaryKey == null);
-            Assert.True(database.FindTable("dbo.Course").Uniques.Count == 1);
+            Assert.True(db.FindTable("dbo.Course").Columns.Count == 2);
+            Assert.False(db.FindTable("dbo.Course").Identity == null);
+            Assert.False(db.FindTable("dbo.Course").PrimaryKey == null);
+            Assert.True(db.FindTable("dbo.Course").Uniques.Count == 1);
 
-            Assert.True(database.FindTable("dbo.CourseStudent").Columns.Count == 3);
-            Assert.False(database.FindTable("dbo.CourseStudent").Identity == null);
-            Assert.False(database.FindTable("dbo.CourseStudent").PrimaryKey == null);
+            Assert.True(db.FindTable("dbo.CourseStudent").Columns.Count == 3);
+            Assert.False(db.FindTable("dbo.CourseStudent").Identity == null);
+            Assert.False(db.FindTable("dbo.CourseStudent").PrimaryKey == null);
 
             Assert.True(student.Table.Columns.Count == 5);
             Assert.False(student.Table.PrimaryKey == null);
@@ -99,12 +107,12 @@ namespace CatFactory.SqlServer.Tests
         public void CreateDefinitionForCMSEntities()
         {
             // Arrange
-            var database = SqlServerDatabase.CreateWithDefaults("CMS");
+            var db = SqlServerDatabase.CreateWithDefaults("CMS");
 
-            database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+            db.AddDefaultTypeMapFor(typeof(string), "nvarchar");
 
             // Act
-            var blog = database
+            var blog = db
                 .DefineEntity(new { BlogId = (short)0, Name = "" })
                 .SetNaming("Blog", "WebSite")
                 .SetColumnFor(e => e.Name, length: 100)
@@ -112,7 +120,7 @@ namespace CatFactory.SqlServer.Tests
                 .SetPrimaryKey(e => e.BlogId)
                 ;
 
-            var post = database
+            var post = db
                 .DefineEntity(new { PostId = 0, BlogId = (short)0, Title = "", Content = "" })
                 .SetNaming("Post", "WebSite")
                 .SetColumnFor(e => e.Title, length: 100)
@@ -122,8 +130,8 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             // Assert
-            Assert.True(database.DbObjects.Count == 2);
-            Assert.True(database.Tables.Count == 2);
+            Assert.True(db.DbObjects.Count == 2);
+            Assert.True(db.Tables.Count == 2);
 
             Assert.True(blog.Table.Columns.Count == 2);
             Assert.False(blog.Table.PrimaryKey == null);
@@ -135,6 +143,51 @@ namespace CatFactory.SqlServer.Tests
             Assert.False(post.Table.Identity == null);
             Assert.True(post.Table["Title"].Length == 100);
             Assert.True(post.Table["Content"].Length == 0);
+        }
+
+        [Fact]
+        public void CreateDefinitionWithAuditPropertiesForLibraryEntities()
+        {
+            // Arrange
+            var db = SqlServerDatabase.CreateWithDefaults("Library");
+
+            db.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+
+            // Act
+            var book = db
+                .DefineEntity(new
+                {
+                    Id = 0,
+                    Name = "",
+                    Author = "",
+                    Year = (short)0
+                })
+                .SetNaming("Book")
+                .SetColumnFor(e => e.Name, length: 100)
+                .SetColumnFor(e => e.Author, length: 25)
+                .SetIdentity(e => e.Id)
+                .SetPrimaryKey(e => e.Id)
+                ;
+
+            var stock = db
+                .DefineEntity(new
+                {
+                    Id = 0,
+                    BookId = 0,
+                    Quantity = 0
+                })
+                .SetNaming("Stock")
+                .SetIdentity(e => e.Id)
+                .SetPrimaryKey(e => e.Id)
+                .AddForeignKey(e => e.BookId, book.Table)
+                ;
+
+            db.AddColumnForTables(new Column { Name = "CreationUser", Type = "nvarchar", Length = 25 });
+            db.AddColumnForTables(new Column { Name = "CreationDate", Type = "datetime" });
+
+            // Assert
+            Assert.True(db.FindTable("dbo.Book").Columns.Count == 6);
+            Assert.True(db.FindTable("dbo.Stock").Columns.Count == 5);
         }
     }
 }
