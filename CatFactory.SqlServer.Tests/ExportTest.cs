@@ -1,4 +1,5 @@
 ﻿using System;
+using CatFactory.ObjectRelationalMapping;
 using CatFactory.SqlServer.CodeFactory;
 using CatFactory.SqlServer.DatabaseObjectModel;
 using CatFactory.SqlServer.ObjectRelationalMapping;
@@ -146,6 +147,17 @@ namespace CatFactory.SqlServer.Tests
                 .AddExtendedProperty(p => p.ConfirmationID, "MS_Description", "Confirmation Identifier")
                 .AddExtendedProperty(p => p.Amount, "MS_Description", "Transaction Amount")
                 .AddExtendedProperty(p => p.PaymentDateTime, "MS_Description", "Payment Date time");
+
+            //db.AddColumnForTables(new Column { Name = "CreationUser", Type = "nvarchar", Length = 25 });
+            //db.AddColumnForTables(new Column { Name = "CreationDate", Type = "datetime" });
+
+            foreach (var table in database.Tables)
+            {
+                table.Columns.Add(new Column { Name = "CreationUser", Type = "nvarchar", Length = 25 });
+                table.Columns.Add(new Column { Name = "CreationDate", Type = "datetime" });
+                table.Columns.Add(new Column { Name = "LastModificationUser", Type = "nvarchar", Length = 25 });
+                table.Columns.Add(new Column { Name = "LastModificationDate", Type = "datetime", Nullable = true });
+            }
 
             // Act
 

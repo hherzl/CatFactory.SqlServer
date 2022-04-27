@@ -254,35 +254,30 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new EmptyLine();
             }
 
-            for (var i = 0; i < table.Columns.Count; i++)
-            {
-                
-            }
+            //var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
 
-            var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
+            //if (columnsWithExtendedProperties.Count > 0)
+            //{
+            //    for (var i = 0; i < columnsWithExtendedProperties.Count; i++)
+            //    {
+            //        var column = columnsWithExtendedProperties[i];
 
-            if (columnsWithExtendedProperties.Count > 0)
-            {
-                for (var i = 0; i < columnsWithExtendedProperties.Count; i++)
-                {
-                    var column = columnsWithExtendedProperties[i];
-
-                    foreach (ExtendedProperty extendedProperty in column.ImportBag.ExtendedProperties)
-                    {
-                        yield return new CodeLine("exec [sp_addextendedproperty]");
-                        yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
-                        yield return new CodeLine("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
-                        yield return new CodeLine("{0}@level0type = '{1}',", Indent(1), "schema");
-                        yield return new CodeLine("{0}@level0name = '{1}',", Indent(1), table.Schema);
-                        yield return new CodeLine("{0}@level1type = '{1}',", Indent(1), "table");
-                        yield return new CodeLine("{0}@level1name = '{1}',", Indent(1), table.Name);
-                        yield return new CodeLine("{0}@level2type = '{1}',", Indent(1), "column");
-                        yield return new CodeLine("{0}@level2name = '{1}'", Indent(1), column.Name);
-                        yield return new CodeLine("go");
-                        yield return new EmptyLine();
-                    }
-                }
-            }
+            //        foreach (ExtendedProperty extendedProperty in column.ImportBag.ExtendedProperties)
+            //        {
+            //            yield return new CodeLine("exec [sp_addextendedproperty]");
+            //            yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
+            //            yield return new CodeLine("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
+            //            yield return new CodeLine("{0}@level0type = '{1}',", Indent(1), "schema");
+            //            yield return new CodeLine("{0}@level0name = '{1}',", Indent(1), table.Schema);
+            //            yield return new CodeLine("{0}@level1type = '{1}',", Indent(1), "table");
+            //            yield return new CodeLine("{0}@level1name = '{1}',", Indent(1), table.Name);
+            //            yield return new CodeLine("{0}@level2type = '{1}',", Indent(1), "column");
+            //            yield return new CodeLine("{0}@level2name = '{1}'", Indent(1), column.Name);
+            //            yield return new CodeLine("go");
+            //            yield return new EmptyLine();
+            //        }
+            //    }
+            //}
         }
 
         ///// <summary>
