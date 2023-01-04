@@ -11,7 +11,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportAsync("server=(local);database=OnlineStore;integrated security=yes;");
+                .ImportAsync("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -30,7 +30,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAsync("server=(local);database=OnlineStore;integrated security=yes;", "Sales.OrderHeader", "Sales.OrderDetail");
+                .ImportTablesAsync("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -48,7 +48,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportAsync("server=(local);database=Northwind;integrated security=yes;", "dbo.ChangeLog");
+                .ImportAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;", "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -73,7 +73,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=Northwind;integrated security=yes;",
+                    ConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;",
                     ImportStoredProcedures = true,
                     ImportTableFunctions = true,
                     ImportScalarFunctions = true
@@ -104,7 +104,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAsync("server=(local);database=Northwind;integrated security=yes;");
+                .ImportTablesAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -116,7 +116,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportViewsAsync("server=(local);database=Northwind;integrated security=yes;");
+                .ImportViewsAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;");
 
             // Assert
             Assert.True(database.Tables.Count == 0);
@@ -128,7 +128,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAndViewsAsync("server=(local);database=Northwind;integrated security=yes;", "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
+                .ImportTablesAndViewsAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;", "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -146,7 +146,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
+                    ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;",
                     ImportStoredProcedures = true,
                     ImportScalarFunctions = true,
                     ImportTableFunctions = true,
@@ -188,7 +188,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=WideWorldImporters;integrated security=yes;",
+                    ConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;",
                     ImportSequences = true
                 }
             };

@@ -13,7 +13,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;",
+                    ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -65,7 +65,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -91,7 +91,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -117,7 +117,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -143,7 +143,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -167,7 +167,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -193,7 +193,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -220,7 +220,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -247,7 +247,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -274,7 +274,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -299,7 +299,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -323,7 +323,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -348,7 +348,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -373,7 +373,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -398,7 +398,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=OnlineStore;integrated security=yes;",
+                    ConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;",
                     ExtendedProperties =
                     {
                         "MS_Description"
