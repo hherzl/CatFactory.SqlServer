@@ -50,7 +50,7 @@ namespace CatFactory.SqlServer.Tests
             // todo: add sql transcriber => translate results from select to code (c#)
 
             var course = database
-                .DefineEntity(new { CourseId = 0, Name = "" })
+                .DefineEntity(new { CourseId = 0, Name = "", Description = "" })
                 .SetNaming("Course")
                 .SetColumnFor(e => e.Name, length: 255)
                 .SetIdentity(e => e.CourseId, seed: 1000, increment: 1000)
@@ -96,10 +96,10 @@ namespace CatFactory.SqlServer.Tests
                     BirthDate = DateTime.Now
                 })
                 .SetNaming("Person", "People")
-                .SetColumnFor(p => p.GivenName, length: 10)
-                .SetColumnFor(p => p.MiddleName, length: 10, nullable: true)
-                .SetColumnFor(p => p.FamilyName, length: 10)
-                .SetColumnFor(p => p.FullName, length: 30)
+                .SetColumnFor(p => p.GivenName, length: 15)
+                .SetColumnFor(p => p.MiddleName, length: 15, nullable: true)
+                .SetColumnFor(p => p.FamilyName, length: 15)
+                .SetColumnFor(p => p.FullName, length: 45)
                 .SetPrimaryKey(p => p.PersonID)
                 ;
 
@@ -155,6 +155,8 @@ namespace CatFactory.SqlServer.Tests
                 .SetColumnFor(p => p.Amount, prec: 10, scale: 4)
                 .SetPrimaryKey(p => p.CreditCardID)
                 .AddForeignKey(p => p.CreditCardID, creditCard.Table)
+                .AddDefault(p => p.PaymentDateTime, "GETDATE()")
+                .AddCheck(p => p.Amount, "Amount > 0")
                 ;
 
             paymentTransaction

@@ -22,7 +22,7 @@ namespace CatFactory.SqlServer
         /// <param name="namingConvention">Database naming convention</param>
         /// <returns>An instance of <see cref="Database"/> class</returns>
         public static SqlServerDatabase CreateWithDefaults(string name, string defaultSchema = "dbo", List<DatabaseTypeMap> databaseTypeMaps = null, IDatabaseNamingConvention namingConvention = null)
-            => new SqlServerDatabase
+            => new()
             {
                 Name = name,
                 DefaultSchema = defaultSchema,
@@ -31,23 +31,12 @@ namespace CatFactory.SqlServer
                 NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
             };
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<ExtendedProperty> m_extendedProperties;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<ScalarFunction> m_scalarFunctions;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<TableFunction> m_tableFunctions;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<StoredProcedure> m_storedProcedures;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Sequence> m_sequences;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<DefaultTypeMap> m_defaultTypeMaps;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<ExtendedProperty> m_extendedProperties;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<ScalarFunction> m_scalarFunctions;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<TableFunction> m_tableFunctions;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<StoredProcedure> m_storedProcedures;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Sequence> m_sequences;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<DefaultTypeMap> m_defaultTypeMaps;
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlServerDatabase"/> class
@@ -62,7 +51,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<ExtendedProperty> ExtendedProperties
         {
-            get => m_extendedProperties ?? (m_extendedProperties = new List<ExtendedProperty>());
+            get => m_extendedProperties ??= new List<ExtendedProperty>();
             set => m_extendedProperties = value;
         }
 
@@ -71,7 +60,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<ScalarFunction> ScalarFunctions
         {
-            get => m_scalarFunctions ?? (m_scalarFunctions = new List<ScalarFunction>());
+            get => m_scalarFunctions ??= new List<ScalarFunction>();
             set => m_scalarFunctions = value;
         }
 
@@ -80,7 +69,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<TableFunction> TableFunctions
         {
-            get => m_tableFunctions ?? (m_tableFunctions = new List<TableFunction>());
+            get => m_tableFunctions ??= new List<TableFunction>();
             set => m_tableFunctions = value;
         }
 
@@ -89,7 +78,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<StoredProcedure> StoredProcedures
         {
-            get => m_storedProcedures ?? (m_storedProcedures = new List<StoredProcedure>());
+            get => m_storedProcedures ??= new List<StoredProcedure>();
             set => m_storedProcedures = value;
         }
 
@@ -98,7 +87,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<Sequence> Sequences
         {
-            get => m_sequences ?? (m_sequences = new List<Sequence>());
+            get => m_sequences ??= new List<Sequence>();
             set => m_sequences = value;
         }
 
@@ -107,7 +96,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<DefaultTypeMap> DefaultTypeMaps
         {
-            get => m_defaultTypeMaps ?? (m_defaultTypeMaps = new List<DefaultTypeMap>());
+            get => m_defaultTypeMaps ??= new List<DefaultTypeMap>();
             set => m_defaultTypeMaps = value;
         }
     }

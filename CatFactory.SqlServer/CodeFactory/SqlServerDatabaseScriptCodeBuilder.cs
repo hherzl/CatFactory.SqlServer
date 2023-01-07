@@ -365,6 +365,30 @@ namespace CatFactory.SqlServer.CodeFactory
                     }
                 }
             }
+
+            foreach (var def in table.Defaults)
+            {
+                var constraintName = string.IsNullOrEmpty(def.ConstraintName) ? nm.GetDefaultConstraintName(table, def.Key.First()) : Database.GetObjectName(def.ConstraintName);
+
+                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+
+                yield return new CodeLine("{0}default ({1})", Indent(1), def.Value);
+                yield return new CodeLine("go");
+
+                yield return new EmptyLine();
+            }
+
+            foreach (var check in table.Checks)
+            {
+                var constraintName = string.IsNullOrEmpty(check.ConstraintName) ? nm.GetCheckConstraintName(table, check.Key.First()) : Database.GetObjectName(check.ConstraintName);
+
+                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+
+                yield return new CodeLine("{0}check ({1})", Indent(1), check.Expression);
+                yield return new CodeLine("go");
+
+                yield return new EmptyLine();
+            }
         }
 
         /// <summary>

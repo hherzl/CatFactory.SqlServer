@@ -739,28 +739,23 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        // todo: Fix the definition for check contraint in Core module
+        public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string expresion, string constraintName = null) where TModel : class
+        {
+            result.Table.Checks.Add(new Check
+            {
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetCheckConstraintName(result.Table, GetPropertyName(selector)),
+                Key = new List<string>(),
+                Expression = expresion
+            });
 
-        //public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
-        //{
-        //    var names = GetPropertyNames(selector).ToList();
-
-        //    result.Table.Checks.Add(new Check
-        //    {
-        //        ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
-        //        Key = names
-        //    });
-
-        //    return result;
-        //}
+            return result;
+        }
 
         public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
         {
-            var names = GetPropertyNames(selector).ToList();
-
             result.Table.Defaults.Add(new Default
             {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, names.First()),
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, GetPropertyName(selector)),
                 Value = value
             });
 
