@@ -16,7 +16,7 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Blogging;
 
             // Act
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
 
             // Assert
         }
@@ -30,18 +30,22 @@ namespace CatFactory.SqlServer.Tests
             database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
 
             var student = database
-                .DefineEntity(new { StudentId = 0, FirstName = "", MiddleName = "", LastName = "" })
+                .DefineEntity(new { StudentId = 0, GivenName = "", MiddleName = "", FamilyName = "" })
                 .SetNaming("Student")
-                .SetColumnFor(p => p.FirstName, length: 15)
+                .SetColumnFor(p => p.GivenName, length: 15)
                 .SetColumnFor(p => p.MiddleName, length: 15, nullable: true)
-                .SetColumnFor(p => p.LastName, length: 15)
+                .SetColumnFor(p => p.FamilyName, length: 15)
                 .SetIdentity(p => p.StudentId)
                 .SetPrimaryKey(e => e.StudentId)
-                .AddExtendedProperty(p => p.FirstName, "MS_Description", "First name")
-                .AddExtendedProperty(p => p.MiddleName, "MS_Description", "Middle name")
-                .AddExtendedProperty(p => p.LastName, "MS_Description", "Last name");
+                ;
 
-            student.Data.Add(new { StudentId = 0, FirstName = "Carlo", MiddleName = "H", LastName = "Herzl" });
+            student
+                .AddExtendedProperty(p => p.GivenName, "MS_Description", "Given name")
+                .AddExtendedProperty(p => p.MiddleName, "MS_Description", "Middle name")
+                .AddExtendedProperty(p => p.FamilyName, "MS_Description", "Family name")
+                ;
+
+            student.Data.Add(new { StudentId = 0, GivenName = "Carlo", MiddleName = "H", FamilyName = "Herzl" });
 
             // todo: add sql transcriber => translate results from select to code (c#)
 
@@ -51,7 +55,8 @@ namespace CatFactory.SqlServer.Tests
                 .SetColumnFor(e => e.Name, length: 255)
                 .SetIdentity(e => e.CourseId, seed: 1000, increment: 1000)
                 .SetPrimaryKey(e => e.CourseId)
-                .AddUnique(e => e.Name);
+                .AddUnique(e => e.Name)
+                ;
 
             var courseStudent = database
                 .DefineEntity(new { CourseStudentId = 0, CourseId = 0, StudentId = 0 })
@@ -60,7 +65,8 @@ namespace CatFactory.SqlServer.Tests
                 .SetPrimaryKey(p => p.CourseStudentId)
                 .AddUnique(p => new { p.CourseId, p.StudentId })
                 .AddForeignKey(p => p.CourseId, course.Table)
-                .AddForeignKey(p => p.StudentId, student.Table);
+                .AddForeignKey(p => p.StudentId, student.Table)
+                ;
 
             // Act
 
@@ -95,12 +101,16 @@ namespace CatFactory.SqlServer.Tests
                 .SetColumnFor(p => p.FamilyName, length: 10)
                 .SetColumnFor(p => p.FullName, length: 30)
                 .SetPrimaryKey(p => p.PersonID)
+                ;
+
+            person
                 .AddExtendedProperty("MS_Description", "Person catalog")
                 .AddExtendedProperty(p => p.GivenName, "MS_Description", "Given name")
                 .AddExtendedProperty(p => p.MiddleName, "MS_Description", "Middle name")
                 .AddExtendedProperty(p => p.FamilyName, "MS_Description", "Family name")
                 .AddExtendedProperty(p => p.FullName, "MS_Description", "Full name")
-                .AddExtendedProperty(p => p.BirthDate, "MS_Description", "Birth date");
+                .AddExtendedProperty(p => p.BirthDate, "MS_Description", "Birth date")
+                ;
 
             var creditCard = database
                 .DefineEntity(new
@@ -121,12 +131,16 @@ namespace CatFactory.SqlServer.Tests
                 .SetPrimaryKey(p => p.CreditCardID)
                 .AddUnique(p => p.CardNumber)
                 .AddForeignKey(p => p.PersonID, person.Table)
+                ;
+
+            creditCard
                 .AddExtendedProperty(p => p.PersonID, "MS_Description", "Person Identifier")
                 .AddExtendedProperty(p => p.CardType, "MS_Description", "Card type")
                 .AddExtendedProperty(p => p.CardNumber, "MS_Description", "Card number")
                 .AddExtendedProperty(p => p.Last4Digits, "MS_Description", "Last 4 Digits")
                 .AddExtendedProperty(p => p.ExpirationDate, "MS_Description", "Expiration Date")
-                .AddExtendedProperty(p => p.Cvv, "MS_Description", "Card Verification Value");
+                .AddExtendedProperty(p => p.Cvv, "MS_Description", "Card Verification Value")
+                ;
 
             var paymentTransaction = database
                 .DefineEntity(new
@@ -141,15 +155,19 @@ namespace CatFactory.SqlServer.Tests
                 .SetColumnFor(p => p.Amount, prec: 10, scale: 4)
                 .SetPrimaryKey(p => p.CreditCardID)
                 .AddForeignKey(p => p.CreditCardID, creditCard.Table)
+                ;
+
+            paymentTransaction
                 .AddExtendedProperty(p => p.PaymentTransactionID, "MS_Description", "Payment Transaction Identifier")
                 .AddExtendedProperty(p => p.CreditCardID, "MS_Description", "Credit Card Identifier")
                 .AddExtendedProperty(p => p.ConfirmationID, "MS_Description", "Confirmation Identifier")
                 .AddExtendedProperty(p => p.Amount, "MS_Description", "Transaction Amount")
-                .AddExtendedProperty(p => p.PaymentDateTime, "MS_Description", "Payment Date time");
+                .AddExtendedProperty(p => p.PaymentDateTime, "MS_Description", "Payment Date time")
+                ;
 
             // Act
 
-            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true);
+            SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
         }
     }
 }

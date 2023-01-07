@@ -11,7 +11,7 @@ namespace CatFactory.SqlServer.Tests.Models
         {
             get
             {
-                var database = new SqlServerDatabase
+                var db = new SqlServerDatabase
                 {
                     Name = "Blogging",
                     DefaultSchema = "dbo",
@@ -58,9 +58,9 @@ namespace CatFactory.SqlServer.Tests.Models
                     }
                 };
 
-                database.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
+                db.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
-                database
+                db
                     .AddDbObjectsFromTables()
                     .SetPrimaryKeyForTables()
                     .LinkTables()
@@ -73,7 +73,7 @@ namespace CatFactory.SqlServer.Tests.Models
                         new Column { Name = "RowVersionID", Type = "rowversion", Nullable = true }
                     });
 
-                foreach (var table in database.Tables)
+                foreach (var table in db.Tables)
                 {
                     table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
@@ -83,7 +83,7 @@ namespace CatFactory.SqlServer.Tests.Models
                     }
                 }
 
-                return database;
+                return db;
             }
         }
     }

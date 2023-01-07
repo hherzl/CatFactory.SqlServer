@@ -158,8 +158,18 @@ namespace CatFactory.SqlServer.CodeFactory
                 if (string.IsNullOrEmpty(schema) || Database.DefaultSchema == schema)
                     continue;
 
-                yield return new CodeLine("create schema {0}", Database.GetObjectName(schema));
-                yield return new CodeLine("go");
+                if (AddDropIfExists)
+                {
+                    yield return new CodeLine("if not exists (select 1 from [sys].[schemas] where name = '{0}')", schema);
+                    yield return new CodeLine("{0}begin", Indent(1));
+                    yield return new CodeLine("{0}exec ('create schema {1}')", Indent(2), Database.GetObjectName(schema));
+                    yield return new CodeLine("{0}end", Indent(1));
+                }
+                else
+                {
+                    yield return new CodeLine("{0}create schema {1}", Indent(2), Database.GetObjectName(schema));
+                    yield return new CodeLine("{0}go", Indent(1));
+                }
 
                 yield return new EmptyLine();
             }
