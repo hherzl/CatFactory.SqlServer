@@ -105,6 +105,9 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             result.Table.Name = name;
             result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
 
+            if (result.Database.DbObjects.Any(item => item.Name == result.Table.Name && item.Schema == result.Table.Schema))
+                throw new ObjectRelationMappingException(string.Format("There is already object with name '{0}.{1}' in database", result.Table.Schema, result.Table.Name));
+
             result.Database.DbObjects.Add(new DbObject(result.Table.Schema, result.Table.Name));
 
             return result;
@@ -817,5 +820,4 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
     }
-#pragma warning restore CS1591
 }

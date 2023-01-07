@@ -2,23 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build63</Version>
+    <Version>1.0.0-beta-sun-build64</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
     <RepositoryUrl>https://github.com/hherzl/CatFactory.SqlServer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
-    <PackageReleaseNotes>1.0.0-beta-sun-build63 Version:
+    <PackageReleaseNotes>
+      1.0.0-beta-sun-build64 Version:
 
- Upgrade for .NET 6
+      Upgrade for .NET 6
+      Fix issue 21: https://github.com/hherzl/CatFactory.SqlServer/issues/21
 
-Usage:
+      Usage:
 
- var database = await SqlServerDatabaseFactory.ImportAsync("Your connection string!");
+      var database = await SqlServerDatabaseFactory.ImportAsync("Your connection string!");
 
-Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
-</PackageReleaseNotes>
+      Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
+    </PackageReleaseNotes>
         <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/hherzl/CatFactory.SqlServer/blob/master/LICENSE</PackageLicenseUrl>
     </PropertyGroup>

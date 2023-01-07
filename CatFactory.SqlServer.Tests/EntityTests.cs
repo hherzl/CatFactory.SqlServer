@@ -113,7 +113,11 @@ namespace CatFactory.SqlServer.Tests
 
             // Act
             var blog = db
-                .DefineEntity(new { BlogId = (short)0, Name = "" })
+                .DefineEntity(new
+                {
+                    BlogId = (short)0,
+                    Name = ""
+                })
                 .SetNaming("Blog", "WebSite")
                 .SetColumnFor(e => e.Name, length: 100)
                 .SetIdentity(e => e.BlogId)
@@ -121,7 +125,13 @@ namespace CatFactory.SqlServer.Tests
                 ;
 
             var post = db
-                .DefineEntity(new { PostId = 0, BlogId = (short)0, Title = "", Content = "" })
+                .DefineEntity(new
+                {
+                    PostId = 0,
+                    BlogId = (short)0,
+                    Title = "",
+                    Content = ""
+                })
                 .SetNaming("Post", "WebSite")
                 .SetColumnFor(e => e.Title, length: 100)
                 .SetIdentity(e => e.BlogId)
