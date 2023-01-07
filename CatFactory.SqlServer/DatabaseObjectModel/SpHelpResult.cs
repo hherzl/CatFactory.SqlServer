@@ -23,7 +23,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
         /// </summary>
         public List<IDictionary<string, object>> Items
         {
-            get => m_items ?? (m_items = new List<IDictionary<string, object>>());
+            get => m_items ??= new List<IDictionary<string, object>>();
             set => m_items = value;
         }
     }

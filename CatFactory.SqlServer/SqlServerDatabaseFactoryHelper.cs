@@ -76,8 +76,8 @@ namespace CatFactory.SqlServer
                 Length = int.Parse(string.Concat(dictionary["Length"]))
             };
 
-            column.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Prec"]));
-            column.Scale = string.Concat(dictionary["Scale"]).Trim().Length == 0 ? default(short) : short.Parse(string.Concat(dictionary["Scale"]));
+            column.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default : short.Parse(string.Concat(dictionary["Prec"]));
+            column.Scale = string.Concat(dictionary["Scale"]).Trim().Length == 0 ? default : short.Parse(string.Concat(dictionary["Scale"]));
             column.Nullable = string.Compare(string.Concat(dictionary["Nullable"]), "yes", true) == 0 ? true : false;
             column.Collation = string.Concat(dictionary["Collation"]);
 
@@ -101,8 +101,8 @@ namespace CatFactory.SqlServer
                 Length = short.Parse(string.Concat(dictionary["Length"]))
             };
 
-            parameter.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Prec"]));
-            parameter.Order = string.Concat(dictionary["Param_order"]).Trim().Length == 0 ? default(int) : int.Parse(string.Concat(dictionary["Param_order"]));
+            parameter.Prec = string.Concat(dictionary["Prec"]).Trim().Length == 0 ? default : int.Parse(string.Concat(dictionary["Prec"]));
+            parameter.Order = string.Concat(dictionary["Param_order"]).Trim().Length == 0 ? default : int.Parse(string.Concat(dictionary["Param_order"]));
             parameter.Collation = string.Concat(dictionary["Collation"]);
 
             return parameter;

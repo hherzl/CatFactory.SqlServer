@@ -18,35 +18,33 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
         /// <returns>A <see cref="SpHelpResult"/> result that contains the definition of database object</returns>
         public static async Task<SpHelpResult> SpHelpAsync(this DbConnection connection, string id)
         {
-            using (var command = connection.CreateCommand())
+            using var command = connection.CreateCommand();
+
+            command.Connection = connection;
+            command.CommandText = string.Format("sp_help '{0}'", id);
+
+            using var dataReader = await command.ExecuteReaderAsync();
+
+            var queryResult = new SpHelpResult();
+
+            while (await dataReader.NextResultAsync())
             {
-                command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", id);
-
-                using (var dataReader = await command.ExecuteReaderAsync())
+                while (await dataReader.ReadAsync())
                 {
-                    var queryResult = new SpHelpResult();
+                    var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                    while (await dataReader.NextResultAsync())
+                    var row = new Dictionary<string, object>();
+
+                    for (var i = 0; i < names.Count; i++)
                     {
-                        while (await dataReader.ReadAsync())
-                        {
-                            var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
-
-                            var row = new Dictionary<string, object>();
-
-                            for (var i = 0; i < names.Count; i++)
-                            {
-                                row.Add(names[i], dataReader.GetValue(i));
-                            }
-
-                            queryResult.Items.Add(row);
-                        }
+                        row.Add(names[i], dataReader.GetValue(i));
                     }
 
-                    return queryResult;
+                    queryResult.Items.Add(row);
                 }
             }
+
+            return queryResult;
         }
     }
 }

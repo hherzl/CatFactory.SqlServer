@@ -73,7 +73,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public DatabaseImportSettings DatabaseImportSettings
         {
-            get => m_databaseImportSettings ?? (m_databaseImportSettings = new DatabaseImportSettings());
+            get => m_databaseImportSettings ??= new DatabaseImportSettings();
             set => m_databaseImportSettings = value;
         }
 
@@ -99,188 +99,185 @@ namespace CatFactory.SqlServer
         /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
         public virtual async Task<Database> ImportAsync()
         {
-            using (var connection = GetConnection())
+            using var connection = GetConnection();
+
+            var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+
+            database.ServerName = connection.DataSource;
+
+            await connection.OpenAsync();
+
+            await SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypesAsync(database, connection);
+
+            foreach (var dbObject in await GetDbObjectsAsync(connection))
             {
-                var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+                if (DatabaseImportSettings.Exclusions.Contains(dbObject.FullName))
+                    continue;
 
-                database.ServerName = connection.DataSource;
+                database.DbObjects.Add(dbObject);
+            }
 
-                await connection.OpenAsync();
+            if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+            {
+                Logger?.LogInformation("Importing extended properties for database...");
 
-                await SqlServerDatabaseFactoryHelper.AddUserDefinedDataTypesAsync(database, connection);
+                await ImportExtendedPropertiesAsync(connection, database);
+            }
 
-                foreach (var dbObject in await GetDbObjectsAsync(connection))
+            if (DatabaseImportSettings.ImportTables)
+            {
+                Logger?.LogInformation("Importing tables for '{0}' database...", database.Name);
+
+                foreach (var table in await GetTablesAsync(connection, database.GetTables()))
                 {
-                    if (DatabaseImportSettings.Exclusions.Contains(dbObject.FullName))
+                    if (DatabaseImportSettings.Exclusions.Contains(table.FullName))
                         continue;
 
-                    database.DbObjects.Add(dbObject);
+                    database.Tables.Add(table);
                 }
 
                 if (DatabaseImportSettings.ExtendedProperties.Count > 0)
                 {
-                    Logger?.LogInformation("Importing extended properties for database...");
+                    Logger?.LogInformation("Importing extended properties for tables...");
 
-                    await ImportExtendedPropertiesAsync(connection, database);
-                }
-
-                if (DatabaseImportSettings.ImportTables)
-                {
-                    Logger?.LogInformation("Importing tables for '{0}' database...", database.Name);
-
-                    foreach (var table in await GetTablesAsync(connection, database.GetTables()))
+                    foreach (var table in database.Tables)
                     {
-                        if (DatabaseImportSettings.Exclusions.Contains(table.FullName))
-                            continue;
-
-                        database.Tables.Add(table);
-                    }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for tables...");
-
-                        foreach (var table in database.Tables)
-                        {
-                            ImportExtendedProperties(connection, table);
-                        }
+                        ImportExtendedProperties(connection, table);
                     }
                 }
+            }
 
-                if (DatabaseImportSettings.ImportViews)
+            if (DatabaseImportSettings.ImportViews)
+            {
+                Logger?.LogInformation("Importing views for '{0}' database...", database.Name);
+
+                foreach (var view in await GetViewsAsync(connection, database.GetViews()))
                 {
-                    Logger?.LogInformation("Importing views for '{0}' database...", database.Name);
+                    if (DatabaseImportSettings.Exclusions.Contains(view.FullName))
+                        continue;
 
-                    foreach (var view in await GetViewsAsync(connection, database.GetViews()))
+                    database.Views.Add(view);
+                }
+
+                if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                {
+                    Logger?.LogInformation("Importing extended properties for views...");
+
+                    foreach (var view in database.Views)
                     {
-                        if (DatabaseImportSettings.Exclusions.Contains(view.FullName))
-                            continue;
-
-                        database.Views.Add(view);
+                        ImportExtendedProperties(connection, view);
                     }
+                }
+            }
 
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+            if (DatabaseImportSettings.ImportScalarFunctions)
+            {
+                Logger?.LogInformation("Importing scalar functions for '{0}' database...", database.Name);
+
+                foreach (var scalarFunction in await GetScalarFunctionsAsync(connection, database.GetScalarFunctions()))
+                {
+                    if (DatabaseImportSettings.Exclusions.Contains(scalarFunction.FullName))
+                        continue;
+
+                    database.ScalarFunctions.Add(scalarFunction);
+                }
+
+                if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                {
+                    Logger?.LogInformation("Importing extended properties for scalar functions...");
+
+                    foreach (var scalarFunction in database.ScalarFunctions)
                     {
-                        Logger?.LogInformation("Importing extended properties for views...");
-
-                        foreach (var view in database.Views)
-                        {
-                            ImportExtendedProperties(connection, view);
-                        }
+                        ImportExtendedProperties(connection, scalarFunction);
                     }
                 }
 
-                if (DatabaseImportSettings.ImportScalarFunctions)
+                database.ImportBag.ScalarFunctions = database.ScalarFunctions;
+            }
+
+            if (DatabaseImportSettings.ImportTableFunctions)
+            {
+                Logger?.LogInformation("Importing table functions for '{0}' database...", database.Name);
+
+                foreach (var tableFunction in await GetTableFunctionsAsync(connection, database.GetTableFunctions()))
                 {
-                    Logger?.LogInformation("Importing scalar functions for '{0}' database...", database.Name);
+                    if (DatabaseImportSettings.Exclusions.Contains(tableFunction.FullName))
+                        continue;
 
-                    foreach (var scalarFunction in await GetScalarFunctionsAsync(connection, database.GetScalarFunctions()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(scalarFunction.FullName))
-                            continue;
-
-                        database.ScalarFunctions.Add(scalarFunction);
-                    }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for scalar functions...");
-
-                        foreach (var scalarFunction in database.ScalarFunctions)
-                        {
-                            ImportExtendedProperties(connection, scalarFunction);
-                        }
-                    }
-
-                    database.ImportBag.ScalarFunctions = database.ScalarFunctions;
+                    database.TableFunctions.Add(tableFunction);
                 }
 
-                if (DatabaseImportSettings.ImportTableFunctions)
+                if (DatabaseImportSettings.ExtendedProperties.Count > 0)
                 {
-                    Logger?.LogInformation("Importing table functions for '{0}' database...", database.Name);
+                    Logger?.LogInformation("Importing extended properties for table functions...");
 
-                    foreach (var tableFunction in await GetTableFunctionsAsync(connection, database.GetTableFunctions()))
+                    foreach (var tableFunction in database.TableFunctions)
                     {
-                        if (DatabaseImportSettings.Exclusions.Contains(tableFunction.FullName))
-                            continue;
-
-                        database.TableFunctions.Add(tableFunction);
+                        ImportExtendedProperties(connection, tableFunction);
                     }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for table functions...");
-
-                        foreach (var tableFunction in database.TableFunctions)
-                        {
-                            ImportExtendedProperties(connection, tableFunction);
-                        }
-                    }
-
-                    database.ImportBag.TableFunctions = database.TableFunctions;
                 }
 
-                if (DatabaseImportSettings.ImportStoredProcedures)
+                database.ImportBag.TableFunctions = database.TableFunctions;
+            }
+
+            if (DatabaseImportSettings.ImportStoredProcedures)
+            {
+                Logger?.LogInformation("Importing stored procedures for '{0}' database...", database.Name);
+
+                foreach (var storedProcedure in await GetStoredProceduresAsync(connection, database.GetStoredProcedures()))
                 {
-                    Logger?.LogInformation("Importing stored procedures for '{0}' database...", database.Name);
+                    if (DatabaseImportSettings.Exclusions.Contains(storedProcedure.FullName))
+                        continue;
 
-                    foreach (var storedProcedure in await GetStoredProceduresAsync(connection, database.GetStoredProcedures()))
+                    database.StoredProcedures.Add(storedProcedure);
+                }
+
+                Logger?.LogInformation("Getting result sets for stored procedures...");
+
+                foreach (var storedProcedure in database.StoredProcedures)
+                {
+                    foreach (var firstResultSet in await SqlServerDatabaseFactoryHelper.GetFirstResultSetForObjectAsync(storedProcedure, connection))
                     {
-                        if (DatabaseImportSettings.Exclusions.Contains(storedProcedure.FullName))
-                            continue;
-
-                        database.StoredProcedures.Add(storedProcedure);
+                        storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
                     }
 
-                    Logger?.LogInformation("Getting result sets for stored procedures...");
+                    foreach (var resultSet in await SqlServerDatabaseFactoryHelper.GetResultSetsAsync(storedProcedure, connection))
+                    {
+                        storedProcedure.ResultSets.Add(resultSet);
+                    }
+                }
+
+                if (DatabaseImportSettings.ExtendedProperties.Count > 0)
+                {
+                    Logger?.LogInformation("Importing extended properties for stored procedures...");
 
                     foreach (var storedProcedure in database.StoredProcedures)
                     {
-                        foreach (var firstResultSet in await SqlServerDatabaseFactoryHelper.GetFirstResultSetForObjectAsync(storedProcedure, connection))
-                        {
-                            storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
-                        }
-
-                        foreach (var resultSet in await SqlServerDatabaseFactoryHelper.GetResultSetsAsync(storedProcedure, connection))
-                        {
-                            storedProcedure.ResultSets.Add(resultSet);
-                        }
+                        ImportExtendedProperties(connection, storedProcedure);
                     }
-
-                    if (DatabaseImportSettings.ExtendedProperties.Count > 0)
-                    {
-                        Logger?.LogInformation("Importing extended properties for stored procedures...");
-
-                        foreach (var storedProcedure in database.StoredProcedures)
-                        {
-                            ImportExtendedProperties(connection, storedProcedure);
-                        }
-                    }
-
-                    database.ImportBag.StoredProcedures = database.StoredProcedures;
                 }
 
-                if (DatabaseImportSettings.ImportSequences)
-                {
-                    Logger?.LogInformation("Importing sequences for '{0}' database...", database.Name);
-
-                    foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
-                    {
-                        if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
-                            continue;
-
-                        database.Sequences.Add(sequence);
-                    }
-
-                    database.ImportBag.Sequences = database.Sequences;
-                }
-
-                connection.Close();
-
-                connection.Dispose();
-
-                return database;
+                database.ImportBag.StoredProcedures = database.StoredProcedures;
             }
+
+            if (DatabaseImportSettings.ImportSequences)
+            {
+                Logger?.LogInformation("Importing sequences for '{0}' database...", database.Name);
+
+                foreach (var sequence in await GetSequencesAsync(connection, database.GetSequences()))
+                {
+                    if (DatabaseImportSettings.Exclusions.Contains(sequence.FullName))
+                        continue;
+
+                    database.Sequences.Add(sequence);
+                }
+
+                database.ImportBag.Sequences = database.Sequences;
+            }
+
+            connection.Close();
+
+            return database;
         }
 
         /// <summary>
@@ -297,30 +294,28 @@ namespace CatFactory.SqlServer
         /// <returns>A sequence of <see cref="DbObject"/> class that represents objects in database</returns>
         protected virtual async Task<ICollection<DbObject>> GetDbObjectsAsync(DbConnection connection)
         {
-            using (var command = connection.CreateCommand())
+            using var command = connection.CreateCommand();
+
+            command.Connection = connection;
+            command.CommandText = DatabaseImportSettings.ImportCommandText;
+
+            using var dataReader = await command.ExecuteReaderAsync();
+
+            var collection = new Collection<DbObject>();
+
+            while (await dataReader.ReadAsync())
             {
-                command.Connection = connection;
-                command.CommandText = DatabaseImportSettings.ImportCommandText;
-
-                using (var dataReader = await command.ExecuteReaderAsync())
+                collection.Add(new DbObject
                 {
-                    var collection = new Collection<DbObject>();
-
-                    while (await dataReader.ReadAsync())
-                    {
-                        collection.Add(new DbObject
-                        {
-                            DataSource = connection.DataSource,
-                            DatabaseName = connection.Database,
-                            Schema = dataReader.GetString(0),
-                            Name = dataReader.GetString(1),
-                            Type = dataReader.GetString(2)
-                        });
-                    }
-
-                    return collection;
-                }
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dataReader.GetString(0),
+                    Name = dataReader.GetString(1),
+                    Type = dataReader.GetString(2)
+                });
             }
+
+            return collection;
         }
 
         /// <summary>
@@ -335,69 +330,67 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in tables)
             {
-                using (var command = connection.CreateCommand())
+                using var command = connection.CreateCommand();
+
+                var table = new Table
                 {
-                    var table = new Table
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dbObject.Schema,
+                    Name = dbObject.Name
+                };
+
+                command.Connection = connection;
+                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                var queryResults = new List<DynamicQueryResult>();
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.NextResultAsync())
+                {
+                    var queryResult = new DynamicQueryResult();
+
+                    while (await reader.ReadAsync())
                     {
-                        DataSource = connection.DataSource,
-                        DatabaseName = connection.Database,
-                        Schema = dbObject.Schema,
-                        Name = dbObject.Name
-                    };
+                        var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                        var row = new Dictionary<string, object>();
 
-                    var queryResults = new List<DynamicQueryResult>();
+                        for (var i = 0; i < names.Count; i++)
+                            row.Add(names[i], reader.GetValue(i));
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                        queryResult.Items.Add(row);
+                    }
+
+                    queryResults.Add(queryResult);
+                }
+
+                table.ImportBag.ConstraintDetails = new Collection<ConstraintDetail>();
+                table.ImportBag.TableReferences = new Collection<TableReference>();
+
+                foreach (var result in queryResults)
+                {
+                    foreach (var item in result.Items)
                     {
-                        while (await reader.NextResultAsync())
-                        {
-                            var queryResult = new DynamicQueryResult();
-
-                            while (await reader.ReadAsync())
-                            {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
-
-                                var row = new Dictionary<string, object>();
-
-                                for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], reader.GetValue(i));
-
-                                queryResult.Items.Add(row);
-                            }
-
-                            queryResults.Add(queryResult);
-                        }
-
-                        table.ImportBag.ConstraintDetails = new Collection<ConstraintDetail>();
-                        table.ImportBag.TableReferences = new Collection<TableReference>();
-
-                        foreach (var result in queryResults)
-                        {
-                            foreach (var item in result.Items)
-                            {
-                                if (item.ContainsKey("Column_name"))
-                                    AddColumn(table, item);
-                                else if (item.ContainsKey("Identity"))
-                                    SetIdentity(table, item);
-                                else if (item.ContainsKey("RowGuidCol"))
-                                    SetRowGuidCol(table, item);
-                                else if (item.ContainsKey("index_name"))
-                                    AddIndexToTable(table, item);
-                                else if (item.ContainsKey("constraint_type"))
-                                    AddConstraintToTable(table, item);
-                                else if (item.ContainsKey("Table is referenced by foreign key"))
-                                    AddTableReferenceToTable(table, item);
-                            }
-                        }
-
-                        SetConstraintsFromConstraintDetails(table);
-
-                        collection.Add(table);
+                        if (item.ContainsKey("Column_name"))
+                            AddColumn(table, item);
+                        else if (item.ContainsKey("Identity"))
+                            SetIdentity(table, item);
+                        else if (item.ContainsKey("RowGuidCol"))
+                            SetRowGuidCol(table, item);
+                        else if (item.ContainsKey("index_name"))
+                            AddIndexToTable(table, item);
+                        else if (item.ContainsKey("constraint_type"))
+                            AddConstraintToTable(table, item);
+                        else if (item.ContainsKey("Table is referenced by foreign key"))
+                            AddTableReferenceToTable(table, item);
                     }
                 }
+
+                SetConstraintsFromConstraintDetails(table);
+
+                collection.Add(table);
             }
 
             return collection;
@@ -697,60 +690,58 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in views)
             {
-                using (var command = connection.CreateCommand())
+                using var command = connection.CreateCommand();
+
+                command.Connection = connection;
+                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                var queryResults = new List<DynamicQueryResult>();
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.NextResultAsync())
                 {
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                    var queryResult = new DynamicQueryResult();
 
-                    var queryResults = new List<DynamicQueryResult>();
-
-                    using (var reader = await command.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.NextResultAsync())
-                        {
-                            var queryResult = new DynamicQueryResult();
+                        var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
-                            while (await reader.ReadAsync())
-                            {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
+                        var row = new Dictionary<string, object>();
 
-                                var row = new Dictionary<string, object>();
+                        for (var i = 0; i < names.Count; i++)
+                            row.Add(names[i], reader.GetValue(i));
 
-                                for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], reader.GetValue(i));
+                        queryResult.Items.Add(row);
+                    }
 
-                                queryResult.Items.Add(row);
-                            }
+                    queryResults.Add(queryResult);
+                }
 
-                            queryResults.Add(queryResult);
-                        }
+                var view = new View
+                {
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dbObject.Schema,
+                    Name = dbObject.Name
+                };
 
-                        var view = new View
-                        {
-                            DataSource = connection.DataSource,
-                            DatabaseName = connection.Database,
-                            Schema = dbObject.Schema,
-                            Name = dbObject.Name
-                        };
-
-                        foreach (var result in queryResults)
-                        {
-                            foreach (var item in result.Items)
-                            {
-                                if (item.ContainsKey("Column_name"))
-                                    AddColumn(view, item);
-                                else if (item.ContainsKey("Identity"))
-                                    SetIdentity(view, item);
-                                else if (item.ContainsKey("RowGuidCol"))
-                                    SetRowGuidCol(view, item);
-                                else if (item.ContainsKey("index_name"))
-                                    AddIndexToView(view, item);
-                            }
-                        }
-
-                        collection.Add(view);
+                foreach (var result in queryResults)
+                {
+                    foreach (var item in result.Items)
+                    {
+                        if (item.ContainsKey("Column_name"))
+                            AddColumn(view, item);
+                        else if (item.ContainsKey("Identity"))
+                            SetIdentity(view, item);
+                        else if (item.ContainsKey("RowGuidCol"))
+                            SetRowGuidCol(view, item);
+                        else if (item.ContainsKey("index_name"))
+                            AddIndexToView(view, item);
                     }
                 }
+
+                collection.Add(view);
             }
 
             return collection;
@@ -800,54 +791,52 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in scalarFunctions)
             {
-                using (var command = connection.CreateCommand())
+                using var command = connection.CreateCommand();
+
+                var scalarFunction = new ScalarFunction
                 {
-                    var scalarFunction = new ScalarFunction
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dbObject.Schema,
+                    Name = dbObject.Name
+                };
+
+                command.Connection = connection;
+                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                var queryResults = new List<DynamicQueryResult>();
+
+                using var dataReader = await command.ExecuteReaderAsync();
+
+                while (await dataReader.NextResultAsync())
+                {
+                    var queryResult = new DynamicQueryResult();
+
+                    while (await dataReader.ReadAsync())
                     {
-                        DataSource = connection.DataSource,
-                        DatabaseName = connection.Database,
-                        Schema = dbObject.Schema,
-                        Name = dbObject.Name
-                    };
+                        var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
 
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                        var row = new Dictionary<string, object>();
 
-                    var queryResults = new List<DynamicQueryResult>();
+                        for (var i = 0; i < names.Count; i++)
+                            row.Add(names[i], dataReader.GetValue(i));
 
-                    using (var dataReader = await command.ExecuteReaderAsync())
+                        queryResult.Items.Add(row);
+                    }
+
+                    queryResults.Add(queryResult);
+                }
+
+                foreach (var result in queryResults)
+                {
+                    foreach (var item in result.Items)
                     {
-                        while (await dataReader.NextResultAsync())
-                        {
-                            var queryResult = new DynamicQueryResult();
-
-                            while (await dataReader.ReadAsync())
-                            {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(dataReader).ToList();
-
-                                var row = new Dictionary<string, object>();
-
-                                for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], dataReader.GetValue(i));
-
-                                queryResult.Items.Add(row);
-                            }
-
-                            queryResults.Add(queryResult);
-                        }
-
-                        foreach (var result in queryResults)
-                        {
-                            foreach (var item in result.Items)
-                            {
-                                if (item.ContainsKey("Parameter_name"))
-                                    AddParameter(scalarFunction, item);
-                            }
-                        }
-
-                        collection.Add(scalarFunction);
+                        if (item.ContainsKey("Parameter_name"))
+                            AddParameter(scalarFunction, item);
                     }
                 }
+
+                collection.Add(scalarFunction);
             }
 
             return collection;
@@ -878,58 +867,56 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in tableFunctions)
             {
-                using (var command = connection.CreateCommand())
+                using var command = connection.CreateCommand();
+
+                command.Connection = connection;
+                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                var queryResults = new List<DynamicQueryResult>();
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.NextResultAsync())
                 {
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                    var queryResult = new DynamicQueryResult();
 
-                    var queryResults = new List<DynamicQueryResult>();
-
-                    using (var reader = await command.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.NextResultAsync())
-                        {
-                            var queryResult = new DynamicQueryResult();
+                        var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
-                            while (await reader.ReadAsync())
-                            {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
+                        var row = new Dictionary<string, object>();
 
-                                var row = new Dictionary<string, object>();
+                        for (var i = 0; i < names.Count; i++)
+                            row.Add(names[i], reader.GetValue(i));
 
-                                for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], reader.GetValue(i));
+                        queryResult.Items.Add(row);
+                    }
 
-                                queryResult.Items.Add(row);
-                            }
+                    queryResults.Add(queryResult);
+                }
 
-                            queryResults.Add(queryResult);
-                        }
+                var tableFunction = new TableFunction
+                {
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dbObject.Schema,
+                    Name = dbObject.Name
+                };
 
-                        var tableFunction = new TableFunction
-                        {
-                            DataSource = connection.DataSource,
-                            DatabaseName = connection.Database,
-                            Schema = dbObject.Schema,
-                            Name = dbObject.Name
-                        };
-
-                        foreach (var result in queryResults)
-                        {
-                            foreach (var item in result.Items)
-                            {
-                                if (item.ContainsKey("Column_name"))
-                                    AddColumn(tableFunction, item);
-                                else if (item.ContainsKey("Identity"))
-                                    SetIdentity(tableFunction, item);
-                                else if (item.ContainsKey("Parameter_name"))
-                                    AddParameter(tableFunction, item);
-                            }
-                        }
-
-                        collection.Add(tableFunction);
+                foreach (var result in queryResults)
+                {
+                    foreach (var item in result.Items)
+                    {
+                        if (item.ContainsKey("Column_name"))
+                            AddColumn(tableFunction, item);
+                        else if (item.ContainsKey("Identity"))
+                            SetIdentity(tableFunction, item);
+                        else if (item.ContainsKey("Parameter_name"))
+                            AddParameter(tableFunction, item);
                     }
                 }
+
+                collection.Add(tableFunction);
             }
 
             return collection;
@@ -960,54 +947,52 @@ namespace CatFactory.SqlServer
 
             foreach (var dbObject in storedProcedures)
             {
-                using (var command = connection.CreateCommand())
+                using var command = connection.CreateCommand();
+
+                command.Connection = connection;
+                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+
+                var queryResults = new List<DynamicQueryResult>();
+
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.NextResultAsync())
                 {
-                    command.Connection = connection;
-                    command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                    var queryResult = new DynamicQueryResult();
 
-                    var queryResults = new List<DynamicQueryResult>();
-
-                    using (var reader = await command.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.NextResultAsync())
-                        {
-                            var queryResult = new DynamicQueryResult();
+                        var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
 
-                            while (await reader.ReadAsync())
-                            {
-                                var names = SqlServerDatabaseFactoryHelper.GetNames(reader).ToList();
+                        var row = new Dictionary<string, object>();
 
-                                var row = new Dictionary<string, object>();
+                        for (var i = 0; i < names.Count; i++)
+                            row.Add(names[i], reader.GetValue(i));
 
-                                for (var i = 0; i < names.Count; i++)
-                                    row.Add(names[i], reader.GetValue(i));
+                        queryResult.Items.Add(row);
+                    }
 
-                                queryResult.Items.Add(row);
-                            }
+                    queryResults.Add(queryResult);
+                }
 
-                            queryResults.Add(queryResult);
-                        }
+                var storedProcedure = new StoredProcedure
+                {
+                    DataSource = connection.DataSource,
+                    DatabaseName = connection.Database,
+                    Schema = dbObject.Schema,
+                    Name = dbObject.Name
+                };
 
-                        var storedProcedure = new StoredProcedure
-                        {
-                            DataSource = connection.DataSource,
-                            DatabaseName = connection.Database,
-                            Schema = dbObject.Schema,
-                            Name = dbObject.Name
-                        };
-
-                        foreach (var result in queryResults)
-                        {
-                            foreach (var item in result.Items)
-                            {
-                                if (item.ContainsKey("Parameter_name"))
-                                    AddParameter(storedProcedure, item);
-                            }
-                        }
-
-                        collection.Add(storedProcedure);
+                foreach (var result in queryResults)
+                {
+                    foreach (var item in result.Items)
+                    {
+                        if (item.ContainsKey("Parameter_name"))
+                            AddParameter(storedProcedure, item);
                     }
                 }
+
+                collection.Add(storedProcedure);
             }
 
             return collection;
@@ -1087,7 +1072,8 @@ namespace CatFactory.SqlServer
                         IsCached = (bool)record.IsCached,
                         IsCycling = (bool)record.IsCycling
                     });
-                } else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
+                }
+                else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
                 {
                     collection.Add(new Int16Sequence
                     {

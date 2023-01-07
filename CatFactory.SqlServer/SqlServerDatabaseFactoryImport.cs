@@ -52,23 +52,22 @@ namespace CatFactory.SqlServer
                 }
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                await connection.OpenAsync();
+            using var connection = databaseFactory.GetConnection();
 
-                var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+            await connection.OpenAsync();
 
-                database.ServerName = connection.DataSource;
+            var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
 
-                if (tables.Length == 0)
-                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)));
-                else
-                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => tables.Contains(item.FullName)));
+            database.ServerName = connection.DataSource;
 
-                database.Tables.AddRange(await databaseFactory.GetTablesAsync(connection, database.GetTables()));
+            if (tables.Length == 0)
+                database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)));
+            else
+                database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => tables.Contains(item.FullName)));
 
-                return database;
-            }
+            database.Tables.AddRange(await databaseFactory.GetTablesAsync(connection, database.GetTables()));
+
+            return database;
         }
 
         /// <summary>
@@ -98,23 +97,22 @@ namespace CatFactory.SqlServer
                 }
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                await connection.OpenAsync();
+            using var connection = databaseFactory.GetConnection();
 
-                var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+            await connection.OpenAsync();
 
-                database.ServerName = connection.DataSource;
+            var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
 
-                if (views.Length == 0)
-                    database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
-                else
-                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => views.Contains(item.FullName)).ToList());
+            database.ServerName = connection.DataSource;
 
-                database.Views.AddRange((await databaseFactory.GetViewsAsync(connection, database.GetViews())).ToList());
+            if (views.Length == 0)
+                database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
+            else
+                database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => views.Contains(item.FullName)).ToList());
 
-                return database;
-            }
+            database.Views.AddRange((await databaseFactory.GetViewsAsync(connection, database.GetViews())).ToList());
+
+            return database;
         }
 
         /// <summary>
@@ -143,31 +141,30 @@ namespace CatFactory.SqlServer
                 }
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                await connection.OpenAsync();
+            using var connection = databaseFactory.GetConnection();
 
-                var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
+            await connection.OpenAsync();
 
-                database.ServerName = connection.DataSource;
+            var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
 
-                if (names.Length == 0)
-                    database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
-                else
-                    database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => names.Contains(item.FullName)));
+            database.ServerName = connection.DataSource;
 
-                var tables = await databaseFactory
-                    .GetTablesAsync(connection, database.GetTables());
+            if (names.Length == 0)
+                database.DbObjects.AddRange(await databaseFactory.GetDbObjectsAsync(connection));
+            else
+                database.DbObjects.AddRange((await databaseFactory.GetDbObjectsAsync(connection)).Where(item => names.Contains(item.FullName)));
 
-                database.Tables.AddRange(tables);
+            var tables = await databaseFactory
+                .GetTablesAsync(connection, database.GetTables());
 
-                var views = await databaseFactory
-                    .GetViewsAsync(connection, database.GetViews());
+            database.Tables.AddRange(tables);
 
-                database.Views.AddRange(views);
+            var views = await databaseFactory
+                .GetViewsAsync(connection, database.GetViews());
 
-                return database;
-            }
+            database.Views.AddRange(views);
+
+            return database;
         }
 
         /// <summary>

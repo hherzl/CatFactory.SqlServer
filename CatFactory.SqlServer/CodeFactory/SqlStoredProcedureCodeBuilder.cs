@@ -47,8 +47,6 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <returns></returns>
         protected virtual string GetType(IColumn column)
         {
-            var databaseTypes = Database.DatabaseTypeMaps;
-
             if (Database.ColumnIsDecimal(column))
                 return string.Format("{0}({1}, {2})", column.Type, column.Prec, column.Scale);
             else if (Database.ColumnIsString(column))

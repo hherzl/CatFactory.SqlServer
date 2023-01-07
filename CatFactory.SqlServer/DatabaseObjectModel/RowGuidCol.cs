@@ -8,8 +8,6 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
     [DebuggerDisplay("Name={Name}")]
     public class RowGuidCol
     {
-        #region [ Constructors ]
-
         /// <summary>
         /// Initializes a new instance of <see cref="RowGuidCol"/> class
         /// </summary>
@@ -17,15 +15,9 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
         {
         }
 
-        #endregion
-
-        #region [ Properties ]
-
         /// <summary>
         /// Gets or sets the column's name
         /// </summary>
         public string Name { get; set; }
-
-        #endregion
     }
 }

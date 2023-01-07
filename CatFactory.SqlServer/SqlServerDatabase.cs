@@ -31,12 +31,23 @@ namespace CatFactory.SqlServer
                 NamingConvention = namingConvention ?? new SqlServerDatabaseNamingConvention()
             };
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<ExtendedProperty> m_extendedProperties;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<ScalarFunction> m_scalarFunctions;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<TableFunction> m_tableFunctions;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<StoredProcedure> m_storedProcedures;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<Sequence> m_sequences;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private List<DefaultTypeMap> m_defaultTypeMaps;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<ExtendedProperty> m_extendedProperties;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<ScalarFunction> m_scalarFunctions;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<TableFunction> m_tableFunctions;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<StoredProcedure> m_storedProcedures;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<Sequence> m_sequences;
+        
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private List<DefaultTypeMap> m_defaultTypeMaps;
 
         /// <summary>
         /// Initializes a new instance of <see cref="SqlServerDatabase"/> class

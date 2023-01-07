@@ -35,11 +35,11 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
         {
             var collection = new Collection<ExtendedProperty>();
 
-            using (var command = connection.CreateCommand())
-            {
-                command.Connection = connection;
-                command.CommandType = CommandType.Text;
-                command.CommandText = @"
+            using var command = connection.CreateCommand();
+
+            command.Connection = connection;
+            command.CommandType = CommandType.Text;
+            command.CommandText = @"
                 select
                     [objtype], [objname], [name], [value]
                 from
@@ -49,25 +49,23 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
                     )
                 ";
 
-                command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
-                command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-                command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-                command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-                command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-                command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-                command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
+            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
 
-                using (var reader = await command.ExecuteReaderAsync())
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                collection.Add(new ExtendedProperty
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        collection.Add(new ExtendedProperty
-                        {
-                            Name = reader.GetString(2),
-                            Value = reader.GetString(3)
-                        });
-                    }
-                }
+                    Name = reader.GetString(2),
+                    Value = reader.GetString(3)
+                });
             }
 
             return collection;

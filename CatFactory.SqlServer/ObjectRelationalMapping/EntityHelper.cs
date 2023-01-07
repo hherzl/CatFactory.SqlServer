@@ -730,34 +730,16 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         {
             var names = GetPropertyNames(selector).ToList();
 
-            result.Table.PrimaryKey = new PrimaryKey
-            {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetPrimaryKeyConstraintName(result.Table, names.ToArray()),
-                Key = names
-            };
+            result.Table.PrimaryKey = new PrimaryKey(constraintName ?? result.Database.NamingConvention.GetPrimaryKeyConstraintName(result.Table, names.ToArray()), names.ToArray());
 
             return result;
         }
 
-        public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string expresion, string constraintName = null) where TModel : class
+        public static EntityResult<TModel> AddUnique<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
         {
-            result.Table.Checks.Add(new Check
-            {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetCheckConstraintName(result.Table, GetPropertyName(selector)),
-                Key = new List<string>(),
-                Expression = expresion
-            });
+            var names = GetPropertyNames(selector).ToList();
 
-            return result;
-        }
-
-        public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
-        {
-            result.Table.Defaults.Add(new Default
-            {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, GetPropertyName(selector)),
-                Value = value
-            });
+            result.Table.Uniques.Add(new Unique(constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()), names.ToArray()));
 
             return result;
         }
@@ -788,14 +770,25 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        public static EntityResult<TModel> AddUnique<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string constraintName = null) where TModel : class
+        public static EntityResult<TModel> AddDefault<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string value, string constraintName = null) where TModel : class
         {
-            var names = GetPropertyNames(selector).ToList();
-
-            result.Table.Uniques.Add(new Unique
+            result.Table.Defaults.Add(new Default
             {
-                ConstraintName = constraintName ?? result.Database.NamingConvention.GetUniqueConstraintName(result.Table, names.ToArray()),
-                Key = names
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetDefaultConstraintName(result.Table, GetPropertyName(selector)),
+                Key = new List<string> { GetPropertyName(selector) },
+                Value = value
+            });
+
+            return result;
+        }
+
+        public static EntityResult<TModel> AddCheck<TModel, TProperty>(this EntityResult<TModel> result, Expression<Func<TModel, TProperty>> selector, string expresion, string constraintName = null) where TModel : class
+        {
+            result.Table.Checks.Add(new Check
+            {
+                ConstraintName = constraintName ?? result.Database.NamingConvention.GetCheckConstraintName(result.Table, GetPropertyName(selector)),
+                Key = new List<string>(),
+                Expression = expresion
             });
 
             return result;

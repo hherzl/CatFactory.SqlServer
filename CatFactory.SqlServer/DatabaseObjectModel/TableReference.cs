@@ -7,8 +7,6 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
     /// </summary>
     public class TableReference
     {
-        #region [ Constructors ]
-
         /// <summary>
         /// Initializes a new instance of <see cref="TableReference"/> class
         /// </summary>
@@ -16,15 +14,9 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
         {
         }
 
-        #endregion
-
-        #region [ Properties ]
-
         /// <summary>
         /// Gets or sets the reference description
         /// </summary>
         public string ReferenceDescription { get; set; }
-
-        #endregion
     }
 }

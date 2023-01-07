@@ -19,5 +19,4 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
 
         public string DatabaseType { get; set; }
     }
-#pragma warning restore CS1591
 }

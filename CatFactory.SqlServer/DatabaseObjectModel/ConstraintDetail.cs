@@ -8,18 +8,12 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
     [DebuggerDisplay("ConstraintType={ConstraintType}, ConstraintName={ConstraintName}, ConstraintKeys={ConstraintKeys}")]
     public class ConstraintDetail
     {
-        #region [ Constructors ]
-
         /// <summary>
         /// Initializes a new instance of <see cref="ConstraintDetail"/> class
         /// </summary>
         public ConstraintDetail()
         {
         }
-
-        #endregion
-
-        #region [ Properties ]
 
         /// <summary>
         /// Gets or sets the constraint's type
@@ -55,7 +49,5 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
         /// Gets or sets the constraint's keys
         /// </summary>
         public string ConstraintKeys { get; set; }
-
-        #endregion
     }
 }

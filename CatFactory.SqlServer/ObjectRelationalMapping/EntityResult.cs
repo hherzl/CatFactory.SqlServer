@@ -40,7 +40,7 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
         /// </summary>
         public List<TModel> Data
         {
-            get => m_data ?? (m_data = new List<TModel>());
+            get => m_data ??= new List<TModel>();
             set => m_data = value;
         }
     }

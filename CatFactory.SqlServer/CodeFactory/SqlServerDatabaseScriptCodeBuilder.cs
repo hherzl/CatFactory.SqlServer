@@ -107,13 +107,13 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <returns>A sequence of <see cref="ILine"/> that represents the database creation</returns>
         protected virtual IEnumerable<ILine> AddDatabaseCreation()
         {
-            yield return new CodeLine("create database {0}", Database.GetObjectName(Database.Name));
-            yield return new CodeLine("go");
+            yield return new CodeLine("CREATE DATABASE {0}", Database.GetObjectName(Database.Name));
+            yield return new CodeLine("GO");
 
             yield return new EmptyLine();
 
-            yield return new CodeLine("use {0}", Database.GetObjectName(Database.Name));
-            yield return new CodeLine("go");
+            yield return new CodeLine("USE {0}", Database.GetObjectName(Database.Name));
+            yield return new CodeLine("GO");
 
             yield return new EmptyLine();
         }
@@ -128,7 +128,7 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 foreach (var extendedProperty in Database.ExtendedProperties)
                 {
-                    yield return new CodeLine("exec [sp_addextendedproperty]");
+                    yield return new CodeLine("EXEC [sp_addextendedproperty]");
                     yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
                     yield return new CodeLine("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
                     yield return new CodeLine("{0}@level0type = null,", Indent(1));
@@ -139,7 +139,7 @@ namespace CatFactory.SqlServer.CodeFactory
                     yield return new CodeLine("{0}@level2name = null", Indent(1));
                 }
 
-                yield return new CodeLine("go");
+                yield return new CodeLine("GO");
 
                 yield return new EmptyLine();
             }
@@ -160,15 +160,15 @@ namespace CatFactory.SqlServer.CodeFactory
 
                 if (AddDropIfExists)
                 {
-                    yield return new CodeLine("if not exists (select 1 from [sys].[schemas] where name = '{0}')", schema);
-                    yield return new CodeLine("{0}begin", Indent(1));
-                    yield return new CodeLine("{0}exec ('create schema {1}')", Indent(2), Database.GetObjectName(schema));
-                    yield return new CodeLine("{0}end", Indent(1));
+                    yield return new CodeLine("IF NOT EXISTS (SELECT 1 FROM [sys].[schemas] WHERE [name] = '{0}')", schema);
+                    yield return new CodeLine("{0}BEGIN", Indent(1));
+                    yield return new CodeLine("{0}EXEC ('CREATE SCHEMA {1}')", Indent(2), Database.GetObjectName(schema));
+                    yield return new CodeLine("{0}END", Indent(1));
                 }
                 else
                 {
-                    yield return new CodeLine("{0}create schema {1}", Indent(2), Database.GetObjectName(schema));
-                    yield return new CodeLine("{0}go", Indent(1));
+                    yield return new CodeLine("{0}CREATE SCHEMA {1}", Indent(2), Database.GetObjectName(schema));
+                    yield return new CodeLine("{0}GO", Indent(1));
                 }
 
                 yield return new EmptyLine();
@@ -182,9 +182,9 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <returns>A sequence of <see cref="ILine"/> that represents the table dropping</returns>
         protected virtual IEnumerable<ILine> DropTableIfExists(Table table)
         {
-            yield return new CodeLine("if object_id('{0}') is not null", table.FullName);
-            yield return new CodeLine("{0}drop table {1}", Indent(1), Database.NamingConvention.GetObjectName(table.Schema, table.Name));
-            yield return new CodeLine("go");
+            yield return new CodeLine("IF OBJECT_ID('{0}') IS NOT NULL", table.FullName);
+            yield return new CodeLine("{0}DROP TABLE {1}", Indent(1), Database.NamingConvention.GetObjectName(table.Schema, table.Name));
+            yield return new CodeLine("GO");
             yield return new EmptyLine();
         }
 
@@ -195,7 +195,7 @@ namespace CatFactory.SqlServer.CodeFactory
         /// <returns>A sequence of <see cref="ILine"/> that represents the table creation</returns>
         protected virtual IEnumerable<ILine> AddTable(Table table)
         {
-            yield return new CodeLine("create table {0}", Database.GetObjectName(table));
+            yield return new CodeLine("CREATE TABLE {0}", Database.GetObjectName(table));
 
             yield return new CodeLine("(");
 
@@ -205,40 +205,42 @@ namespace CatFactory.SqlServer.CodeFactory
 
                 var output = new StringBuilder();
 
+                var type = column.Type.ToUpper();
+
                 if (Database.ColumnIsString(column))
                 {
                     if (column.Length == 0)
-                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, "max");
+                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), type, "MAX");
                     else
-                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, column.Length);
+                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), type, column.Length);
                 }
                 else if (Database.ColumnIsNumber(column))
                 {
                     if (column.Prec > 0 && column.Scale > 0)
-                        output.AppendFormat("{0}{1} {2}({3}, {4})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec, column.Scale);
+                        output.AppendFormat("{0}{1} {2}({3}, {4})", Indent(1), Database.GetObjectName(column), type, column.Prec, column.Scale);
                     else if (column.Prec > 0)
-                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), column.Type, column.Prec);
+                        output.AppendFormat("{0}{1} {2}({3})", Indent(1), Database.GetObjectName(column), type, column.Prec);
                     else
-                        output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
+                        output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), type);
                 }
                 else
                 {
-                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), column.Type);
+                    output.AppendFormat("{0}{1} {2}", Indent(1), Database.GetObjectName(column), type);
                 }
 
-                output.AppendFormat(" {0}", column.Nullable ? "null" : "not null");
+                output.AppendFormat(" {0}", column.Nullable ? "NULL" : "NOT NULL");
 
                 if (table.Identity != null && table.Identity.Name == column.Name)
-                    output.AppendFormat(" identity({0}, {1})", table.Identity.Seed, table.Identity.Increment);
+                    output.AppendFormat(" IDENTITY({0}, {1})", table.Identity.Seed, table.Identity.Increment);
 
                 if (i < table.Columns.Count - 1)
-                    output.Append(",");
+                    output.Append(',');
 
                 yield return new CodeLine(output.ToString());
             }
 
             yield return new CodeLine(")");
-            yield return new CodeLine("go");
+            yield return new CodeLine("GO");
             yield return new EmptyLine();
         }
 
@@ -251,7 +253,7 @@ namespace CatFactory.SqlServer.CodeFactory
         {
             foreach (ExtendedProperty extendedProperty in table.ImportBag.ExtendedProperties)
             {
-                yield return new CodeLine("exec [sp_addextendedproperty]");
+                yield return new CodeLine("EXEC [sp_addextendedproperty]");
                 yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
                 yield return new CodeLine("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
                 yield return new CodeLine("{0}@level0type = '{1}',", Indent(1), "schema");
@@ -260,7 +262,7 @@ namespace CatFactory.SqlServer.CodeFactory
                 yield return new CodeLine("{0}@level1name = '{1}',", Indent(1), table.Name);
                 yield return new CodeLine("{0}@level2type = null,", Indent(1));
                 yield return new CodeLine("{0}@level2name = null", Indent(1));
-                yield return new CodeLine("go");
+                yield return new CodeLine("GO");
                 yield return new EmptyLine();
             }
 
@@ -269,17 +271,17 @@ namespace CatFactory.SqlServer.CodeFactory
                 
             }
 
-            var columnsWithExtendedProperties = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
+            var columnsWithExtendedProps = table.Columns.Where(item => item.ImportBag.ExtendedProperties.Count > 0).ToList();
 
-            if (columnsWithExtendedProperties.Count > 0)
+            if (columnsWithExtendedProps.Count > 0)
             {
-                for (var i = 0; i < columnsWithExtendedProperties.Count; i++)
+                for (var i = 0; i < columnsWithExtendedProps.Count; i++)
                 {
-                    var column = columnsWithExtendedProperties[i];
+                    var column = columnsWithExtendedProps[i];
 
                     foreach (ExtendedProperty extendedProperty in column.ImportBag.ExtendedProperties)
                     {
-                        yield return new CodeLine("exec [sp_addextendedproperty]");
+                        yield return new CodeLine("EXEC [sp_addextendedproperty]");
                         yield return new CodeLine("{0}@name = '{1}',", Indent(1), extendedProperty.Name);
                         yield return new CodeLine("{0}@value = '{1}',", Indent(1), extendedProperty.Value);
                         yield return new CodeLine("{0}@level0type = '{1}',", Indent(1), "schema");
@@ -288,7 +290,7 @@ namespace CatFactory.SqlServer.CodeFactory
                         yield return new CodeLine("{0}@level1name = '{1}',", Indent(1), table.Name);
                         yield return new CodeLine("{0}@level2type = '{1}',", Indent(1), "column");
                         yield return new CodeLine("{0}@level2name = '{1}'", Indent(1), column.Name);
-                        yield return new CodeLine("go");
+                        yield return new CodeLine("GO");
                         yield return new EmptyLine();
                     }
                 }
@@ -320,10 +322,10 @@ namespace CatFactory.SqlServer.CodeFactory
 
                 var constraintName = string.IsNullOrEmpty(pk.ConstraintName) ? nm.GetPrimaryKeyConstraintName(table, pk.Key.ToArray()) : Database.GetObjectName(pk.ConstraintName);
 
-                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                yield return new CodeLine("ALTER TABLE {0} ADD CONSTRAINT {1}", Database.GetObjectName(table), constraintName);
 
-                yield return new CodeLine("{0}primary key ({1})", Indent(1), string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
-                yield return new CodeLine("go");
+                yield return new CodeLine("{0}PRIMARY KEY ({1})", Indent(1), string.Join(", ", pk.Key.Select(item => Database.GetObjectName(item))));
+                yield return new CodeLine("GO");
 
                 yield return new EmptyLine();
             }
@@ -332,10 +334,10 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var constraintName = string.IsNullOrEmpty(unique.ConstraintName) ? nm.GetUniqueConstraintName(table, unique.Key.ToArray()) : Database.GetObjectName(unique.ConstraintName);
 
-                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                yield return new CodeLine("ALTER TABLE {0} ADD CONSTRAINT {1}", Database.GetObjectName(table), constraintName);
 
-                yield return new CodeLine("{0}unique ({1})", Indent(1), string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
-                yield return new CodeLine("go");
+                yield return new CodeLine("{0}UNIQUE ({1})", Indent(1), string.Join(", ", unique.Key.Select(item => Database.GetObjectName(item))));
+                yield return new CodeLine("GO");
 
                 yield return new EmptyLine();
             }
@@ -356,10 +358,10 @@ namespace CatFactory.SqlServer.CodeFactory
                     {
                         var constraintName = string.IsNullOrEmpty(foreignKey.ConstraintName) ? nm.GetForeignKeyConstraintName(table, foreignKey.Key.ToArray(), references) : Database.GetObjectName(foreignKey.ConstraintName);
 
-                        yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                        yield return new CodeLine("ALTER TABLE {0} ADD CONSTRAINT {1}", Database.GetObjectName(table), constraintName);
 
-                        yield return new CodeLine("{0}foreign key ({1}) references {2}", Indent(1), string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
-                        yield return new CodeLine("go");
+                        yield return new CodeLine("{0}FOREIGN KEY ({1}) REFERENCES {2}", Indent(1), string.Join(", ", foreignKey.Key.Select(item => Database.GetObjectName(item))), Database.GetObjectName(references));
+                        yield return new CodeLine("GO");
 
                         yield return new EmptyLine();
                     }
@@ -370,10 +372,10 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var constraintName = string.IsNullOrEmpty(def.ConstraintName) ? nm.GetDefaultConstraintName(table, def.Key.First()) : Database.GetObjectName(def.ConstraintName);
 
-                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                yield return new CodeLine("ALTER TABLE {0} ADD CONSTRAINT {1}", Database.GetObjectName(table), constraintName);
 
-                yield return new CodeLine("{0}default ({1})", Indent(1), def.Value);
-                yield return new CodeLine("go");
+                yield return new CodeLine("{0}DEFAULT {1} FOR {2}", Indent(1), def.Value, def.Key.First());
+                yield return new CodeLine("GO");
 
                 yield return new EmptyLine();
             }
@@ -382,10 +384,10 @@ namespace CatFactory.SqlServer.CodeFactory
             {
                 var constraintName = string.IsNullOrEmpty(check.ConstraintName) ? nm.GetCheckConstraintName(table, check.Key.First()) : Database.GetObjectName(check.ConstraintName);
 
-                yield return new CodeLine("alter table {0} add constraint {1}", Database.GetObjectName(table), constraintName);
+                yield return new CodeLine("ALTER TABLE {0} ADD CONSTRAINT {1}", Database.GetObjectName(table), constraintName);
 
-                yield return new CodeLine("{0}check ({1})", Indent(1), check.Expression);
-                yield return new CodeLine("go");
+                yield return new CodeLine("{0}CHECK ({1})", Indent(1), check.Expression);
+                yield return new CodeLine("GO");
 
                 yield return new EmptyLine();
             }
