@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CatFactory.SqlServer
@@ -24,16 +23,16 @@ namespace CatFactory.SqlServer
         public DatabaseImportSettings()
         {
             ImportCommandText = @"
-				select
-					[schemas].[name] as [schema_name],
-					[objects].[name] as [object_name],
-					[type_desc] as [object_type]
-				from
+				SELECT
+					[schemas].[name] AS [schema_name],
+					[objects].[name] AS [object_name],
+					[type_desc] AS [object_type]
+				FROM
 					[sys].[objects] objects
-					inner join [sys].[schemas] schemas on [objects].[schema_id] = [schemas].[schema_id]
-				where
-					[type] in ('FN', 'IF', 'TF', 'U', 'V', 'T', 'P', 'SO')
-				order by
+					INNER JOIN [sys].[schemas] schemas ON [objects].[schema_id] = [schemas].[schema_id]
+				WHERE
+					[type] IN ('FN', 'IF', 'TF', 'U', 'V', 'T', 'P', 'SO')
+				ORDER BY
 					[object_type],
 					[schema_name],
 					[object_name]
@@ -86,17 +85,11 @@ namespace CatFactory.SqlServer
         public bool ImportSequences { get; set; }
 
         /// <summary>
-        /// Gets or sets a flag to import MS_Description extended property
-        /// </summary>
-        [Obsolete("Add extended properties in order to retrieve description")]
-        public bool ImportMSDescription { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets exclusions (database objects) for database import settings
         /// </summary>
         public List<string> Exclusions
         {
-            get => m_exclusions ?? (m_exclusions = new List<string>());
+            get => m_exclusions ??= new List<string>();
             set => m_exclusions = value;
         }
 
@@ -105,7 +98,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<string> ExclusionTypes
         {
-            get => m_exclusionTypes ?? (m_exclusionTypes = new List<string>());
+            get => m_exclusionTypes ??= new List<string>();
             set => m_exclusionTypes = value;
         }
 
@@ -114,7 +107,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         public List<string> ExtendedProperties
         {
-            get => m_extendedProperties ?? (m_extendedProperties = new List<string>());
+            get => m_extendedProperties ??= new List<string>();
             set => m_extendedProperties = value;
         }
     }

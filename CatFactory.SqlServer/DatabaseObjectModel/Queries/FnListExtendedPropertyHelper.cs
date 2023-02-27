@@ -40,9 +40,9 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             command.Connection = connection;
             command.CommandType = CommandType.Text;
             command.CommandText = @"
-                select
+                SELECT
                     [objtype], [objname], [name], [value]
-                from
+                FROM
                     [fn_listextendedproperty]
                     (
                         @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name

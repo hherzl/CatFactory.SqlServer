@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build67</Version>
+    <Version>1.0.0-beta-sun-build68</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
@@ -10,13 +10,14 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
-      1.0.0-beta-sun-build67 Version:
+      1.0.0-beta-sun-build68 Version:
 
       Upgrade for .NET 6
       Fix issue 20: https://github.com/hherzl/CatFactory.SqlServer/issues/20
       Fix issue 21: https://github.com/hherzl/CatFactory.SqlServer/issues/21
       Fix issue 22: https://github.com/hherzl/CatFactory.SqlServer/issues/22
       Fix issue 23: https://github.com/hherzl/CatFactory.SqlServer/issues/23
+      Fix issue 24: https://github.com/hherzl/CatFactory.SqlServer/issues/24
 
       Usage:
 

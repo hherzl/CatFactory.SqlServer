@@ -25,11 +25,11 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [principal_id], ");
             cmdText.Append("  [schema_id] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[schemas] ");
 
             command.Connection = connection;
@@ -67,7 +67,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [system_type_id], ");
             cmdText.Append("  [user_type_id], ");
@@ -83,12 +83,12 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [default_object_id], ");
             cmdText.Append("  [rule_object_id], ");
             cmdText.Append("  [is_table_type] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[types] ");
-            cmdText.Append(" where ");
-            cmdText.Append("  (@name is null or [sys].[types].[name] like @name) ");
-            cmdText.Append("  and (@schemaId is null or [sys].[types].[schema_id] = @schemaId) ");
-            cmdText.Append("  and (@isUserDefined is null or [sys].[types].[is_user_defined] = @isUserDefined) ");
+            cmdText.Append(" WHERE ");
+            cmdText.Append("  (@name IS null OR [sys].[types].[name] like @name) ");
+            cmdText.Append("  AND (@schemaId IS null OR [sys].[types].[schema_id] = @schemaId) ");
+            cmdText.Append("  AND (@isUserDefined IS null OR [sys].[types].[is_user_defined] = @isUserDefined) ");
 
             command.Connection = connection;
             command.CommandType = CommandType.Text;
@@ -137,7 +137,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [object_id], ");
             cmdText.Append("  [principal_id], ");
@@ -179,7 +179,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [history_retention_period_unit_desc], ");
             cmdText.Append("  [is_node], ");
             cmdText.Append("  [is_edge] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[tables] ");
 
             command.Connection = connection;
@@ -252,7 +252,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [object_id], ");
             cmdText.Append("  [principal_id], ");
@@ -272,7 +272,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [with_check_option], ");
             cmdText.Append("  [is_date_correlation_view], ");
             cmdText.Append("  [is_tracked_by_cdc] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[views] ");
 
             command.Connection = connection;
@@ -323,7 +323,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [object_id], ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [column_id], ");
@@ -360,7 +360,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [is_masked], ");
             cmdText.Append("  [graph_type], ");
             cmdText.Append("  [graph_type_desc] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[columns] ");
 
             command.Connection = connection;
@@ -428,7 +428,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select ");
+            cmdText.Append(" SELECT ");
             cmdText.Append("  [name], ");
             cmdText.Append("  [object_id], ");
             cmdText.Append("  [principal_id], ");
@@ -455,7 +455,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [current_value], ");
             cmdText.Append("  [is_exhausted], ");
             cmdText.Append("  [last_used_value] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[sequences] ");
 
             command.Connection = connection;

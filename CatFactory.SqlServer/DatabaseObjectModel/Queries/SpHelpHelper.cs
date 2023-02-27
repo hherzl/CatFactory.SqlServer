@@ -21,7 +21,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             using var command = connection.CreateCommand();
 
             command.Connection = connection;
-            command.CommandText = string.Format("sp_help '{0}'", id);
+            command.CommandText = string.Format("SP_HELP '{0}'", id);
 
             using var dataReader = await command.ExecuteReaderAsync();
 

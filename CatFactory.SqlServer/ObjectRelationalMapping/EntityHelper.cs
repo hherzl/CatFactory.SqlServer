@@ -113,17 +113,6 @@ namespace CatFactory.SqlServer.ObjectRelationalMapping
             return result;
         }
 
-        [Obsolete("Use SetNaming method")]
-        public static EntityResult<TModel> SetName<TModel>(this EntityResult<TModel> result, string name, string schema = "") where TModel : class
-        {
-            result.Table.Name = name;
-            result.Table.Schema = string.IsNullOrEmpty(schema) ? result.Database.DefaultSchema : schema;
-
-            result.Database.DbObjects.Add(new DbObject(result.Table.Schema, result.Table.Name));
-
-            return result;
-        }
-
         public static EntityResult<TModel> SetColumnFor<TModel>(this EntityResult<TModel> result, Expression<Func<TModel, bool>> selector, string type = "", bool nullable = false) where TModel : class
         {
             var column = new Column

@@ -26,7 +26,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             var cmdText = new StringBuilder();
 
-            cmdText.Append(" select");
+            cmdText.Append(" SELECT");
             cmdText.Append("  [is_hidden], ");
             cmdText.Append("  [column_ordinal], ");
             cmdText.Append("  [name], ");
@@ -68,7 +68,7 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
             cmdText.Append("  [error_message], ");
             cmdText.Append("  [error_type], ");
             cmdText.Append("  [error_type_desc] ");
-            cmdText.Append(" from ");
+            cmdText.Append(" FROM ");
             cmdText.Append("  [sys].[dm_exec_describe_first_result_set_for_object] ");
             cmdText.AppendFormat(" (object_id('{0}'), {1}) ", objectName, browseInformationMode.HasValue ? browseInformationMode.Value.ToString() : "null");
 

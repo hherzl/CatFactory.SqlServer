@@ -59,32 +59,12 @@ namespace CatFactory.SqlServer
             => new SqlConnection(DatabaseImportSettings.ConnectionString);
 
         /// <summary>
-        /// Gets or sets the connnection string
-        /// </summary>
-        [Obsolete("Set connection string in ImportSettings")]
-        public string ConnectionString
-        {
-            get => DatabaseImportSettings.ConnectionString;
-            set => DatabaseImportSettings.ConnectionString = value;
-        }
-
-        /// <summary>
         /// Gets or sets the database import settings
         /// </summary>
         public DatabaseImportSettings DatabaseImportSettings
         {
             get => m_databaseImportSettings ??= new DatabaseImportSettings();
             set => m_databaseImportSettings = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the import settings
-        /// </summary>
-        [Obsolete("Use DatabaseImportSettings property")]
-        public DatabaseImportSettings ImportSettings
-        {
-            get => DatabaseImportSettings;
-            set => DatabaseImportSettings = value;
         }
 
         /// <summary>
@@ -341,7 +321,7 @@ namespace CatFactory.SqlServer
                 };
 
                 command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                command.CommandText = string.Format("SP_HELP '{0}'", dbObject.FullName);
 
                 var queryResults = new List<DynamicQueryResult>();
 
@@ -693,7 +673,7 @@ namespace CatFactory.SqlServer
                 using var command = connection.CreateCommand();
 
                 command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                command.CommandText = string.Format("SP_HELP '{0}'", dbObject.FullName);
 
                 var queryResults = new List<DynamicQueryResult>();
 
@@ -802,7 +782,7 @@ namespace CatFactory.SqlServer
                 };
 
                 command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                command.CommandText = string.Format("SP_HELP '{0}'", dbObject.FullName);
 
                 var queryResults = new List<DynamicQueryResult>();
 
@@ -870,7 +850,7 @@ namespace CatFactory.SqlServer
                 using var command = connection.CreateCommand();
 
                 command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                command.CommandText = string.Format("SP_HELP '{0}'", dbObject.FullName);
 
                 var queryResults = new List<DynamicQueryResult>();
 
@@ -950,7 +930,7 @@ namespace CatFactory.SqlServer
                 using var command = connection.CreateCommand();
 
                 command.Connection = connection;
-                command.CommandText = string.Format("sp_help '{0}'", dbObject.FullName);
+                command.CommandText = string.Format("SP_HELP '{0}'", dbObject.FullName);
 
                 var queryResults = new List<DynamicQueryResult>();
 

@@ -13,24 +13,24 @@ namespace CatFactory.SqlServer.Features
         /// </summary>
         /// <param name="extendedProperty">Search parameter</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
-        IEnumerable<ExtendedProperty> GetExtendedProperties(ExtendedProperty extendedProperty);
+        IEnumerable<ExtendedProperty> Get(ExtendedProperty extendedProperty);
 
         /// <summary>
         /// Adds an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to add</param>
-        void AddExtendedProperty(ExtendedProperty extendedProperty);
+        void Add(ExtendedProperty extendedProperty);
 
         /// <summary>
         /// Updates an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to update</param>
-        void UpdateExtendedProperty(ExtendedProperty extendedProperty);
+        void Update(ExtendedProperty extendedProperty);
 
         /// <summary>
         /// Drops an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to drop</param>
-        void DropExtendedProperty(ExtendedProperty extendedProperty);
+        void Drop(ExtendedProperty extendedProperty);
     }
 }

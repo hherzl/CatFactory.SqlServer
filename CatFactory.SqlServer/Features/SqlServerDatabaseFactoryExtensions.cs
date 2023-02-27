@@ -9,6 +9,11 @@ namespace CatFactory.SqlServer.Features
     /// </summary>
     public static class SqlServerDatabaseFactoryExtensions
     {
+        private const string SCHEMA = "schema";
+        private const string TABLE = "table";
+        private const string VIEW = "view";
+        private const string COLUMN = "column";
+
         /// <summary>
         /// Adds an extended property for database object
         /// </summary>
@@ -18,16 +23,15 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.AddExtendedProperty(new ExtendedProperty(name, value));
+            var repository = new ExtendedPropertyRepository(connection);
 
-                database.Description = value;
-            }
+            repository.Add(new ExtendedProperty(name, value));
+
+            database.Description = value;
         }
 
         /// <summary>
@@ -39,16 +43,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Add(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
-
-                table.Description = value;
-            }
+            table.Description = value;
         }
 
         /// <summary>
@@ -61,16 +67,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Add(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
-
-                column.Description = value;
-            }
+            column.Description = value;
         }
 
         /// <summary>
@@ -82,16 +90,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Add(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
-
-                view.Description = value;
-            }
+            view.Description = value;
         }
 
         /// <summary>
@@ -104,16 +114,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Add(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.AddExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
-
-                column.Description = value;
-            }
+            column.Description = value;
         }
 
         /// <summary>
@@ -125,16 +137,15 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.UpdateExtendedProperty(new ExtendedProperty(name, value));
+            var repository = new ExtendedPropertyRepository(connection);
 
-                database.Description = value;
-            }
+            repository.Update(new ExtendedProperty(name, value));
+
+            database.Description = value;
         }
 
         /// <summary>
@@ -146,16 +157,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name) { Value = value });
-
-                table.Description = value;
-            }
+            table.Description = value;
         }
 
         /// <summary>
@@ -168,16 +181,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            new ExtendedPropertyRepository(connection).Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                new ExtendedPropertyRepository(connection).UpdateExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name) { Value = value });
-
-                column.Description = value;
-            }
+            column.Description = value;
         }
 
         /// <summary>
@@ -189,16 +204,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Update(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name) { Value = value });
-
-                view.Description = value;
-            }
+            view.Description = value;
         }
 
         /// <summary>
@@ -211,16 +228,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            using (var connection = databaseFactory.GetConnection())
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Update(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
             {
-                connection.Open();
+                Value = value
+            });
 
-                var repository = new ExtendedPropertyRepository(connection);
-
-                repository.UpdateExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name) { Value = value });
-
-                column.Description = value;
-            }
+            column.Description = value;
         }
 
         /// <summary>
@@ -232,26 +251,25 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            var model = new ExtendedProperty(name, "schema", table.Schema, "table", table.Name)
+            var model = new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
             {
                 Value = value
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                var extendedProperty = repository.GetExtendedProperties(model).FirstOrDefault();
+            var repository = new ExtendedPropertyRepository(connection);
 
-                if (extendedProperty == null)
-                    repository.AddExtendedProperty(model);
-                else
-                    repository.UpdateExtendedProperty(model);
+            var extendedProperty = repository.Get(model).FirstOrDefault();
 
-                table.Description = value;
-            }
+            if (extendedProperty == null)
+                repository.Add(model);
+            else
+                repository.Update(model);
+
+            table.Description = value;
         }
 
         /// <summary>
@@ -264,26 +282,25 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            var model = new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name)
+            var model = new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
             {
                 Value = value
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                var extendedProperty = repository.GetExtendedProperties(model).FirstOrDefault();
+            var repository = new ExtendedPropertyRepository(connection);
 
-                if (extendedProperty == null)
-                    repository.AddExtendedProperty(model);
-                else
-                    repository.UpdateExtendedProperty(model);
+            var extendedProperty = repository.Get(model).FirstOrDefault();
 
-                column.Description = value;
-            }
+            if (extendedProperty == null)
+                repository.Add(model);
+            else
+                repository.Update(model);
+
+            column.Description = value;
         }
 
         /// <summary>
@@ -295,26 +312,25 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            var model = new ExtendedProperty(name, "schema", view.Schema, "view", view.Name)
+            var model = new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
             {
                 Value = value
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                var extendedProperty = repository.GetExtendedProperties(model).FirstOrDefault();
+            var repository = new ExtendedPropertyRepository(connection);
 
-                if (extendedProperty == null)
-                    repository.AddExtendedProperty(model);
-                else
-                    repository.UpdateExtendedProperty(model);
+            var extendedProperty = repository.Get(model).FirstOrDefault();
 
-                view.Description = value;
-            }
+            if (extendedProperty == null)
+                repository.Add(model);
+            else
+                repository.Update(model);
+
+            view.Description = value;
         }
 
         /// <summary>
@@ -327,26 +343,25 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            var model = new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name)
+            var model = new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
             {
                 Value = value
             };
 
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                var extendedProperty = repository.GetExtendedProperties(model).FirstOrDefault();
+            var repository = new ExtendedPropertyRepository(connection);
 
-                if (extendedProperty == null)
-                    repository.AddExtendedProperty(model);
-                else
-                    repository.UpdateExtendedProperty(model);
+            var extendedProperty = repository.Get(model).FirstOrDefault();
 
-                column.Description = value;
-            }
+            if (extendedProperty == null)
+                repository.Add(model);
+            else
+                repository.Update(model);
+
+            column.Description = value;
         }
 
         /// <summary>
@@ -357,12 +372,11 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name));
-            }
+            connection.Open();
+
+            new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name));
         }
 
         /// <summary>
@@ -373,14 +387,13 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
-            }
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name));
         }
 
         /// <summary>
@@ -392,14 +405,13 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
-            }
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name));
         }
 
         /// <summary>
@@ -410,14 +422,13 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
-            }
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name));
         }
 
         /// <summary>
@@ -429,14 +440,13 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var repository = new ExtendedPropertyRepository(connection);
+            connection.Open();
 
-                repository.DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
-            }
+            var repository = new ExtendedPropertyRepository(connection);
+
+            repository.Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name));
         }
 
         /// <summary>
@@ -446,15 +456,14 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var extendedProperty = connection.GetExtendedProperties(name).FirstOrDefault();
+            connection.Open();
 
-                if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name));
-            }
+            var extendedProperty = connection.GetExtendedProperties(name).FirstOrDefault();
+
+            if (extendedProperty != null)
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name));
         }
 
         /// <summary>
@@ -465,15 +474,14 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
+            connection.Open();
 
-                if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name));
-            }
+            var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
+
+            if (extendedProperty != null)
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name));
         }
 
         /// <summary>
@@ -485,15 +493,14 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
+            connection.Open();
 
-                if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", table.Schema, "table", table.Name, "column", column.Name));
-            }
+            var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
+
+            if (extendedProperty != null)
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name));
         }
 
         /// <summary>
@@ -504,15 +511,14 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+            connection.Open();
 
-                if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name));
-            }
+            var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+
+            if (extendedProperty != null)
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name));
         }
 
         /// <summary>
@@ -524,15 +530,14 @@ namespace CatFactory.SqlServer.Features
         /// <param name="name">Extended property name</param>
         public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
         {
-            using (var connection = databaseFactory.GetConnection())
-            {
-                connection.Open();
+            using var connection = databaseFactory.GetConnection();
 
-                var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+            connection.Open();
 
-                if (extendedProperty != null)
-                    new ExtendedPropertyRepository(connection).DropExtendedProperty(new ExtendedProperty(name, "schema", view.Schema, "view", view.Name, "column", column.Name));
-            }
+            var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+
+            if (extendedProperty != null)
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name));
         }
     }
 }
