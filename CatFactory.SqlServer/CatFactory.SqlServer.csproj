@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build69</Version>
+    <Version>1.0.0-beta-sun-build68</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
@@ -10,9 +10,10 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
-      1.0.0-beta-sun-build69 Version:
+      1.0.0-beta-sun-build68 Version:
 
       Fix issue 25: https://github.com/hherzl/CatFactory.SqlServer/issues/25
+      Fix issue 26: https://github.com/hherzl/CatFactory.SqlServer/issues/26
 
       Usage:
 
@@ -29,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build32" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build34" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 

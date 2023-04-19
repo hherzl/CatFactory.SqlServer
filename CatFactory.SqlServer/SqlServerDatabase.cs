@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using CatFactory.ObjectRelationalMapping;
-using CatFactory.ObjectRelationalMapping.Programmability;
 using CatFactory.SqlServer.DatabaseObjectModel;
 using CatFactory.SqlServer.ObjectRelationalMapping;
 
@@ -33,19 +32,7 @@ namespace CatFactory.SqlServer
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<ExtendedProperty> m_extendedProperties;
-        
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<ScalarFunction> m_scalarFunctions;
-        
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<TableFunction> m_tableFunctions;
-        
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<StoredProcedure> m_storedProcedures;
-        
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Sequence> m_sequences;
-        
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<DefaultTypeMap> m_defaultTypeMaps;
 
@@ -64,42 +51,6 @@ namespace CatFactory.SqlServer
         {
             get => m_extendedProperties ??= new List<ExtendedProperty>();
             set => m_extendedProperties = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the scalar functions
-        /// </summary>
-        public List<ScalarFunction> ScalarFunctions
-        {
-            get => m_scalarFunctions ??= new List<ScalarFunction>();
-            set => m_scalarFunctions = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the table functions
-        /// </summary>
-        public List<TableFunction> TableFunctions
-        {
-            get => m_tableFunctions ??= new List<TableFunction>();
-            set => m_tableFunctions = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the store procedures
-        /// </summary>
-        public List<StoredProcedure> StoredProcedures
-        {
-            get => m_storedProcedures ??= new List<StoredProcedure>();
-            set => m_storedProcedures = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the sequences
-        /// </summary>
-        public List<Sequence> Sequences
-        {
-            get => m_sequences ??= new List<Sequence>();
-            set => m_sequences = value;
         }
 
         /// <summary>

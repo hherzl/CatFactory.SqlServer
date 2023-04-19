@@ -17,5 +17,4 @@ namespace CatFactory.SqlServer
             return database;
         }
     }
-#pragma warning restore CS1591
 }
