@@ -9,10 +9,12 @@ namespace CatFactory.SqlServer.Features
     /// </summary>
     public static class SqlServerDatabaseFactoryExtensions
     {
-        private const string SCHEMA = "schema";
-        private const string TABLE = "table";
-        private const string VIEW = "view";
-        private const string COLUMN = "column";
+#pragma warning disable CS1591
+        public const string SCHEMA = "schema";
+        public const string TABLE = "table";
+        public const string VIEW = "view";
+        public const string COLUMN = "column";
+#pragma warning restore CS1591
 
         /// <summary>
         /// Adds an extended property for database object
