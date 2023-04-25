@@ -1,4 +1,5 @@
-﻿using CatFactory.SqlServer.Features;
+﻿using System.Threading.Tasks;
+using CatFactory.SqlServer.Features;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
@@ -136,7 +137,7 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public void AddExtendedPropertiesForColumnFromView()
+        public async Task AddExtendedPropertiesForColumnFromView()
         {
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
@@ -152,7 +153,7 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var db = dbFactory.Import();
+            var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
             dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], "MS_Description");

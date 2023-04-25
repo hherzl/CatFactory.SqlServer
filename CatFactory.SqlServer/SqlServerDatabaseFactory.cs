@@ -55,7 +55,7 @@ namespace CatFactory.SqlServer
         /// Gets an instance for <see cref="DbConnection"/> class
         /// </summary>
         /// <returns>An instance of <see cref="SqlConnection"/> class</returns>
-        public DbConnection GetConnection()
+        public SqlConnection GetConnection()
             => new SqlConnection(DatabaseImportSettings.ConnectionString);
 
         /// <summary>
@@ -84,6 +84,7 @@ namespace CatFactory.SqlServer
             var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
 
             database.ServerName = connection.DataSource;
+            database.Dbms = "SQL Server";
 
             await connection.OpenAsync();
 
