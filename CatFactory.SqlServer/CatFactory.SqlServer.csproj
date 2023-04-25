@@ -12,6 +12,7 @@
     <PackageReleaseNotes>
       1.0.0-beta-sun-build69 Version:
 
+      Fix issue 27: https://github.com/hherzl/CatFactory.SqlServer/issues/27
       Fix issue 28: https://github.com/hherzl/CatFactory.SqlServer/issues/28
 
       Usage:

@@ -246,6 +246,33 @@ namespace CatFactory.SqlServer.Features
         /// Adds if not exists or updates if exists an extended property for database object
         /// </summary>
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
+        /// <param name="database">Instance of <see cref="Database"/> class</param>
+        /// <param name="name">Extended property name</param>
+        /// <param name="value">Extended property value</param>
+        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
+        {
+            var model = new ExtendedProperty(name, value);
+
+            using var connection = databaseFactory.GetConnection();
+
+            connection.Open();
+
+            var repository = new ExtendedPropertyRepository(connection);
+
+            var extendedProperty = repository.Get(model).FirstOrDefault();
+
+            if (extendedProperty == null)
+                repository.Add(model);
+            else
+                repository.Update(model);
+
+            database.Description = value;
+        }
+
+        /// <summary>
+        /// Adds if not exists or updates if exists an extended property for database object
+        /// </summary>
+        /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
