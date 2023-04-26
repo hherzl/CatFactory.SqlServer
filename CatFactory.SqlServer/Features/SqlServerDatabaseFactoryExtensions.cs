@@ -189,7 +189,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            new ExtendedPropertyRepository(connection).Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
+            repository.Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
             {
                 Value = value
             });

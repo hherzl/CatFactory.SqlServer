@@ -8,6 +8,34 @@ namespace CatFactory.SqlServer
     /// </summary>
     public class DatabaseImportSettings
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="DatabaseImportSettings"/>
+        /// </summary>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="extendedProperties">Extended properties</param>
+        /// <returns></returns>
+        public static DatabaseImportSettings Create(string connectionString, params string[] extendedProperties)
+            => new()
+            {
+                ConnectionString = connectionString,
+                ExtendedProperties = new List<string>(extendedProperties)
+            };
+
+        /// <summary>
+        /// Creates a new instance of <see cref="DatabaseImportSettings"/>
+        /// </summary>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="importTables">Import tables flag</param>
+        /// <param name="importViews">Import views flag</param>
+        /// <param name="extendedProperties">Extended properties</param>
+        /// <returns></returns>
+        public static DatabaseImportSettings Create(string connectionString, bool importTables, bool importViews, params string[] extendedProperties)
+            => new()
+            {
+                ConnectionString = connectionString,
+                ExtendedProperties = new List<string>(extendedProperties)
+            };
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<string> m_exclusions;
 
@@ -37,6 +65,9 @@ namespace CatFactory.SqlServer
 					[schema_name],
 					[object_name]
 			";
+
+            ImportTables = true;
+            ImportViews = true;
         }
 
         /// <summary>
@@ -57,12 +88,12 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// Gets or sets a flag to import tables
         /// </summary>
-        public bool ImportTables { get; set; } = true;
+        public bool ImportTables { get; set; }
 
         /// <summary>
         /// Gets or sets a flag to import views
         /// </summary>
-        public bool ImportViews { get; set; } = true;
+        public bool ImportViews { get; set; }
 
         /// <summary>
         /// Gets or sets a flag to import scalar functions
