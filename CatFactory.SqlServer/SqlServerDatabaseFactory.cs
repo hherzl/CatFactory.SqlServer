@@ -20,6 +20,24 @@ namespace CatFactory.SqlServer
     /// </summary>
     public partial class SqlServerDatabaseFactory : IDatabaseFactory
     {
+        private const string CHECK = "CHECK";
+        private const string COLUMN_NAME = "Column_name";
+        private const string CONSTRAINT_TYPE = "constraint_type";
+        private const string DEFAULT = "DEFAULT";
+        private const string DEFAULT_ON_COLUMN_ = "DEFAULT on column ";
+        private const string FOREIGN_KEY = "FOREIGN KEY";
+        private const string IDENTITY = "Identity";
+        private const string INCREMENT = "Increment";
+        private const string INDEX_NAME = "index_name";
+        private const string NO_IDENTITY_COLUMN_DEFINED = "No identity column defined.";
+        private const string PARAMETER_NAME = "Parameter_name";
+        private const string PRIMARY_KEY = "PRIMARY KEY";
+        private const string REFERENCES = "REFERENCES";
+        private const string ROW_GUID_COL = "RowGuidCol";
+        private const string SEED = "Seed";
+        private const string TABLE_IS_REFERENCED_BY_FOREIGN_KEY = "Table is referenced by foreign key";
+        private const string UNIQUE = "UNIQUE";
+
         /// <summary>
         /// Gets a instance for <see cref="Logger"/> class
         /// </summary>
@@ -56,7 +74,7 @@ namespace CatFactory.SqlServer
         /// </summary>
         /// <returns>An instance of <see cref="SqlConnection"/> class</returns>
         public SqlConnection GetConnection()
-            => new SqlConnection(DatabaseImportSettings.ConnectionString);
+            => new(DatabaseImportSettings.ConnectionString);
 
         /// <summary>
         /// Gets or sets the database import settings
@@ -354,17 +372,17 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var item in result.Items)
                     {
-                        if (item.ContainsKey("Column_name"))
+                        if (item.ContainsKey(COLUMN_NAME))
                             AddColumn(table, item);
-                        else if (item.ContainsKey("Identity"))
+                        else if (item.ContainsKey(IDENTITY))
                             SetIdentity(table, item);
-                        else if (item.ContainsKey("RowGuidCol"))
+                        else if (item.ContainsKey(ROW_GUID_COL))
                             SetRowGuidCol(table, item);
-                        else if (item.ContainsKey("index_name"))
+                        else if (item.ContainsKey(INDEX_NAME))
                             AddIndexToTable(table, item);
-                        else if (item.ContainsKey("constraint_type"))
+                        else if (item.ContainsKey(CONSTRAINT_TYPE))
                             AddConstraintToTable(table, item);
-                        else if (item.ContainsKey("Table is referenced by foreign key"))
+                        else if (item.ContainsKey(TABLE_IS_REFERENCED_BY_FOREIGN_KEY))
                             AddTableReferenceToTable(table, item);
                     }
                 }
@@ -423,10 +441,10 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(Table table, IDictionary<string, object> dictionary)
         {
-            var identity = string.Concat(dictionary["Identity"]);
+            var identity = string.Concat(dictionary[IDENTITY]);
 
-            if (string.Compare(identity, "No identity column defined.", true) != 0)
-                table.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+            if (string.Compare(identity, NO_IDENTITY_COLUMN_DEFINED, true) != 0)
+                table.Identity = new Identity(identity, Convert.ToInt32(dictionary[SEED]), Convert.ToInt32(dictionary[INCREMENT]));
         }
 
         /// <summary>
@@ -436,10 +454,10 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(View view, IDictionary<string, object> dictionary)
         {
-            var identity = string.Concat(dictionary["Identity"]);
+            var identity = string.Concat(dictionary[IDENTITY]);
 
-            if (string.Compare(identity, "No identity column defined.", true) != 0)
-                view.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+            if (string.Compare(identity, NO_IDENTITY_COLUMN_DEFINED, true) != 0)
+                view.Identity = new Identity(identity, Convert.ToInt32(dictionary[SEED]), Convert.ToInt32(dictionary[INCREMENT]));
         }
 
         /// <summary>
@@ -479,10 +497,10 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         protected virtual void SetIdentity(TableFunction tableFunction, IDictionary<string, object> dictionary)
         {
-            var identity = string.Concat(dictionary["Identity"]);
+            var identity = string.Concat(dictionary[IDENTITY]);
 
-            if (string.Compare(identity, "No identity column defined.", true) != 0)
-                tableFunction.Identity = new Identity(identity, Convert.ToInt32(dictionary["Seed"]), Convert.ToInt32(dictionary["Increment"]));
+            if (string.Compare(identity, NO_IDENTITY_COLUMN_DEFINED, true) != 0)
+                tableFunction.Identity = new Identity(identity, Convert.ToInt32(dictionary[SEED]), Convert.ToInt32(dictionary[INCREMENT]));
         }
 
         /// <summary>
@@ -494,7 +512,7 @@ namespace CatFactory.SqlServer
         {
             table.ImportBag.RowGuidCol = new RowGuidCol
             {
-                Name = string.Concat(dictionary["RowGuidCol"])
+                Name = string.Concat(dictionary[ROW_GUID_COL])
             };
         }
 
@@ -507,7 +525,7 @@ namespace CatFactory.SqlServer
         {
             view.ImportBag.RowGuidCol = new RowGuidCol
             {
-                Name = string.Concat(dictionary["RowGuidCol"])
+                Name = string.Concat(dictionary[ROW_GUID_COL])
             };
         }
 
@@ -540,9 +558,9 @@ namespace CatFactory.SqlServer
         {
             var item = SqlServerDatabaseFactoryHelper.GetConstraintDetail(dictionary);
 
-            if (item.ConstraintType.Contains("DEFAULT on column "))
+            if (item.ConstraintType.Contains(DEFAULT_ON_COLUMN_))
             {
-                var columnName = item.ConstraintType.Replace("DEFAULT on column ", "").Trim();
+                var columnName = item.ConstraintType.Replace(DEFAULT_ON_COLUMN_, "").Trim();
 
                 var column = table[columnName];
 
@@ -561,11 +579,11 @@ namespace CatFactory.SqlServer
         {
             foreach (ConstraintDetail constraintDetail in table.ImportBag.ConstraintDetails)
             {
-                if (constraintDetail.ConstraintType.Contains("CHECK"))
+                if (constraintDetail.ConstraintType.Contains(CHECK))
                 {
                     table.Checks.Add(new Check(constraintDetail.ConstraintName, new string[] { constraintDetail.ConstraintKeys }));
                 }
-                else if (constraintDetail.ConstraintType.Contains("DEFAULT"))
+                else if (constraintDetail.ConstraintType.Contains(DEFAULT))
                 {
                     var column = constraintDetail.ConstraintType.Replace("DEFAULT on column ", string.Empty).Trim();
 
@@ -576,25 +594,25 @@ namespace CatFactory.SqlServer
 
                     table[column].DefaultValue = constraintDetail.ConstraintKeys;
                 }
-                else if (constraintDetail.ConstraintType.Contains("FOREIGN KEY"))
+                else if (constraintDetail.ConstraintType.Contains(FOREIGN_KEY))
                 {
                     var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
                     table.ForeignKeys.Add(new ForeignKey(constraintDetail.ConstraintName, key));
                 }
-                else if (constraintDetail.ConstraintType.Contains("PRIMARY KEY"))
+                else if (constraintDetail.ConstraintType.Contains(PRIMARY_KEY))
                 {
                     var key = string.Concat(constraintDetail.ConstraintKeys).Split(',').Select(item => item.Trim()).ToArray();
 
                     table.PrimaryKey = new PrimaryKey(constraintDetail.ConstraintName, key);
                 }
-                else if (constraintDetail.ConstraintKeys.Contains("REFERENCES"))
+                else if (constraintDetail.ConstraintKeys.Contains(REFERENCES))
                 {
                     var value = constraintDetail.ConstraintKeys.Replace("REFERENCES", string.Empty);
 
                     table.ForeignKeys.Last().References = value.Substring(0, value.IndexOf("(")).Trim();
                 }
-                else if (constraintDetail.ConstraintType.Contains("UNIQUE"))
+                else if (constraintDetail.ConstraintType.Contains(UNIQUE))
                 {
                     var key = constraintDetail.ConstraintKeys.ToString().Split(',').Select(item => item.Trim()).ToArray();
 
@@ -612,7 +630,7 @@ namespace CatFactory.SqlServer
         {
             table.ImportBag.TableReferences.Add(new TableReference
             {
-                ReferenceDescription = string.Concat(dictionary["Table is referenced by foreign key"]),
+                ReferenceDescription = string.Concat(dictionary[TABLE_IS_REFERENCED_BY_FOREIGN_KEY]),
             });
         }
 
@@ -639,7 +657,7 @@ namespace CatFactory.SqlServer
                     table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                     // todo: Remove this token
-                    if (name == "MS_Description")
+                    if (name == SqlServerToken.MS_DESCRIPTION)
                         table.Description = exProperty.Value;
                 }
 
@@ -652,7 +670,7 @@ namespace CatFactory.SqlServer
                         column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                         // todo: Remove this token
-                        if (name == "MS_Description")
+                        if (name == SqlServerToken.MS_DESCRIPTION)
                             column.Description = exProperty.Value;
                     }
                 }
@@ -711,13 +729,13 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var item in result.Items)
                     {
-                        if (item.ContainsKey("Column_name"))
+                        if (item.ContainsKey(COLUMN_NAME))
                             AddColumn(view, item);
-                        else if (item.ContainsKey("Identity"))
+                        else if (item.ContainsKey(IDENTITY))
                             SetIdentity(view, item);
-                        else if (item.ContainsKey("RowGuidCol"))
+                        else if (item.ContainsKey(ROW_GUID_COL))
                             SetRowGuidCol(view, item);
-                        else if (item.ContainsKey("index_name"))
+                        else if (item.ContainsKey(INDEX_NAME))
                             AddIndexToView(view, item);
                     }
                 }
@@ -740,7 +758,7 @@ namespace CatFactory.SqlServer
                     view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                     // todo: Remove this token
-                    if (name == "MS_Description")
+                    if (name == SqlServerToken.MS_DESCRIPTION)
                         view.ImportBag.Description = exProperty.Value;
                 }
 
@@ -753,7 +771,7 @@ namespace CatFactory.SqlServer
                         column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
                         // todo: Remove this token
-                        if (name == "MS_Description")
+                        if (name == SqlServerToken.MS_DESCRIPTION)
                             column.Description = exProperty.Value;
                     }
                 }
@@ -812,7 +830,7 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var item in result.Items)
                     {
-                        if (item.ContainsKey("Parameter_name"))
+                        if (item.ContainsKey(PARAMETER_NAME))
                             AddParameter(scalarFunction, item);
                     }
                 }
@@ -830,7 +848,7 @@ namespace CatFactory.SqlServer
                 foreach (var exProperty in connection.GetExtendedProperties(scalarFunction, name))
                 {
                     // todo: Remove this token
-                    if (name == "MS_Description")
+                    if (name == SqlServerToken.MS_DESCRIPTION)
                         scalarFunction.Description = exProperty.Value;
                 }
             }
@@ -888,11 +906,11 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var item in result.Items)
                     {
-                        if (item.ContainsKey("Column_name"))
+                        if (item.ContainsKey(COLUMN_NAME))
                             AddColumn(tableFunction, item);
-                        else if (item.ContainsKey("Identity"))
+                        else if (item.ContainsKey(IDENTITY))
                             SetIdentity(tableFunction, item);
-                        else if (item.ContainsKey("Parameter_name"))
+                        else if (item.ContainsKey(PARAMETER_NAME))
                             AddParameter(tableFunction, item);
                     }
                 }
@@ -910,7 +928,7 @@ namespace CatFactory.SqlServer
                 foreach (var exProperty in connection.GetExtendedProperties(tableFunction, name))
                 {
                     // todo: Remove this token
-                    if (name == "MS_Description")
+                    if (name == SqlServerToken.MS_DESCRIPTION)
                         tableFunction.Description = exProperty.Value;
                 }
             }
@@ -968,7 +986,7 @@ namespace CatFactory.SqlServer
                 {
                     foreach (var item in result.Items)
                     {
-                        if (item.ContainsKey("Parameter_name"))
+                        if (item.ContainsKey(PARAMETER_NAME))
                             AddParameter(storedProcedure, item);
                     }
                 }
@@ -986,7 +1004,7 @@ namespace CatFactory.SqlServer
                 foreach (var exProperty in connection.GetExtendedProperties(storedProcedure, name))
                 {
                     // todo: Remove this token
-                    if (name == "MS_Description")
+                    if (name == SqlServerToken.MS_DESCRIPTION)
                         storedProcedure.Description = exProperty.Value;
                 }
             }

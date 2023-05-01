@@ -2,6 +2,8 @@
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.SqlServer.DatabaseObjectModel;
 
+using token = CatFactory.SqlServer.SqlServerToken;
+
 namespace CatFactory.SqlServer.Features
 {
     /// <summary>
@@ -9,13 +11,6 @@ namespace CatFactory.SqlServer.Features
     /// </summary>
     public static class SqlServerDatabaseFactoryExtensions
     {
-#pragma warning disable CS1591
-        public const string SCHEMA = "schema";
-        public const string TABLE = "table";
-        public const string VIEW = "view";
-        public const string COLUMN = "column";
-#pragma warning restore CS1591
-
         /// <summary>
         /// Adds an extended property for database object
         /// </summary>
@@ -51,7 +46,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
+            repository.Add(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
                 Value = value
             });
@@ -75,7 +70,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
+            repository.Add(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
@@ -98,7 +93,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
+            repository.Add(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
                 Value = value
             });
@@ -122,7 +117,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
+            repository.Add(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
@@ -165,7 +160,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
+            repository.Update(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
                 Value = value
             });
@@ -189,7 +184,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
+            repository.Update(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
@@ -212,7 +207,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
+            repository.Update(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
                 Value = value
             });
@@ -236,7 +231,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
+            repository.Update(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
@@ -280,7 +275,7 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
-            var model = new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name)
+            var model = new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
                 Value = value
             };
@@ -311,7 +306,7 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
-            var model = new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name)
+            var model = new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
                 Value = value
             };
@@ -341,7 +336,7 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
-            var model = new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name)
+            var model = new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
                 Value = value
             };
@@ -372,7 +367,7 @@ namespace CatFactory.SqlServer.Features
         /// <param name="value">Extended property value</param>
         public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
-            var model = new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name)
+            var model = new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
                 Value = value
             };
@@ -422,7 +417,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name));
+            repository.Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
         }
 
         /// <summary>
@@ -440,7 +435,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name));
+            repository.Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -457,7 +452,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name));
+            repository.Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
         }
 
         /// <summary>
@@ -475,7 +470,7 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name));
+            repository.Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -510,7 +505,7 @@ namespace CatFactory.SqlServer.Features
             var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
 
             if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name));
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
         }
 
         /// <summary>
@@ -529,7 +524,7 @@ namespace CatFactory.SqlServer.Features
             var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
 
             if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, table.Schema, TABLE, table.Name, COLUMN, column.Name));
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -547,7 +542,7 @@ namespace CatFactory.SqlServer.Features
             var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
 
             if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name));
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
         }
 
         /// <summary>
@@ -566,7 +561,7 @@ namespace CatFactory.SqlServer.Features
             var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
 
             if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, SCHEMA, view.Schema, VIEW, view.Name, COLUMN, column.Name));
+                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
         }
     }
 }

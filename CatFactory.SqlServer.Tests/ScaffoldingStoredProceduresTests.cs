@@ -7,12 +7,13 @@ namespace CatFactory.SqlServer.Tests
 {
     public class ScaffoldingStoredProceduresTests
     {
+        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
+
         [Fact]
         public async Task ScaffoldProceduresFromExistingDatabaseAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory
-                .ImportAsync("server=(local);database=OnlineStore;integrated security=yes;");
+            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
 
             // Act
             foreach (var table in database.Tables)

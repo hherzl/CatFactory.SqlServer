@@ -6,6 +6,11 @@ namespace CatFactory.SqlServer.Tests
 {
     public class DocumentationTests
     {
+        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
+        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;";
+        private const string WideWorldImportersConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;";
+        private const string NorthwindConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;";
+
         private const string MsDescription = "MS_Description";
 
         [Fact]
@@ -14,7 +19,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(AdventureWorks2017ConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
@@ -34,14 +39,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
 
             dbFactory.DropExtendedPropertyIfExists(MsDescription);
-            dbFactory.AddExtendedProperty(db, MsDescription, "Online store");
+            dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
 
             // Assert
         }
@@ -52,15 +57,15 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, MsDescription);
-            dbFactory.AddExtendedProperty(table, MsDescription, "Products catalog");
+            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
 
             // Assert
         }
@@ -71,15 +76,15 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], MsDescription);
-            dbFactory.AddExtendedProperty(table, table["ID"], MsDescription, "ID for product");
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
 
             // Assert
         }
@@ -90,15 +95,15 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, MsDescription);
-            dbFactory.AddExtendedProperty(view, MsDescription, "Summary for orders");
+            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
 
             // Assert
         }
@@ -109,15 +114,15 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], MsDescription);
-            dbFactory.AddExtendedProperty(view, view["CustomerName"], MsDescription, "Name for customer (CompanyName)");
+            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
         }
 
         [Fact]
@@ -126,15 +131,15 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
 
             dbFactory.DropExtendedPropertyIfExists(MsDescription);
-            dbFactory.AddExtendedProperty(db, MsDescription, "Online store");
-            dbFactory.UpdateExtendedProperty(db, MsDescription, "Online store (Update)");
+            dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
+            dbFactory.UpdateExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
 
             // Assert
         }
@@ -145,16 +150,16 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, MsDescription);
-            dbFactory.AddExtendedProperty(table, MsDescription, "Products catalog");
-            dbFactory.UpdateExtendedProperty(table, MsDescription, "Products catalog (Update)");
+            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
+            dbFactory.UpdateExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
 
             // Assert
         }
@@ -165,16 +170,16 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], MsDescription);
-            dbFactory.AddExtendedProperty(table, table["ID"], MsDescription, "ID for product");
-            dbFactory.UpdateExtendedProperty(table, table["ID"], MsDescription, "ID for product (Update)");
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
+            dbFactory.UpdateExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product (Update)");
 
             // Assert
         }
@@ -185,16 +190,16 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, MsDescription);
-            dbFactory.AddExtendedProperty(view, MsDescription, "Summary for orders");
-            dbFactory.UpdateExtendedProperty(view, MsDescription, "Summary for orders (Update)");
+            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
+            dbFactory.UpdateExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
 
             // Assert
         }
@@ -205,16 +210,16 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], MsDescription);
-            dbFactory.AddExtendedProperty(view, view["CustomerName"], MsDescription, "Name for customer (CompanyName)");
-            dbFactory.UpdateExtendedProperty(view, view["CustomerName"], MsDescription, "Name for customer (CompanyName)");
+            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
+            dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            dbFactory.UpdateExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
         }
 
         [Fact]
@@ -223,7 +228,7 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
@@ -240,14 +245,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, MsDescription);
+            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -258,14 +263,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], MsDescription);
+            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -276,14 +281,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            dbFactory.DropExtendedPropertyIfExists(view, MsDescription);
+            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -294,14 +299,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var dbFactory = new SqlServerDatabaseFactory
             {
-                DatabaseImportSettings = DatabaseImportSettings.Create("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", MsDescription)
+                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
             };
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], MsDescription);
+            dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
         }
     }
 }

@@ -8,6 +8,8 @@ namespace CatFactory.SqlServer.Tests
 {
     public class SerializationTests
     {
+        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True; MultipleActiveResultSets=true;";
+
         [Fact]
         public void SerializeMockDatabaseToXml()
         {
@@ -15,9 +17,9 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Blogging;
 
             // Act
-            var output = XmlSerializerHelper.Serialize(database);
+            var xml = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.xml", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.xml", xml);
 
             // Assert
         }
@@ -29,9 +31,9 @@ namespace CatFactory.SqlServer.Tests
             var database = Databases.Blogging;
 
             // Act
-            var output = JsonConvert.SerializeObject(database, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.json", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.json", json);
 
             // Assert
         }
@@ -44,7 +46,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
+                    ConnectionString = AdventureWorks2017ConnectionString,
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -59,9 +61,9 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var output = XmlSerializerHelper.Serialize(database);
+            var xml = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.xml", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.xml", xml);
 
             // Assert
         }
@@ -74,7 +76,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local);database=AdventureWorks2017;integrated security=yes;MultipleActiveResultSets=true;",
+                    ConnectionString = AdventureWorks2017ConnectionString,
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -89,9 +91,9 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var database = databaseFactory.Import();
 
-            var output = JsonConvert.SerializeObject(database, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.json", output);
+            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.json", json);
 
             // Assert
         }

@@ -6,12 +6,16 @@ namespace CatFactory.SqlServer.Tests
 {
     public class ImportTests
     {
+        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
+        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;";
+        private const string WideWorldImportersConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;";
+        private const string NorthwindConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;";
+
         [Fact]
         public async Task ImportOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportAsync("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;");
+            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -30,7 +34,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAsync("server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;", "Sales.OrderHeader", "Sales.OrderDetail");
+                .ImportTablesAsync(OnlineStoreConnectionString, "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -44,101 +48,6 @@ namespace CatFactory.SqlServer.Tests
         }
 
         [Fact]
-        public async Task ImportNorthwindDatabaseAsync()
-        {
-            // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;", "dbo.ChangeLog");
-
-            // Assert
-            Assert.True(database.Tables.Count > 0);
-
-            Assert.True(database.FindTable("dbo.ChangeLog") == null);
-            Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
-            Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
-            Assert.True(database.FindTable("dbo.Products").ForeignKeys.Count > 0);
-            Assert.True(database.FindTable("dbo.Products").Defaults.Count > 0);
-            Assert.True(database.FindTable("dbo.Products").Checks.Count > 0);
-
-            Assert.True(database.Views.Count > 0);
-
-            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
-        }
-
-        [Fact]
-        public async Task FullImportNorthwindDatabaseAsync()
-        {
-            // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;",
-                    ImportStoredProcedures = true,
-                    ImportTableFunctions = true,
-                    ImportScalarFunctions = true
-                }
-            };
-
-            // Act
-            var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
-
-            // Assert
-            Assert.True(database.Tables.Count > 0);
-
-            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
-            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
-            Assert.True(database.FindTable("dbo.Orders").ForeignKeys.Count > 0);
-
-            Assert.True(database.Views.Count > 0);
-
-            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
-
-            Assert.True(database.StoredProcedures.Count > 0);
-
-            Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").ResultSets.Count > 0);
-        }
-
-        [Fact]
-        public async Task ImportTablesFromNorthwindDatabaseAsync()
-        {
-            // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportTablesAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;");
-
-            // Assert
-            Assert.True(database.Tables.Count > 0);
-            Assert.True(database.Views.Count == 0);
-        }
-
-        [Fact]
-        public async Task ImportNorthwindViewsAsync()
-        {
-            // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportViewsAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;");
-
-            // Assert
-            Assert.True(database.Tables.Count == 0);
-            Assert.True(database.Views.Count > 0);
-        }
-
-        [Fact]
-        public async Task ImportTablesAndViewsFromNorthwindAsync()
-        {
-            // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportTablesAndViewsAsync("server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;", "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
-
-            // Assert
-            Assert.True(database.Tables.Count == 2);
-            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
-            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
-
-            Assert.True(database.Views.Count == 2);
-        }
-
-        [Fact]
         public async Task ImportAdventureWorksDatabaseAsync()
         {
             // Arrange
@@ -146,7 +55,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;",
+                    ConnectionString = AdventureWorks2017ConnectionString,
                     ImportStoredProcedures = true,
                     ImportScalarFunctions = true,
                     ImportTableFunctions = true,
@@ -188,7 +97,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;",
+                    ConnectionString = WideWorldImportersConnectionString,
                     ImportSequences = true
                 }
             };
@@ -203,6 +112,99 @@ namespace CatFactory.SqlServer.Tests
             Assert.False(database.FindTable("Warehouse.StockItems")["StockItemID"].ImportBag.ComputedExpression == null);
 
             Assert.True(database.Sequences.Count > 0);
+        }
+
+        [Fact]
+        public async Task ImportNorthwindDatabaseAsync()
+        {
+            // Arrange and Act
+            var database = await SqlServerDatabaseFactory.ImportAsync(NorthwindConnectionString, "dbo.ChangeLog");
+
+            // Assert
+            Assert.True(database.Tables.Count > 0);
+
+            Assert.True(database.FindTable("dbo.ChangeLog") == null);
+            Assert.True(database.FindTable("dbo.Products").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").PrimaryKey != null);
+            Assert.True(database.FindTable("dbo.Products").ForeignKeys.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").Defaults.Count > 0);
+            Assert.True(database.FindTable("dbo.Products").Checks.Count > 0);
+
+            Assert.True(database.Views.Count > 0);
+
+            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
+        }
+
+        [Fact]
+        public async Task FullImportNorthwindDatabaseAsync()
+        {
+            // Arrange
+            var databaseFactory = new SqlServerDatabaseFactory
+            {
+                DatabaseImportSettings = new DatabaseImportSettings
+                {
+                    ConnectionString = NorthwindConnectionString,
+                    ImportStoredProcedures = true,
+                    ImportTableFunctions = true,
+                    ImportScalarFunctions = true
+                }
+            };
+
+            // Act
+            var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
+
+            // Assert
+            Assert.True(database.Tables.Count > 0);
+
+            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
+            Assert.True(database.FindTable("dbo.Orders").ForeignKeys.Count > 0);
+
+            Assert.True(database.Views.Count > 0);
+
+            Assert.True(database.FindView("dbo.Invoices").Columns.Count > 0);
+
+            Assert.True(database.StoredProcedures.Count > 0);
+
+            Assert.True(database.StoredProcedures.First(item => item.FullName == "dbo.CustOrderHist").ResultSets.Count > 0);
+        }
+
+        [Fact]
+        public async Task ImportTablesFromNorthwindDatabaseAsync()
+        {
+            // Arrange and Act
+            var database = await SqlServerDatabaseFactory.ImportTablesAsync(NorthwindConnectionString);
+
+            // Assert
+            Assert.True(database.Tables.Count > 0);
+            Assert.True(database.Views.Count == 0);
+        }
+
+        [Fact]
+        public async Task ImportNorthwindViewsAsync()
+        {
+            // Arrange and Act
+            var database = await SqlServerDatabaseFactory
+                .ImportViewsAsync(NorthwindConnectionString);
+
+            // Assert
+            Assert.True(database.Tables.Count == 0);
+            Assert.True(database.Views.Count > 0);
+        }
+
+        [Fact]
+        public async Task ImportTablesAndViewsFromNorthwindAsync()
+        {
+            // Arrange and Act
+            var database = await SqlServerDatabaseFactory
+                .ImportTablesAndViewsAsync(NorthwindConnectionString, "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
+
+            // Assert
+            Assert.True(database.Tables.Count == 2);
+            Assert.True(database.FindTable("dbo.Orders").Columns.Count > 0);
+            Assert.True(database.FindTable("dbo.Orders").PrimaryKey != null);
+
+            Assert.True(database.Views.Count == 2);
         }
     }
 }
