@@ -33,8 +33,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportTablesFromOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportTablesAsync(OnlineStoreConnectionString, "Sales.OrderHeader", "Sales.OrderDetail");
+            var database = await SqlServerDatabaseFactory.ImportTablesAsync(OnlineStoreConnectionString, "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -51,20 +50,14 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportAdventureWorksDatabaseAsync()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger())
+            var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger(), new DatabaseImportSettings
             {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = AdventureWorks2017ConnectionString,
-                    ImportStoredProcedures = true,
-                    ImportScalarFunctions = true,
-                    ImportTableFunctions = true,
-                    ExclusionTypes =
-                    {
-                        "geography"
-                    }
-                }
-            };
+                ConnectionString = AdventureWorks2017ConnectionString,
+                ImportStoredProcedures = true,
+                ImportScalarFunctions = true,
+                ImportTableFunctions = true,
+                ExclusionTypes = { "geography" }
+            });
 
             // Act
             var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
@@ -93,14 +86,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportWideWorldImportersDatabaseAsync()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = WideWorldImportersConnectionString,
-                    ImportSequences = true
-                }
-            };
+            var databaseFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create(connectionString: WideWorldImportersConnectionString, importSequences: true));
 
             // Act
             var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
@@ -139,16 +125,9 @@ namespace CatFactory.SqlServer.Tests
         public async Task FullImportNorthwindDatabaseAsync()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = NorthwindConnectionString,
-                    ImportStoredProcedures = true,
-                    ImportTableFunctions = true,
-                    ImportScalarFunctions = true
-                }
-            };
+            var databaseFactory = new SqlServerDatabaseFactory(
+                DatabaseImportSettings.Create(connectionString: NorthwindConnectionString, importScalarFunctions: true, importTableFunctions: true, importStoredProcedures: true)
+            );
 
             // Act
             var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
@@ -184,8 +163,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportNorthwindViewsAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory
-                .ImportViewsAsync(NorthwindConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportViewsAsync(NorthwindConnectionString);
 
             // Assert
             Assert.True(database.Tables.Count == 0);
@@ -197,7 +175,8 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAndViewsAsync(NorthwindConnectionString, "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997");
+                .ImportTablesAndViewsAsync(NorthwindConnectionString, "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997")
+                ;
 
             // Assert
             Assert.True(database.Tables.Count == 2);

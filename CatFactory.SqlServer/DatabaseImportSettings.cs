@@ -11,12 +11,14 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// Creates a new instance of <see cref="DatabaseImportSettings"/>
         /// </summary>
+        /// <param name="name">Name</param>
         /// <param name="connectionString">Connection string</param>
         /// <param name="extendedProperties">Extended properties</param>
-        /// <returns></returns>
-        public static DatabaseImportSettings Create(string connectionString, params string[] extendedProperties)
+        /// <returns>The database import settings</returns>
+        public static DatabaseImportSettings Create(string name, string connectionString, params string[] extendedProperties)
             => new()
             {
+                Name = name,
                 ConnectionString = connectionString,
                 ExtendedProperties = new List<string>(extendedProperties)
             };
@@ -24,16 +26,47 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// Creates a new instance of <see cref="DatabaseImportSettings"/>
         /// </summary>
+        /// <param name="name">Name</param>
         /// <param name="connectionString">Connection string</param>
         /// <param name="importTables">Import tables flag</param>
         /// <param name="importViews">Import views flag</param>
         /// <param name="extendedProperties">Extended properties</param>
-        /// <returns></returns>
-        public static DatabaseImportSettings Create(string connectionString, bool importTables, bool importViews, params string[] extendedProperties)
+        /// <returns>The database import settings</returns>
+        public static DatabaseImportSettings Create(string name, string connectionString, bool importTables, bool importViews, params string[] extendedProperties)
             => new()
             {
+                Name = name,
                 ConnectionString = connectionString,
+                ImportTables = importTables,
+                ImportViews = importViews,
                 ExtendedProperties = new List<string>(extendedProperties)
+            };
+
+        /// <summary>
+        /// Creates a new instance of <see cref="DatabaseImportSettings"/>
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="importTables">Import tables flag</param>
+        /// <param name="importViews">Import views flag</param>
+        /// <param name="importScalarFunctions">Import scalar functions flag</param>
+        /// <param name="importTableFunctions">Import table functions flag</param>
+        /// <param name="importStoredProcedures">Import stored procedures flag</param>
+        /// <param name="importSequences">Import sequences flag</param>
+        /// <param name="extendedProperties">Extended properties</param>
+        /// <returns>The database import settings</returns>
+        public static DatabaseImportSettings Create(string name = "", string connectionString = "", bool importTables = true, bool importViews = true, bool importScalarFunctions = false, bool importTableFunctions = false, bool importStoredProcedures = false, bool importSequences = false, string[] extendedProperties = null)
+            => new()
+            {
+                Name = name,
+                ConnectionString = connectionString,
+                ImportTables = importTables,
+                ImportViews = importViews,
+                ImportScalarFunctions = importScalarFunctions,
+                ImportTableFunctions = importTableFunctions,
+                ImportStoredProcedures = importStoredProcedures,
+                ImportSequences = importSequences,
+                ExtendedProperties = extendedProperties == null ? new List<string>() : new List<string>(extendedProperties)
             };
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

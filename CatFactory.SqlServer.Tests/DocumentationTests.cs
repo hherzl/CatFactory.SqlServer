@@ -17,10 +17,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task GetExtendedProperties()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(AdventureWorks2017ConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("AdventureWorks2017", AdventureWorks2017ConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = (SqlServerDatabase)await dbFactory.ImportAsync();
@@ -37,10 +34,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForDatabase()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -55,10 +49,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -74,10 +65,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -93,10 +81,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -112,10 +97,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -129,10 +111,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForDatabase()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -148,10 +127,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -168,10 +144,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -188,10 +161,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -208,10 +178,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -226,10 +193,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForDatabase()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -243,10 +207,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -261,10 +222,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -279,10 +237,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
@@ -297,10 +252,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory
-            {
-                DatabaseImportSettings = DatabaseImportSettings.Create(OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION)
-            };
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();

@@ -11,8 +11,9 @@
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
       1.0.0-beta-sun-build70 Version:
-      
+
       Fix issue 32: https://github.com/hherzl/CatFactory.SqlServer/issues/32
+      Fix issue 34: https://github.com/hherzl/CatFactory.SqlServer/issues/34
 
       Usage:
 

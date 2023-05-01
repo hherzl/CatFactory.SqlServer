@@ -65,6 +65,26 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
+        /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
+        /// </summary>
+        /// <param name="databaseImportSettings">Instance of <see cref="DatabaseImportSettings"/> class</param>
+        public SqlServerDatabaseFactory(DatabaseImportSettings databaseImportSettings)
+        {
+            m_databaseImportSettings = databaseImportSettings;
+        }
+
+        /// <summary>
+        /// Initializes a new instance for <see cref="SqlServerDatabaseFactory"/> class
+        /// </summary>
+        /// <param name="logger"><see cref="Logger"/> class</param>
+        /// <param name="databaseImportSettings">Instance of <see cref="DatabaseImportSettings"/> class</param>
+        public SqlServerDatabaseFactory(ILogger<SqlServerDatabaseFactory> logger, DatabaseImportSettings databaseImportSettings)
+        {
+            Logger = logger;
+            m_databaseImportSettings = databaseImportSettings;
+        }
+
+        /// <summary>
         /// Gets the <see cref="Logger"/> instance
         /// </summary>
         protected ILogger Logger { get; }
