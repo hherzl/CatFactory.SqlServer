@@ -36,7 +36,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Initializes a new instance of <see cref="ExtendedPropertyRepository"/> class
         /// </summary>
-        /// <param name="connection">Connection to database</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         public ExtendedPropertyRepository(SqlConnection connection)
         {
             _connection = connection;
@@ -46,7 +46,7 @@ namespace CatFactory.SqlServer.Features
         /// Gets extended properties
         /// </summary>
         /// <param name="extendedProperty">Search parameter</param>
-        /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
+        /// <returns>A task representing the asynchronous operation</returns>
         public async Task<List<ExtendedProperty>> GetAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
@@ -87,8 +87,8 @@ namespace CatFactory.SqlServer.Features
         /// Adds an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to add</param>
-        /// <returns>The number of rows affected</returns>
-        public async Task<int> AddAsync(ExtendedProperty extendedProperty)
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task AddAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -105,15 +105,15 @@ namespace CatFactory.SqlServer.Features
             command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
             command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            return await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync();
         }
 
         /// <summary>
         /// Updates an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to update</param>
-        /// <returns>The number of rows affected</returns>
-        public async Task<int> UpdateAsync(ExtendedProperty extendedProperty)
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task UpdateAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -130,15 +130,15 @@ namespace CatFactory.SqlServer.Features
             command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
             command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            return await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync();
         }
 
         /// <summary>
         /// Drops an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to drop</param>
-        /// <returns>The number of rows affected</returns>
-        public async Task<int> DropAsync(ExtendedProperty extendedProperty)
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task DropAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -154,7 +154,7 @@ namespace CatFactory.SqlServer.Features
             command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
             command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            return await command.ExecuteNonQueryAsync();
+            await command.ExecuteNonQueryAsync();
         }
     }
 }
