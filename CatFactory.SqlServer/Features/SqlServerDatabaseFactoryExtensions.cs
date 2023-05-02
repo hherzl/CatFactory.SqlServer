@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.SqlServer.DatabaseObjectModel;
 
@@ -18,15 +19,16 @@ namespace CatFactory.SqlServer.Features
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, value));
+            await repository.AddAsync(new ExtendedProperty(name, value));
 
             database.Description = value;
         }
@@ -38,20 +40,23 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
+            var affectedRows = await repository.AddAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
                 Value = value
             });
 
             table.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -62,20 +67,23 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
+            var affectedRows = await repository.AddAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -85,7 +93,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
@@ -93,12 +102,14 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
+            var affectedRows = await repository.AddAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
                 Value = value
             });
 
             view.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -109,7 +120,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
@@ -117,12 +129,14 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Add(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
+            var affectedRows = await repository.AddAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -132,17 +146,20 @@ namespace CatFactory.SqlServer.Features
         /// <param name="database"></param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, value));
+            var affectedRows = await repository.UpdateAsync(new ExtendedProperty(name, value));
 
             database.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -152,7 +169,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
@@ -160,12 +178,14 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
+            var affectedRows = await repository.UpdateAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
                 Value = value
             });
 
             table.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -176,7 +196,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
@@ -184,12 +205,14 @@ namespace CatFactory.SqlServer.Features
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
+            var affectedRows = await repository.UpdateAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -199,20 +222,23 @@ namespace CatFactory.SqlServer.Features
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
+            var affectedRows = await repository.UpdateAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
                 Value = value
             });
 
             view.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -223,20 +249,23 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> UpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Update(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
+            var affectedRows = await repository.UpdateAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
                 Value = value
             });
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -246,24 +275,24 @@ namespace CatFactory.SqlServer.Features
         /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name, string value)
         {
             var model = new ExtendedProperty(name, value);
 
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            var extendedProperty = repository.Get(model).FirstOrDefault();
+            var extendedProperty = (await repository.GetAsync(model)).FirstOrDefault();
 
-            if (extendedProperty == null)
-                repository.Add(model);
-            else
-                repository.Update(model);
+            var affectedRows = extendedProperty == null ? await repository.AddAsync(model) : await repository.UpdateAsync(model);
 
             database.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -273,7 +302,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name, string value)
         {
             var model = new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name)
             {
@@ -282,18 +312,17 @@ namespace CatFactory.SqlServer.Features
 
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            var extendedProperty = repository.Get(model).FirstOrDefault();
+            var extendedProperty = (await repository.GetAsync(model)).FirstOrDefault();
 
-            if (extendedProperty == null)
-                repository.Add(model);
-            else
-                repository.Update(model);
+            var affectedRows = extendedProperty == null ? await repository.AddAsync(model) : await repository.UpdateAsync(model);
 
             table.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -304,7 +333,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name, string value)
         {
             var model = new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name)
             {
@@ -313,18 +343,17 @@ namespace CatFactory.SqlServer.Features
 
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            var extendedProperty = repository.Get(model).FirstOrDefault();
+            var extendedProperty = (await repository.GetAsync(model)).FirstOrDefault();
 
-            if (extendedProperty == null)
-                repository.Add(model);
-            else
-                repository.Update(model);
+            var affectedRows = extendedProperty == null ? await repository.AddAsync(model) : await repository.UpdateAsync(model);
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -334,7 +363,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name, string value)
         {
             var model = new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name)
             {
@@ -343,18 +373,17 @@ namespace CatFactory.SqlServer.Features
 
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            var extendedProperty = repository.Get(model).FirstOrDefault();
+            var extendedProperty = (await repository.GetAsync(model)).FirstOrDefault();
 
-            if (extendedProperty == null)
-                repository.Add(model);
-            else
-                repository.Update(model);
+            var affectedRows = extendedProperty == null ? await repository.AddAsync(model) : await repository.UpdateAsync(model);
 
             view.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -365,7 +394,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
         /// <param name="value">Extended property value</param>
-        public static void AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> AddOrUpdateExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name, string value)
         {
             var model = new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name)
             {
@@ -374,33 +404,33 @@ namespace CatFactory.SqlServer.Features
 
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            var extendedProperty = repository.Get(model).FirstOrDefault();
+            var extendedProperty = (await repository.GetAsync(model)).FirstOrDefault();
 
-            if (extendedProperty == null)
-                repository.Add(model);
-            else
-                repository.Update(model);
+            var affectedRows = extendedProperty == null ? await repository.AddAsync(model) : await repository.UpdateAsync(model);
 
             column.Description = value;
+
+            return affectedRows;
         }
 
         /// <summary>
         /// Drops an extended property for database object
         /// </summary>
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
-        /// <param name="database"></param>
+        /// <param name="database">Instance of <see cref="Database"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, Database database, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name));
+            return await new ExtendedPropertyRepository(connection).DropAsync(new ExtendedProperty(name));
         }
 
         /// <summary>
@@ -409,15 +439,16 @@ namespace CatFactory.SqlServer.Features
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
+            return await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
         }
 
         /// <summary>
@@ -427,15 +458,16 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
+            return await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -444,15 +476,16 @@ namespace CatFactory.SqlServer.Features
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
+            return await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
         }
 
         /// <summary>
@@ -462,15 +495,16 @@ namespace CatFactory.SqlServer.Features
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedProperty(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
             var repository = new ExtendedPropertyRepository(connection);
 
-            repository.Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
+            return await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -478,16 +512,18 @@ namespace CatFactory.SqlServer.Features
         /// </summary>
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var extendedProperty = connection.GetExtendedProperties(name).FirstOrDefault();
+            var extendedProperty = (await connection.GetExtendedProperties(name)).FirstOrDefault();
 
-            if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name));
+            var repository = new ExtendedPropertyRepository(connection);
+
+            return extendedProperty == null ? 0 : await repository.DropAsync(new ExtendedProperty(name));
         }
 
         /// <summary>
@@ -496,16 +532,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var extendedProperty = connection.GetExtendedProperties(table, name).FirstOrDefault();
+            var extendedProperty = (await connection.GetExtendedProperties(table, name)).FirstOrDefault();
 
-            if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
+            var repository = new ExtendedPropertyRepository(connection);
+
+            return extendedProperty == null ? 0 : await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name));
         }
 
         /// <summary>
@@ -515,16 +553,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Instance of <see cref="Table"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, ITable table, Column column, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var extendedProperty = connection.GetExtendedProperties(table, column, name).FirstOrDefault();
+            var extendedProperty = (await connection.GetExtendedProperties(table, column, name)).FirstOrDefault();
 
-            if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
+            var repository = new ExtendedPropertyRepository(connection);
+
+            return extendedProperty == null ? 0 : await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, table.Schema, token.TABLE, table.Name, token.COLUMN, column.Name));
         }
 
         /// <summary>
@@ -533,16 +573,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="databaseFactory">Instance of <see cref="SqlServerDatabaseFactory"/> class</param>
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+            var extendedProperty = (await connection.GetExtendedProperties(view, name)).FirstOrDefault();
 
-            if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
+            var repository = new ExtendedPropertyRepository(connection);
+
+            return extendedProperty == null ? 0 : await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name));
         }
 
         /// <summary>
@@ -552,16 +594,21 @@ namespace CatFactory.SqlServer.Features
         /// <param name="view">Instance of <see cref="View"/> class</param>
         /// <param name="column">Instance of <see cref="Column"/> class</param>
         /// <param name="name">Extended property name</param>
-        public static void DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
+        /// <returns>The number of rows affected</returns>
+        public static async Task<int> DropExtendedPropertyIfExists(this SqlServerDatabaseFactory databaseFactory, IView view, Column column, string name)
         {
             using var connection = databaseFactory.GetConnection();
 
-            connection.Open();
+            await connection.OpenAsync();
 
-            var extendedProperty = connection.GetExtendedProperties(view, name).FirstOrDefault();
+            var extendedProperty = (await connection.GetExtendedProperties(view, name)).FirstOrDefault();
 
-            if (extendedProperty != null)
-                new ExtendedPropertyRepository(connection).Drop(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
+            var repository = new ExtendedPropertyRepository(connection);
+
+            if (extendedProperty == null)
+                return 0;
+
+            return await repository.DropAsync(new ExtendedProperty(name, token.SCHEMA, view.Schema, token.VIEW, view.Name, token.COLUMN, column.Name));
         }
     }
 }

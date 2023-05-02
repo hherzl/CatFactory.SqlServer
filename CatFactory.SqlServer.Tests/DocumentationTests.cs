@@ -39,8 +39,9 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            dbFactory.DropExtendedPropertyIfExists(MsDescription);
-            dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
+            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
+            
+            await dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online Store Database (Sample Database for Entity Framework Core for the The Enterprise)");
 
             // Assert
         }
@@ -55,8 +56,9 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
+            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
 
             // Assert
         }
@@ -71,8 +73,9 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
+            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
 
             // Assert
         }
@@ -87,8 +90,9 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
+            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
 
             // Assert
         }
@@ -103,8 +107,9 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            await dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION, "Name for employee (Full name)");
         }
 
         [Fact]
@@ -116,9 +121,11 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            dbFactory.DropExtendedPropertyIfExists(MsDescription);
-            dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
-            dbFactory.UpdateExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
+            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
+
+            await dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
+
+            await dbFactory.UpdateExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
 
             // Assert
         }
@@ -133,9 +140,11 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
-            dbFactory.UpdateExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
+            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
+            
+            await dbFactory.UpdateExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
 
             // Assert
         }
@@ -150,9 +159,11 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
-            dbFactory.UpdateExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product (Update)");
+            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
+            
+            await dbFactory.UpdateExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product (Update)");
 
             // Assert
         }
@@ -167,9 +178,11 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
-            dbFactory.UpdateExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
+            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
+            
+            await dbFactory.UpdateExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
 
             // Assert
         }
@@ -184,9 +197,11 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
-            dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
-            dbFactory.UpdateExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            await dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
+
+            await dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            
+            await dbFactory.UpdateExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
         }
 
         [Fact]
@@ -198,7 +213,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            dbFactory.DropExtendedPropertyIfExists(MsDescription);
+            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
 
             // Assert
         }
@@ -213,7 +228,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -228,7 +243,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -243,7 +258,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -258,7 +273,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
+            await dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
         }
     }
 }

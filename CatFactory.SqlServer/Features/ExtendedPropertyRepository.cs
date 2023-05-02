@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.Features
@@ -12,18 +12,14 @@ namespace CatFactory.SqlServer.Features
     /// </summary>
     public class ExtendedPropertyRepository : IExtendedPropertyRepository
     {
-        private readonly DbConnection _connection;
+        private const string LEVEL_0_TYPE = "@level0type";
+        private const string LEVEL_0_NAME = "@level0name";
+        private const string LEVEL_1_TYPE = "@level1type";
+        private const string LEVEL_1_NAME = "@level1name";
+        private const string LEVEL_2_TYPE = "@level2type";
+        private const string LEVEL_2_NAME = "@level2name";
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="ExtendedPropertyRepository"/> class
-        /// </summary>
-        /// <param name="connection">Connection to database</param>
-        public ExtendedPropertyRepository(DbConnection connection)
-        {
-            _connection = connection;
-        }
-
-        private SqlParameter GetParameter(string name, SqlDbType sqlDbType, string value)
+        private static SqlParameter GetParameter(string name, SqlDbType sqlDbType, string value)
         {
             var parameter = new SqlParameter(name, sqlDbType);
 
@@ -35,12 +31,23 @@ namespace CatFactory.SqlServer.Features
             return parameter;
         }
 
+        private readonly SqlConnection _connection;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="ExtendedPropertyRepository"/> class
+        /// </summary>
+        /// <param name="connection">Connection to database</param>
+        public ExtendedPropertyRepository(SqlConnection connection)
+        {
+            _connection = connection;
+        }
+
         /// <summary>
         /// Gets extended properties
         /// </summary>
         /// <param name="extendedProperty">Search parameter</param>
         /// <returns>A sequence of <see cref="ExtendedProperty"/> class</returns>
-        public IEnumerable<ExtendedProperty> Get(ExtendedProperty extendedProperty)
+        public async Task<List<ExtendedProperty>> GetAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -57,30 +64,31 @@ namespace CatFactory.SqlServer.Features
                 ";
 
             command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
-            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(GetParameter(LEVEL_0_TYPE, SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(GetParameter(LEVEL_0_NAME, SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(GetParameter(LEVEL_1_TYPE, SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(GetParameter(LEVEL_1_NAME, SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            using var dataReader = command.ExecuteReader();
+            using var dataReader = await command.ExecuteReaderAsync();
+
+            var list = new List<ExtendedProperty>();
 
             while (dataReader.Read())
             {
-                yield return new ExtendedProperty
-                {
-                    Name = dataReader.GetString(2),
-                    Value = dataReader.GetString(3)
-                };
+                list.Add(new ExtendedProperty(dataReader.GetString(2), dataReader.GetString(3)));
             }
+
+            return list;
         }
 
         /// <summary>
         /// Adds an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to add</param>
-        public void Add(ExtendedProperty extendedProperty)
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> AddAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -90,21 +98,22 @@ namespace CatFactory.SqlServer.Features
 
             command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
             command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
-            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(GetParameter(LEVEL_0_TYPE, SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(GetParameter(LEVEL_0_NAME, SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(GetParameter(LEVEL_1_TYPE, SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(GetParameter(LEVEL_1_NAME, SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            command.ExecuteNonQuery();
+            return await command.ExecuteNonQueryAsync();
         }
 
         /// <summary>
         /// Updates an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to update</param>
-        public void Update(ExtendedProperty extendedProperty)
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> UpdateAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -114,21 +123,22 @@ namespace CatFactory.SqlServer.Features
 
             command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
             command.Parameters.Add(new SqlParameter("@value", extendedProperty.Value));
-            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(GetParameter(LEVEL_0_TYPE, SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(GetParameter(LEVEL_0_NAME, SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(GetParameter(LEVEL_1_TYPE, SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(GetParameter(LEVEL_1_NAME, SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            command.ExecuteNonQuery();
+            return await command.ExecuteNonQueryAsync();
         }
 
         /// <summary>
         /// Drops an extended property
         /// </summary>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/> class to drop</param>
-        public void Drop(ExtendedProperty extendedProperty)
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> DropAsync(ExtendedProperty extendedProperty)
         {
             using var command = _connection.CreateCommand();
 
@@ -137,14 +147,14 @@ namespace CatFactory.SqlServer.Features
             command.CommandText = " EXEC [sys].[sp_dropextendedproperty] @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name ";
 
             command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
-            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(GetParameter(LEVEL_0_TYPE, SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(GetParameter(LEVEL_0_NAME, SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(GetParameter(LEVEL_1_TYPE, SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(GetParameter(LEVEL_1_NAME, SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(GetParameter(LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(GetParameter(LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
-            command.ExecuteNonQuery();
+            return await command.ExecuteNonQueryAsync();
         }
     }
 }

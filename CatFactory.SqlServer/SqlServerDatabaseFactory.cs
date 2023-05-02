@@ -161,7 +161,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var table in database.Tables)
                     {
-                        ImportExtendedProperties(connection, table);
+                        await ImportExtendedProperties(connection, table);
                     }
                 }
             }
@@ -184,7 +184,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var view in database.Views)
                     {
-                        ImportExtendedProperties(connection, view);
+                        await ImportExtendedProperties(connection, view);
                     }
                 }
             }
@@ -207,7 +207,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var scalarFunction in database.ScalarFunctions)
                     {
-                        ImportExtendedProperties(connection, scalarFunction);
+                        await ImportExtendedProperties(connection, scalarFunction);
                     }
                 }
 
@@ -232,7 +232,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var tableFunction in database.TableFunctions)
                     {
-                        ImportExtendedProperties(connection, tableFunction);
+                        await ImportExtendedProperties(connection, tableFunction);
                     }
                 }
 
@@ -272,7 +272,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var storedProcedure in database.StoredProcedures)
                     {
-                        ImportExtendedProperties(connection, storedProcedure);
+                        await ImportExtendedProperties(connection, storedProcedure);
                     }
                 }
 
@@ -654,7 +654,7 @@ namespace CatFactory.SqlServer
             });
         }
 
-        private async Task ImportExtendedPropertiesAsync(DbConnection connection, SqlServerDatabase database)
+        private async Task ImportExtendedPropertiesAsync(SqlConnection connection, SqlServerDatabase database)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
@@ -665,14 +665,14 @@ namespace CatFactory.SqlServer
             }
         }
 
-        private void ImportExtendedProperties(DbConnection connection, Table table)
+        private async Task ImportExtendedProperties(SqlConnection connection, Table table)
         {
             table.Type = "table";
             table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var exProperty in connection.GetExtendedProperties(table, name))
+                foreach (var exProperty in await connection.GetExtendedProperties(table, name))
                 {
                     table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
@@ -685,7 +685,7 @@ namespace CatFactory.SqlServer
                 {
                     column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
-                    foreach (var exProperty in connection.GetExtendedProperties(table, column, name))
+                    foreach (var exProperty in await connection.GetExtendedProperties(table, column, name))
                     {
                         column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
@@ -703,7 +703,7 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="views">Sequence of views</param>
         /// <returns>A sequence of <see cref="View"/> that represents existing views in database</returns>
-        protected virtual async Task<ICollection<View>> GetViewsAsync(DbConnection connection, IEnumerable<DbObject> views)
+        protected virtual async Task<ICollection<View>> GetViewsAsync(SqlConnection connection, IEnumerable<DbObject> views)
         {
             var collection = new Collection<View>();
 
@@ -766,14 +766,14 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private void ImportExtendedProperties(DbConnection connection, View view)
+        private async Task ImportExtendedProperties(SqlConnection connection, View view)
         {
             view.Type = "view";
             view.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var exProperty in connection.GetExtendedProperties(view, name))
+                foreach (var exProperty in await connection.GetExtendedProperties(view, name))
                 {
                     view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
@@ -786,7 +786,7 @@ namespace CatFactory.SqlServer
                 {
                     column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
 
-                    foreach (var exProperty in connection.GetExtendedProperties(view, column, name))
+                    foreach (var exProperty in await connection.GetExtendedProperties(view, column, name))
                     {
                         column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
 
@@ -804,7 +804,7 @@ namespace CatFactory.SqlServer
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="scalarFunctions">Sequence of scalar functions</param>
         /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
-        protected virtual async Task<ICollection<ScalarFunction>> GetScalarFunctionsAsync(DbConnection connection, IEnumerable<DbObject> scalarFunctions)
+        protected virtual async Task<ICollection<ScalarFunction>> GetScalarFunctionsAsync(SqlConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
             var collection = new Collection<ScalarFunction>();
 
@@ -861,11 +861,11 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private void ImportExtendedProperties(DbConnection connection, ScalarFunction scalarFunction)
+        private async Task ImportExtendedProperties(SqlConnection connection, ScalarFunction scalarFunction)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var exProperty in connection.GetExtendedProperties(scalarFunction, name))
+                foreach (var exProperty in await connection.GetExtendedProperties(scalarFunction, name))
                 {
                     // todo: Remove this token
                     if (name == SqlServerToken.MS_DESCRIPTION)
@@ -877,10 +877,10 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// Gets table functions from database connection
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="tableFunctions">Sequence of table functions</param>
         /// <returns>A sequence of <see cref="TableFunction"/> that represents existing views in database</returns>
-        protected virtual async Task<ICollection<TableFunction>> GetTableFunctionsAsync(DbConnection connection, IEnumerable<DbObject> tableFunctions)
+        protected virtual async Task<ICollection<TableFunction>> GetTableFunctionsAsync(SqlConnection connection, IEnumerable<DbObject> tableFunctions)
         {
             var collection = new Collection<TableFunction>();
 
@@ -941,11 +941,11 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private void ImportExtendedProperties(DbConnection connection, TableFunction tableFunction)
+        private async Task ImportExtendedProperties(SqlConnection connection, TableFunction tableFunction)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var exProperty in connection.GetExtendedProperties(tableFunction, name))
+                foreach (var exProperty in await connection.GetExtendedProperties(tableFunction, name))
                 {
                     // todo: Remove this token
                     if (name == SqlServerToken.MS_DESCRIPTION)
@@ -957,10 +957,10 @@ namespace CatFactory.SqlServer
         /// <summary>
         /// Gets stored procedures from database connection
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="storedProcedures">Sequence of stored procedures</param>
         /// <returns>A sequence of <see cref="StoredProcedure"/> that represents existing views in database</returns>
-        protected virtual async Task<ICollection<StoredProcedure>> GetStoredProceduresAsync(DbConnection connection, IEnumerable<DbObject> storedProcedures)
+        protected virtual async Task<ICollection<StoredProcedure>> GetStoredProceduresAsync(SqlConnection connection, IEnumerable<DbObject> storedProcedures)
         {
             var collection = new Collection<StoredProcedure>();
 
@@ -1017,11 +1017,11 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private void ImportExtendedProperties(DbConnection connection, StoredProcedure storedProcedure)
+        private async Task ImportExtendedProperties(SqlConnection connection, StoredProcedure storedProcedure)
         {
             foreach (var name in DatabaseImportSettings.ExtendedProperties)
             {
-                foreach (var exProperty in connection.GetExtendedProperties(storedProcedure, name))
+                foreach (var exProperty in await connection.GetExtendedProperties(storedProcedure, name))
                 {
                     // todo: Remove this token
                     if (name == SqlServerToken.MS_DESCRIPTION)
