@@ -38,9 +38,9 @@ namespace CatFactory.SqlServer
                 database.DatabaseTypeMaps.Add(new DatabaseTypeMap
                 {
                     DatabaseType = type.Name,
-                    Collation = type.CollationName,
                     IsUserDefined = (bool)type.IsUserDefined,
-                    ParentDatabaseType = parent.Name
+                    ParentDatabaseType = parent.Name,
+                    Collation = type.CollationName,
                 });
             }
         }
@@ -114,7 +114,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         /// <returns>An instance of <see cref="Index"/> class</returns>
         public static Index GetIndex(IDictionary<string, object> dictionary)
-            => new Index
+            => new()
             {
                 IndexName = string.Concat(dictionary["index_name"]),
                 IndexDescription = string.Concat(dictionary["index_description"]),
@@ -127,7 +127,7 @@ namespace CatFactory.SqlServer
         /// <param name="dictionary">Dictionary from data reader</param>
         /// <returns>An instance of <see cref="ConstraintDetail"/> class</returns>
         public static ConstraintDetail GetConstraintDetail(IDictionary<string, object> dictionary)
-            => new ConstraintDetail
+            => new()
             {
                 ConstraintType = string.Concat(dictionary["constraint_type"]),
                 ConstraintName = string.Concat(dictionary["constraint_name"]),

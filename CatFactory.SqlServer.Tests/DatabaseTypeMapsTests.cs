@@ -1,23 +1,22 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
+using CatFactory.SqlServer.ObjectRelationalMapping;
+using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
     public class DatabaseTypeMapsTests
     {
-        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
-        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;";
-
         [Fact]
         public async Task GetMapsForStringAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
 
             // Act
-            var mapsForString = database.DatabaseTypeMaps.Where(item => item.GetClrType() == typeof(string)).ToList();
+            var mapsForString = database.DatabaseTypeMaps.GetByClrType(typeof(string)).ToList();
 
             // Assert
             Assert.True(mapsForString.Count == 6);
@@ -27,10 +26,10 @@ namespace CatFactory.SqlServer.Tests
         public async Task GetMapsForDecimalAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
 
             // Act
-            var mapsForString = database.DatabaseTypeMaps.Where(item => item.GetClrType() == typeof(decimal)).ToList();
+            var mapsForString = database.DatabaseTypeMaps.GetByClrType(typeof(decimal)).ToList();
 
             // Assert
             Assert.True(mapsForString.Count == 4);
@@ -40,10 +39,10 @@ namespace CatFactory.SqlServer.Tests
         public async Task GetMapForVarcharAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
 
             // Act
-            var mapForVarchar = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == "varchar");
+            var mapForVarchar = database.DatabaseTypeMaps.GetByDatabaseType("varchar");
 
             // Assert
             Assert.False(mapForVarchar == null);
@@ -53,10 +52,10 @@ namespace CatFactory.SqlServer.Tests
         public async Task GetMapForTypeWithParentAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(AdventureWorks2017ConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.AdventureWorks2017);
 
             // Act
-            var mapForName = database.DatabaseTypeMaps.FirstOrDefault(item => item.DatabaseType == "Name");
+            var mapForName = database.DatabaseTypeMaps.GetByDatabaseType("Name");
 
             var parentType = mapForName.GetParentType(database.DatabaseTypeMaps);
 

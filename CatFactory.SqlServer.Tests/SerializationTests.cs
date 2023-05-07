@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using CatFactory.SqlServer.Tests.Helpers;
 using CatFactory.SqlServer.Tests.Models;
+using CatFactory.SqlServer.Tests.Settings;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -8,8 +9,6 @@ namespace CatFactory.SqlServer.Tests
 {
     public class SerializationTests
     {
-        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True; MultipleActiveResultSets=true;";
-
         [Fact]
         public void SerializeMockDatabaseToXml()
         {
@@ -46,7 +45,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = AdventureWorks2017ConnectionString,
+                    ConnectionString = ConnectionStrings.AdventureWorks2017,
                     ExtendedProperties =
                     {
                         "MS_Description"
@@ -76,7 +75,7 @@ namespace CatFactory.SqlServer.Tests
             {
                 DatabaseImportSettings = new DatabaseImportSettings
                 {
-                    ConnectionString = AdventureWorks2017ConnectionString,
+                    ConnectionString = ConnectionStrings.AdventureWorks2017,
                     ExtendedProperties =
                     {
                         "MS_Description"

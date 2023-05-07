@@ -12,9 +12,13 @@
     <PackageReleaseNotes>
       1.0.0-beta-sun-build70 Version:
 
+      Core package update
+
+      Fix issue 31: https://github.com/hherzl/CatFactory.SqlServer/issues/31
       Fix issue 32: https://github.com/hherzl/CatFactory.SqlServer/issues/32
       Fix issue 33: https://github.com/hherzl/CatFactory.SqlServer/issues/33
       Fix issue 34: https://github.com/hherzl/CatFactory.SqlServer/issues/34
+      Fix issue 35: https://github.com/hherzl/CatFactory.SqlServer/issues/35
 
       Usage:
 
@@ -31,7 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build34" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build36" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 

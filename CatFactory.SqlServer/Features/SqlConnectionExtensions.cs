@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using CatFactory.ObjectRelationalMapping.Programmability;
 using CatFactory.SqlServer.DatabaseObjectModel;
+using CatFactory.SqlServer.DatabaseObjectModel.Queries;
 
 namespace CatFactory.SqlServer.Features
 {
@@ -19,8 +20,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name));
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, string name)
+            => await connection.FnListExtendedPropertyAsync(new ExtendedProperty(name));
 
         /// <summary>
         /// Gets a sequence of extended properties for table
@@ -29,48 +30,8 @@ namespace CatFactory.SqlServer.Features
         /// <param name="table">Name for table</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITable table, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, table.Schema, table.Type, table.Name));
-
-        /// <summary>
-        /// Gets a sequence of extended properties for view
-        /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <param name="view">Name for view</param>
-        /// <param name="name">Name for extended property</param>
-        /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, IView view, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, view.Schema, view.Type, view.Name));
-
-        /// <summary>
-        /// Gets a sequence of extended properties for table function
-        /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <param name="tableFunction">Name for table function</param>
-        /// <param name="name">Name for extended property</param>
-        /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITableFunction tableFunction, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, tableFunction.Schema, tableFunction.Type, tableFunction.Name));
-
-        /// <summary>
-        /// Gets a sequence of extended properties for scalar function
-        /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <param name="scalarFunction">Name for scalar function</param>
-        /// <param name="name">Name for extended property</param>
-        /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ScalarFunction scalarFunction, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, scalarFunction.Schema, scalarFunction.Type, scalarFunction.Name));
-
-        /// <summary>
-        /// Gets a sequence of extended properties for stored procedure
-        /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <param name="storedProcedure">Name for stored procedure</param>
-        /// <param name="name">Name for extended property</param>
-        /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, StoredProcedure storedProcedure, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, storedProcedure.Schema, storedProcedure.Type, storedProcedure.Name));
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITable table, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(SqlServerToken.SCHEMA, table.Schema, SqlServerToken.TABLE, table.Name, name));
 
         /// <summary>
         /// Gets a sequence of extended properties for table's column
@@ -80,8 +41,18 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Name for column</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<List<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITable table, Column column, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, table.Schema, table.Type, table.Name, SqlServerToken.COLUMN, column.Name));
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITable table, Column column, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel2(SqlServerToken.SCHEMA, table.Schema, SqlServerToken.TABLE, table.Name, SqlServerToken.COLUMN, column.Name, name));
+
+        /// <summary>
+        /// Gets a sequence of extended properties for view
+        /// </summary>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="view">Name for view</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, IView view, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(SqlServerToken.SCHEMA, view.Schema, SqlServerToken.VIEW, view.Name, name));
 
         /// <summary>
         /// Gets a sequence of extended properties for view's column
@@ -91,7 +62,37 @@ namespace CatFactory.SqlServer.Features
         /// <param name="column">Name for column</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public static async Task<IEnumerable<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, IView view, Column column, string name)
-            => await new ExtendedPropertyRepository(connection).GetAsync(new ExtendedProperty(name, SqlServerToken.SCHEMA, view.Schema, view.Type, view.Name, SqlServerToken.COLUMN, column.Name));
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, IView view, Column column, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel2(SqlServerToken.SCHEMA, view.Schema, SqlServerToken.VIEW, view.Name, SqlServerToken.COLUMN, column.Name, name));
+
+        /// <summary>
+        /// Gets a sequence of extended properties for table function
+        /// </summary>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="tableFunction">Name for table function</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ITableFunction tableFunction, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(SqlServerToken.SCHEMA, tableFunction.Schema, SqlServerToken.FUNCTION, tableFunction.Name, name));
+
+        /// <summary>
+        /// Gets a sequence of extended properties for scalar function
+        /// </summary>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="scalarFunction">Name for scalar function</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, ScalarFunction scalarFunction, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(SqlServerToken.SCHEMA, scalarFunction.Schema, SqlServerToken.FUNCTION, scalarFunction.Name, name));
+
+        /// <summary>
+        /// Gets a sequence of extended properties for stored procedure
+        /// </summary>
+        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="storedProcedure">Name for stored procedure</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, StoredProcedure storedProcedure, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(SqlServerToken.SCHEMA, storedProcedure.Schema, SqlServerToken.PROCEDURE, storedProcedure.Name, name));
     }
 }

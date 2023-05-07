@@ -140,7 +140,7 @@ namespace CatFactory.SqlServer
             {
                 Logger?.LogInformation("Importing extended properties for database...");
 
-                await ImportExtendedPropertiesAsync(connection, database);
+                await connection.ImportExtendedPropertiesAsync(this, database);
             }
 
             if (DatabaseImportSettings.ImportTables)
@@ -161,7 +161,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var table in database.Tables)
                     {
-                        await ImportExtendedProperties(connection, table);
+                        await connection.ImportExtendedPropertiesAsync(this, table);
                     }
                 }
             }
@@ -184,7 +184,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var view in database.Views)
                     {
-                        await ImportExtendedProperties(connection, view);
+                        await connection.ImportExtendedPropertiesAsync(this, view);
                     }
                 }
             }
@@ -207,7 +207,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var scalarFunction in database.ScalarFunctions)
                     {
-                        await ImportExtendedProperties(connection, scalarFunction);
+                        await connection.ImportExtendedPropertiesAsync(this, scalarFunction);
                     }
                 }
 
@@ -232,7 +232,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var tableFunction in database.TableFunctions)
                     {
-                        await ImportExtendedProperties(connection, tableFunction);
+                        await connection.ImportExtendedPropertiesAsync(this, tableFunction);
                     }
                 }
 
@@ -272,7 +272,7 @@ namespace CatFactory.SqlServer
 
                     foreach (var storedProcedure in database.StoredProcedures)
                     {
-                        await ImportExtendedProperties(connection, storedProcedure);
+                        await connection.ImportExtendedPropertiesAsync(this, storedProcedure);
                     }
                 }
 
@@ -290,8 +290,6 @@ namespace CatFactory.SqlServer
 
                     database.Sequences.Add(sequence);
                 }
-
-                database.ImportBag.Sequences = database.Sequences;
             }
 
             connection.Close();
@@ -324,12 +322,8 @@ namespace CatFactory.SqlServer
 
             while (await dataReader.ReadAsync())
             {
-                collection.Add(new DbObject
+                collection.Add(new DbObject(connection.DataSource, connection.Database, dataReader.GetString(0), dataReader.GetString(1))
                 {
-                    DataSource = connection.DataSource,
-                    DatabaseName = connection.Database,
-                    Schema = dataReader.GetString(0),
-                    Name = dataReader.GetString(1),
                     Type = dataReader.GetString(2)
                 });
             }
@@ -654,49 +648,6 @@ namespace CatFactory.SqlServer
             });
         }
 
-        private async Task ImportExtendedPropertiesAsync(SqlConnection connection, SqlServerDatabase database)
-        {
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.FnListExtendedPropertyAsync(new ExtendedProperty(name)))
-                {
-                    database.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
-                }
-            }
-        }
-
-        private async Task ImportExtendedProperties(SqlConnection connection, Table table)
-        {
-            table.Type = "table";
-            table.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
-
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.GetExtendedProperties(table, name))
-                {
-                    table.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
-
-                    // todo: Remove this token
-                    if (name == SqlServerToken.MS_DESCRIPTION)
-                        table.Description = exProperty.Value;
-                }
-
-                foreach (var column in table.Columns)
-                {
-                    column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
-
-                    foreach (var exProperty in await connection.GetExtendedProperties(table, column, name))
-                    {
-                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
-
-                        // todo: Remove this token
-                        if (name == SqlServerToken.MS_DESCRIPTION)
-                            column.Description = exProperty.Value;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Gets views from database connection
         /// </summary>
@@ -766,44 +717,12 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private async Task ImportExtendedProperties(SqlConnection connection, View view)
-        {
-            view.Type = "view";
-            view.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
-
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.GetExtendedProperties(view, name))
-                {
-                    view.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
-
-                    // todo: Remove this token
-                    if (name == SqlServerToken.MS_DESCRIPTION)
-                        view.ImportBag.Description = exProperty.Value;
-                }
-
-                foreach (var column in view.Columns)
-                {
-                    column.ImportBag.ExtendedProperties = new Collection<ExtendedProperty>();
-
-                    foreach (var exProperty in await connection.GetExtendedProperties(view, column, name))
-                    {
-                        column.ImportBag.ExtendedProperties.Add(new ExtendedProperty(exProperty.Name, exProperty.Value));
-
-                        // todo: Remove this token
-                        if (name == SqlServerToken.MS_DESCRIPTION)
-                            column.Description = exProperty.Value;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Gets scalar functions from database connection
         /// </summary>
         /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
         /// <param name="scalarFunctions">Sequence of scalar functions</param>
-        /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing views in database</returns>
+        /// <returns>A sequence of <see cref="ScalarFunction"/> that represents existing scalar functions in database</returns>
         protected virtual async Task<ICollection<ScalarFunction>> GetScalarFunctionsAsync(SqlConnection connection, IEnumerable<DbObject> scalarFunctions)
         {
             var collection = new Collection<ScalarFunction>();
@@ -859,19 +778,6 @@ namespace CatFactory.SqlServer
             }
 
             return collection;
-        }
-
-        private async Task ImportExtendedProperties(SqlConnection connection, ScalarFunction scalarFunction)
-        {
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.GetExtendedProperties(scalarFunction, name))
-                {
-                    // todo: Remove this token
-                    if (name == SqlServerToken.MS_DESCRIPTION)
-                        scalarFunction.Description = exProperty.Value;
-                }
-            }
         }
 
         /// <summary>
@@ -941,19 +847,6 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private async Task ImportExtendedProperties(SqlConnection connection, TableFunction tableFunction)
-        {
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.GetExtendedProperties(tableFunction, name))
-                {
-                    // todo: Remove this token
-                    if (name == SqlServerToken.MS_DESCRIPTION)
-                        tableFunction.Description = exProperty.Value;
-                }
-            }
-        }
-
         /// <summary>
         /// Gets stored procedures from database connection
         /// </summary>
@@ -1017,19 +910,6 @@ namespace CatFactory.SqlServer
             return collection;
         }
 
-        private async Task ImportExtendedProperties(SqlConnection connection, StoredProcedure storedProcedure)
-        {
-            foreach (var name in DatabaseImportSettings.ExtendedProperties)
-            {
-                foreach (var exProperty in await connection.GetExtendedProperties(storedProcedure, name))
-                {
-                    // todo: Remove this token
-                    if (name == SqlServerToken.MS_DESCRIPTION)
-                        storedProcedure.Description = exProperty.Value;
-                }
-            }
-        }
-
         /// <summary>
         /// Gets sequences from database connection
         /// </summary>
@@ -1088,8 +968,8 @@ namespace CatFactory.SqlServer
                         MaximumValue = (byte)record.MaximumValue,
                         CurrentValue = (byte)record.CurrentValue,
                         Increment = (byte)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
+                        IsCached = record.IsCached,
+                        IsCycling = record.IsCycling
                     });
                 }
                 else if (sequenceDatabaseTypeMap.GetClrType() == typeof(short))
@@ -1103,8 +983,8 @@ namespace CatFactory.SqlServer
                         MaximumValue = (short)record.MaximumValue,
                         CurrentValue = (short)record.CurrentValue,
                         Increment = (short)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
+                        IsCached = record.IsCached,
+                        IsCycling = record.IsCycling
                     });
                 }
                 else if (sequenceDatabaseTypeMap.GetClrType() == typeof(int))
@@ -1118,8 +998,8 @@ namespace CatFactory.SqlServer
                         MaximumValue = (int)record.MaximumValue,
                         CurrentValue = (int)record.CurrentValue,
                         Increment = (int)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
+                        IsCached = record.IsCached,
+                        IsCycling = record.IsCycling
                     });
                 }
                 else if (sequenceDatabaseTypeMap.GetClrType() == typeof(long))
@@ -1133,8 +1013,8 @@ namespace CatFactory.SqlServer
                         MaximumValue = (long)record.MaximumValue,
                         CurrentValue = (long)record.CurrentValue,
                         Increment = (long)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
+                        IsCached = record.IsCached,
+                        IsCycling = record.IsCycling
                     });
                 }
                 else if (sequenceDatabaseTypeMap.GetClrType() == typeof(decimal))
@@ -1148,8 +1028,8 @@ namespace CatFactory.SqlServer
                         MaximumValue = (decimal)record.MaximumValue,
                         CurrentValue = (decimal)record.CurrentValue,
                         Increment = (decimal)record.Increment,
-                        IsCached = (bool)record.IsCached,
-                        IsCycling = (bool)record.IsCycling
+                        IsCached = record.IsCached,
+                        IsCycling = record.IsCycling
                     });
                 }
             }

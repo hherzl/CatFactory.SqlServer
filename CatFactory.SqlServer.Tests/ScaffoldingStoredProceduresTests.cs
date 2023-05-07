@@ -1,19 +1,18 @@
 ﻿using System.Threading.Tasks;
 using CatFactory.SqlServer.CodeFactory;
 using CatFactory.SqlServer.Tests.Models;
+using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
     public class ScaffoldingStoredProceduresTests
     {
-        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
-
         [Fact]
         public async Task ScaffoldProceduresFromExistingDatabaseAsync()
         {
             // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
 
             // Act
             foreach (var table in database.Tables)

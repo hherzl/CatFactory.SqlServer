@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using CatFactory.ObjectRelationalMapping;
+using tokens = CatFactory.SqlServer.SqlServerToken;
 
 namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 {
@@ -13,62 +13,52 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
     /// </summary>
     public static class FnListExtendedPropertyHelper
     {
-        private static SqlParameter GetParameter(string name, SqlDbType sqlDbType, string value)
-        {
-            var parameter = new SqlParameter(name, sqlDbType);
-
-            if (string.IsNullOrEmpty(value))
-                parameter.Value = DBNull.Value;
-            else
-                parameter.Value = value;
-
-            return parameter;
-        }
-
         /// <summary>
         /// Gets an enumerator for 'fn_listextendedproperty' table function result
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/>class</param>
-        /// <returns>An enumerator of <see cref="SysSchema"/> that contains all schemas in database</returns>
-        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this DbConnection connection, ExtendedProperty extendedProperty)
+        /// <returns>An enumerator of <see cref="ExtendedProperty"/></returns>
+        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, ExtendedProperty extendedProperty)
         {
-            var collection = new Collection<ExtendedProperty>();
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync();
 
             using var command = connection.CreateCommand();
 
             command.Connection = connection;
             command.CommandType = CommandType.Text;
-            command.CommandText = @"
-                SELECT
-                    [objtype], [objname], [name], [value]
-                FROM
-                    [fn_listextendedproperty]
-                    (
-                        @name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name
-                    )
-                ";
+            command.CommandText =
+                $" SELECT [objtype], [objname], [name], [value] FROM [fn_listextendedproperty](@name, @level0type, @level0name, @level1type, @level1name, @level2type, @level2name) ";
 
             command.Parameters.Add(new SqlParameter("@name", extendedProperty.Name));
-            command.Parameters.Add(GetParameter("@level0type", SqlDbType.VarChar, extendedProperty.Level0Type));
-            command.Parameters.Add(GetParameter("@level0name", SqlDbType.VarChar, extendedProperty.Level0Name));
-            command.Parameters.Add(GetParameter("@level1type", SqlDbType.VarChar, extendedProperty.Level1Type));
-            command.Parameters.Add(GetParameter("@level1name", SqlDbType.VarChar, extendedProperty.Level1Name));
-            command.Parameters.Add(GetParameter("@level2type", SqlDbType.VarChar, extendedProperty.Level2Type));
-            command.Parameters.Add(GetParameter("@level2name", SqlDbType.VarChar, extendedProperty.Level2Name));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_0_TYPE, SqlDbType.VarChar, extendedProperty.Level0Type));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_0_NAME, SqlDbType.VarChar, extendedProperty.Level0Name));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_1_TYPE, SqlDbType.VarChar, extendedProperty.Level1Type));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_1_NAME, SqlDbType.VarChar, extendedProperty.Level1Name));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_2_TYPE, SqlDbType.VarChar, extendedProperty.Level2Type));
+            command.Parameters.Add(connection.GetParameter(tokens.LEVEL_2_NAME, SqlDbType.VarChar, extendedProperty.Level2Name));
 
             using var reader = await command.ExecuteReaderAsync();
 
+            var collection = new Collection<ExtendedProperty>();
+
             while (await reader.ReadAsync())
             {
-                collection.Add(new ExtendedProperty
-                {
-                    Name = reader.GetString(2),
-                    Value = reader.GetString(3)
-                });
+                collection.Add(new ExtendedProperty(reader.GetString(2), reader.GetString(3)));
             }
 
             return collection;
         }
+#pragma warning disable CS1591
+
+        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, string name)
+            => await connection.FnListExtendedPropertyAsync(new ExtendedProperty(name));
+
+        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, ITable table, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(tokens.SCHEMA, table.Schema, tokens.TABLE, table.Name, name));
+
+        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, IView view, string name)
+            => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(tokens.SCHEMA, view.Schema, tokens.VIEW, view.Name, name));
     }
 }

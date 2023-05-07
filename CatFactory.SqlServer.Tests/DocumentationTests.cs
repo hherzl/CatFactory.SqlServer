@@ -1,47 +1,48 @@
 ﻿using System.Threading.Tasks;
-using CatFactory.SqlServer.Features;
+using CatFactory.SqlServer.DatabaseObjectModel.Queries;
+using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
     public class DocumentationTests
     {
-        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
-        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;";
-        private const string WideWorldImportersConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;";
-        private const string NorthwindConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;";
-
-        private const string MsDescription = "MS_Description";
-
         [Fact]
-        public async Task GetExtendedProperties()
+        public async Task GetExtendedPropertiesForAdventureWorks2017()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("AdventureWorks2017", AdventureWorks2017ConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("AdventureWorks2017", ConnectionStrings.AdventureWorks2017, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = (SqlServerDatabase)await dbFactory.ImportAsync();
             var table = db.FindTable("Production.Product");
             var view = db.FindView("HumanResources.vEmployee");
 
+            db.SyncMsDescription();
+
             // Assert
-            Assert.True(db.ExtendedProperties.Count > 0);
+            Assert.True(db.ImportBag.ExtendedProperties.Count > 0);
+            Assert.False(string.IsNullOrEmpty(db.Description));
+
             Assert.True(table.ImportBag.ExtendedProperties.Count > 0);
+
             Assert.True(view.ImportBag.ExtendedProperties.Count > 0);
         }
 
         [Fact]
-        public async Task AddExtendedPropertiesForDatabase()
+        public async Task AddExtendedPropertiesForOnlineStore()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
 
-            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
-            
-            await dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online Store Database (Sample Database for Entity Framework Core for the The Enterprise)");
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online Store Database (Sample Database for Entity Framework Core for the The Enterprise)");
 
             // Assert
         }
@@ -50,15 +51,17 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
+            await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
 
             // Assert
         }
@@ -67,15 +70,17 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
+            await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
 
             // Assert
         }
@@ -84,15 +89,17 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
+            await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
 
             // Assert
         }
@@ -101,31 +108,35 @@ namespace CatFactory.SqlServer.Tests
         public async Task AddExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION, "Name for employee (Full name)");
+            await connection.DropExtendedPropertyIfExistsAsync(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION, "Name for employee (Full name)");
         }
 
         [Fact]
         public async Task UpdateExtendedPropertiesForDatabase()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
 
-            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store");
+            await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
-            await dbFactory.UpdateExtendedProperty(db, SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
+            await connection.AddExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online store");
+
+            await connection.UpdateExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
 
             // Assert
         }
@@ -134,17 +145,19 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
-            
-            await dbFactory.UpdateExtendedProperty(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
+            await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
+
+            await connection.UpdateExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
 
             // Assert
         }
@@ -153,17 +166,19 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product");
-            
-            await dbFactory.UpdateExtendedProperty(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "ID for product (Update)");
+            await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "Id for product");
+
+            await connection.UpdateExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "Id for product (Update)");
 
             // Assert
         }
@@ -172,17 +187,19 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
-            
-            await dbFactory.UpdateExtendedProperty(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
+            await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
+
+            await connection.UpdateExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
 
             // Assert
         }
@@ -191,29 +208,35 @@ namespace CatFactory.SqlServer.Tests
         public async Task UpdateExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
 
-            await dbFactory.AddExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
-            
-            await dbFactory.UpdateExtendedProperty(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            await connection.DropExtendedPropertyIfExistsAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
+
+            await connection.AddExtendedPropertyAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+
+            await connection.UpdateExtendedPropertyAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+
+            // Assert
         }
 
         [Fact]
         public async Task DropExtendedPropertiesForDatabase()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
 
-            await dbFactory.DropExtendedPropertyIfExists(MsDescription);
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -222,13 +245,15 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -237,13 +262,15 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForColumnFromTable()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            await dbFactory.DropExtendedPropertyIfExists(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -252,13 +279,15 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
 
             // Assert
         }
@@ -267,13 +296,15 @@ namespace CatFactory.SqlServer.Tests
         public async Task DropExtendedPropertiesForColumnFromView()
         {
             // Arrange
-            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", OnlineStoreConnectionString, SqlServerToken.MS_DESCRIPTION));
+            var dbFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create("OnlineStore", ConnectionStrings.OnlineStore, SqlServerToken.MS_DESCRIPTION));
 
             // Act
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            await dbFactory.DropExtendedPropertyIfExists(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
+            using var connection = dbFactory.GetConnection();
+
+            await connection.DropExtendedPropertyIfExistsAsync(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
         }
     }
 }

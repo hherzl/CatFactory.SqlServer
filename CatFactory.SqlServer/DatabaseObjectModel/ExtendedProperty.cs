@@ -8,6 +8,96 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
     [DebuggerDisplay("Name={Name}, Value={Value}")]
     public class ExtendedProperty
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="ExtendedProperty"/> class
+        /// </summary>
+        /// <param name="level0Type">Level 0 type</param>
+        /// <param name="level0Name">Level 0 name</param>
+        /// <param name="level1Type">Level 1 type</param>
+        /// <param name="level1Name">Level 1 name</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A new instance of <see cref="ExtendedProperty"/> for nivel 1</returns>
+        public static ExtendedProperty CreateLevel1(string level0Type, string level0Name, string level1Type, string level1Name, string name)
+        {
+            return new(name)
+            {
+                Level0Type = level0Type,
+                Level0Name = level0Name,
+                Level1Type = level1Type,
+                Level1Name = level1Name
+            };
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ExtendedProperty"/> class
+        /// </summary>
+        /// <param name="level0Type">Level 0 type</param>
+        /// <param name="level0Name">Level 0 name</param>
+        /// <param name="level1Type">Level 1 type</param>
+        /// <param name="level1Name">Level 1 name</param>
+        /// <param name="name">Name for extended property</param>
+        /// <param name="value">Value for extended property</param>
+        /// <returns>A new instance of <see cref="ExtendedProperty"/> for nivel 1</returns>
+        public static ExtendedProperty CreateLevel1(string level0Type, string level0Name, string level1Type, string level1Name, string name, string value)
+        {
+            return new(name, value)
+            {
+                Level0Type = level0Type,
+                Level0Name = level0Name,
+                Level1Type = level1Type,
+                Level1Name = level1Name
+            };
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ExtendedProperty"/> class
+        /// </summary>
+        /// <param name="level0Type">Level 0 type</param>
+        /// <param name="level0Name">Level 0 name</param>
+        /// <param name="level1Type">Level 1 type</param>
+        /// <param name="level1Name">Level 1 name</param>
+        /// <param name="level2Type">Level 2 type</param>
+        /// <param name="level2Name">Level 2 name</param>
+        /// <param name="name">Name for extended property</param>
+        /// <param name="value">Value for extended property</param>
+        /// <returns>A new instance of <see cref="ExtendedProperty"/> for nivel 2</returns>
+        public static ExtendedProperty CreateLevel2(string level0Type, string level0Name, string level1Type, string level1Name, string level2Type, string level2Name, string name, string value)
+        {
+            return new(name, value)
+            {
+                Level0Type = level0Type,
+                Level0Name = level0Name,
+                Level1Type = level1Type,
+                Level1Name = level1Name,
+                Level2Type = level2Type,
+                Level2Name = level2Name
+            };
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ExtendedProperty"/> class
+        /// </summary>
+        /// <param name="level0Type">Level 0 type</param>
+        /// <param name="level0Name">Level 0 name</param>
+        /// <param name="level1Type">Level 1 type</param>
+        /// <param name="level1Name">Level 1 name</param>
+        /// <param name="level2Type">Level 2 type</param>
+        /// <param name="level2Name">Level 2 name</param>
+        /// <param name="name">Name for extended property</param>
+        /// <returns>A new instance of <see cref="ExtendedProperty"/> for nivel 2</returns>
+        public static ExtendedProperty CreateLevel2(string level0Type, string level0Name, string level1Type, string level1Name, string level2Type, string level2Name, string name)
+        {
+            return new(name)
+            {
+                Level0Type = level0Type,
+                Level0Name = level0Name,
+                Level1Type = level1Type,
+                Level1Name = level1Name,
+                Level2Type = level2Type,
+                Level2Name = level2Name
+            };
+        }
+
         #region [ Constructors ]
 
         /// <summary>
@@ -35,57 +125,6 @@ namespace CatFactory.SqlServer.DatabaseObjectModel
         {
             Name = name;
             Value = value;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ExtendedProperty"/> class
-        /// </summary>
-        /// <param name="name">Name for extended property</param>
-        /// <param name="level0Type">Level 0 type</param>
-        /// <param name="level0Name">Level 0 name</param>
-        public ExtendedProperty(string name, string level0Type, string level0Name)
-        {
-            Name = name;
-            Level0Type = level0Type;
-            Level0Name = level0Name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ExtendedProperty"/> class
-        /// </summary>
-        /// <param name="name">Name for extended property</param>
-        /// <param name="level0Type">Level 0 type</param>
-        /// <param name="level0Name">Level 0 name</param>
-        /// <param name="level1Type">Level 1 type</param>
-        /// <param name="level1Name">Level 1 name</param>
-        public ExtendedProperty(string name, string level0Type, string level0Name, string level1Type, string level1Name)
-        {
-            Name = name;
-            Level0Type = level0Type;
-            Level0Name = level0Name;
-            Level1Type = level1Type;
-            Level1Name = level1Name;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ExtendedProperty"/> class
-        /// </summary>
-        /// <param name="name">Name for extended property</param>
-        /// <param name="level0Type">Level 0 type</param>
-        /// <param name="level0Name">Level 0 name</param>
-        /// <param name="level1Type">Level 1 type</param>
-        /// <param name="level1Name">Level 1 name</param>
-        /// <param name="level2Type">Level 2 type</param>
-        /// <param name="level2Name">Level 2 name</param>
-        public ExtendedProperty(string name, string level0Type, string level0Name, string level1Type, string level1Name, string level2Type, string level2Name)
-        {
-            Name = name;
-            Level0Type = level0Type;
-            Level0Name = level0Name;
-            Level1Type = level1Type;
-            Level1Name = level1Name;
-            Level2Type = level2Type;
-            Level2Name = level2Name;
         }
 
         #endregion

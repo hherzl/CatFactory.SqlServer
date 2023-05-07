@@ -45,11 +45,6 @@ namespace CatFactory.SqlServer
         }
 
         /// <summary>
-        /// Gets or sets the database management system
-        /// </summary>
-        public string Dbms { get; set; }
-
-        /// <summary>
         /// Gets or sets the extended properties
         /// </summary>
         public List<ExtendedProperty> ExtendedProperties

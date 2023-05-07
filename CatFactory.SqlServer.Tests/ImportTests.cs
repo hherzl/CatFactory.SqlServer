@@ -1,21 +1,17 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
     public class ImportTests
     {
-        private const string OnlineStoreConnectionString = "server=(local); database=OnlineStore; integrated security=yes; TrustServerCertificate=True;";
-        private const string AdventureWorks2017ConnectionString = "server=(local); database=AdventureWorks2017; integrated security=yes; TrustServerCertificate=True;";
-        private const string WideWorldImportersConnectionString = "server=(local); database=WideWorldImporters; integrated security=yes; TrustServerCertificate=True;";
-        private const string NorthwindConnectionString = "server=(local); database=Northwind; integrated security=yes; TrustServerCertificate=True;";
-
         [Fact]
         public async Task ImportOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory.ImportAsync(OnlineStoreConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -33,7 +29,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportTablesFromOnlineStoreDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory.ImportTablesAsync(OnlineStoreConnectionString, "Sales.OrderHeader", "Sales.OrderDetail");
+            var database = await SqlServerDatabaseFactory.ImportTablesAsync(ConnectionStrings.OnlineStore, "Sales.OrderHeader", "Sales.OrderDetail");
 
             // Assert
             Assert.True(database.Tables.Count == 2);
@@ -52,11 +48,14 @@ namespace CatFactory.SqlServer.Tests
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory(SqlServerDatabaseFactory.GetLogger(), new DatabaseImportSettings
             {
-                ConnectionString = AdventureWorks2017ConnectionString,
+                ConnectionString = ConnectionStrings.AdventureWorks2017,
                 ImportStoredProcedures = true,
                 ImportScalarFunctions = true,
                 ImportTableFunctions = true,
-                ExclusionTypes = { "geography" }
+                ExclusionTypes =
+                {
+                    "geography"
+                }
             });
 
             // Act
@@ -86,7 +85,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportWideWorldImportersDatabaseAsync()
         {
             // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create(connectionString: WideWorldImportersConnectionString, importSequences: true));
+            var databaseFactory = new SqlServerDatabaseFactory(DatabaseImportSettings.Create(connectionString: ConnectionStrings.WideWorldImporters, importSequences: true));
 
             // Act
             var database = (SqlServerDatabase)await databaseFactory.ImportAsync();
@@ -104,7 +103,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportNorthwindDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory.ImportAsync(NorthwindConnectionString, "dbo.ChangeLog");
+            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.Northwind, "dbo.ChangeLog");
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -126,7 +125,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange
             var databaseFactory = new SqlServerDatabaseFactory(
-                DatabaseImportSettings.Create(connectionString: NorthwindConnectionString, importScalarFunctions: true, importTableFunctions: true, importStoredProcedures: true)
+                DatabaseImportSettings.Create(connectionString: ConnectionStrings.Northwind, importScalarFunctions: true, importTableFunctions: true, importStoredProcedures: true)
             );
 
             // Act
@@ -152,7 +151,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportTablesFromNorthwindDatabaseAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory.ImportTablesAsync(NorthwindConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportTablesAsync(ConnectionStrings.Northwind);
 
             // Assert
             Assert.True(database.Tables.Count > 0);
@@ -163,7 +162,7 @@ namespace CatFactory.SqlServer.Tests
         public async Task ImportNorthwindViewsAsync()
         {
             // Arrange and Act
-            var database = await SqlServerDatabaseFactory.ImportViewsAsync(NorthwindConnectionString);
+            var database = await SqlServerDatabaseFactory.ImportViewsAsync(ConnectionStrings.Northwind);
 
             // Assert
             Assert.True(database.Tables.Count == 0);
@@ -175,7 +174,7 @@ namespace CatFactory.SqlServer.Tests
         {
             // Arrange and Act
             var database = await SqlServerDatabaseFactory
-                .ImportTablesAndViewsAsync(NorthwindConnectionString, "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997")
+                .ImportTablesAndViewsAsync(ConnectionStrings.Northwind, "dbo.Orders", "dbo.Order Details", "dbo.Category Sales for 1997", "dbo.Product Sales for 1997")
                 ;
 
             // Assert
