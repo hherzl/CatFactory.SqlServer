@@ -13,6 +13,7 @@
       1.0.0-beta-sun-build71 Version:
 
       Fix issue 27: https://github.com/hherzl/CatFactory.SqlServer/issues/27 (review)
+      Fix issue 36: https://github.com/hherzl/CatFactory.SqlServer/issues/36
 
       Usage:
 

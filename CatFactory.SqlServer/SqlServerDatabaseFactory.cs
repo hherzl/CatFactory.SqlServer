@@ -89,12 +89,12 @@ namespace CatFactory.SqlServer
         /// </summary>
         protected ILogger Logger { get; }
 
-        /// <summary>
-        /// Gets an instance for <see cref="DbConnection"/> class
-        /// </summary>
-        /// <returns>An instance of <see cref="SqlConnection"/> class</returns>
-        public SqlConnection GetConnection()
-            => new(DatabaseImportSettings.ConnectionString);
+        ///// <summary>
+        ///// Gets an instance for <see cref="DbConnection"/> class
+        ///// </summary>
+        ///// <returns>An instance of <see cref="SqlConnection"/> class</returns>
+        //public SqlConnection GetConnection()
+        //    => new(DatabaseImportSettings.ConnectionString);
 
         /// <summary>
         /// Gets or sets the database import settings
@@ -117,7 +117,7 @@ namespace CatFactory.SqlServer
         /// <returns>An instance of <see cref="Database"/> class that represents a database from SQL Server instance</returns>
         public virtual async Task<Database> ImportAsync()
         {
-            using var connection = GetConnection();
+            using var connection = DatabaseImportSettings. GetConnection();
 
             var database = SqlServerDatabase.CreateWithDefaults(connection.Database);
 

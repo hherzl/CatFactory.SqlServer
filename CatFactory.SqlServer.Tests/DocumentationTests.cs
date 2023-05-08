@@ -38,7 +38,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
@@ -57,7 +57,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
 
@@ -76,7 +76,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
@@ -95,7 +95,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
 
@@ -114,7 +114,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
 
@@ -130,7 +130,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
@@ -149,7 +149,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
 
@@ -168,7 +168,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
@@ -187,7 +187,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
 
@@ -206,7 +206,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("Sales.OrderSummary");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
 
@@ -224,7 +224,7 @@ namespace CatFactory.SqlServer.Tests
             // Act
             var db = await dbFactory.ImportAsync();
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
@@ -241,7 +241,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
 
@@ -258,7 +258,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var table = db.FindTable("Warehouse.Product");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
@@ -275,7 +275,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
 
@@ -292,7 +292,7 @@ namespace CatFactory.SqlServer.Tests
             var db = await dbFactory.ImportAsync();
             var view = db.FindView("HumanResources.EmployeeInfo");
 
-            using var connection = dbFactory.GetConnection();
+            using var connection = dbFactory.DatabaseImportSettings.GetConnection();
 
             await connection.DropExtendedPropertyIfExistsAsync(view, view["EmployeeName"], SqlServerToken.MS_DESCRIPTION);
         }

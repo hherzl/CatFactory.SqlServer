@@ -43,16 +43,13 @@ namespace CatFactory.SqlServer
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
         public static async Task<Database> ImportTablesAsync(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] tables)
         {
-            var databaseFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(logger, new DatabaseImportSettings
             {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = connectionString,
-                    ImportViews = false
-                }
-            };
+                ConnectionString = connectionString,
+                ImportViews = false
+            });
 
-            using var connection = databaseFactory.GetConnection();
+            using var connection = databaseFactory.DatabaseImportSettings.GetConnection();
 
             await connection.OpenAsync();
 
@@ -97,7 +94,7 @@ namespace CatFactory.SqlServer
                 }
             };
 
-            using var connection = databaseFactory.GetConnection();
+            using var connection = databaseFactory.DatabaseImportSettings.GetConnection();
 
             await connection.OpenAsync();
 
@@ -133,15 +130,12 @@ namespace CatFactory.SqlServer
         /// <returns>An instance of <see cref="Database"/> class that represents an existing database in SQL Server instance</returns>
         public static async Task<Database> ImportTablesAndViewsAsync(ILogger<SqlServerDatabaseFactory> logger, string connectionString, params string[] names)
         {
-            var databaseFactory = new SqlServerDatabaseFactory(logger)
+            var databaseFactory = new SqlServerDatabaseFactory(logger, new DatabaseImportSettings
             {
-                DatabaseImportSettings = new DatabaseImportSettings
-                {
-                    ConnectionString = connectionString
-                }
-            };
+                ConnectionString = connectionString
+            });
 
-            using var connection = databaseFactory.GetConnection();
+            using var connection = databaseFactory.DatabaseImportSettings.GetConnection();
 
             await connection.OpenAsync();
 
