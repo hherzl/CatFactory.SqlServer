@@ -134,9 +134,7 @@ namespace CatFactory.SqlServer.Tests
 
             await connection.DropExtendedPropertyIfExistsAsync(SqlServerToken.MS_DESCRIPTION);
 
-            await connection.AddExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online store");
-
-            await connection.UpdateExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
+            await connection.AddOrUpdateExtendedPropertyAsync(SqlServerToken.MS_DESCRIPTION, "Online store (Update)");
 
             // Assert
         }
@@ -155,9 +153,7 @@ namespace CatFactory.SqlServer.Tests
 
             await connection.DropExtendedPropertyIfExistsAsync(table, SqlServerToken.MS_DESCRIPTION);
 
-            await connection.AddExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog");
-
-            await connection.UpdateExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Update)");
+            await connection.AddOrUpdateExtendedPropertyAsync(table, SqlServerToken.MS_DESCRIPTION, "Products catalog (Added or updated)");
 
             // Assert
         }
@@ -176,9 +172,7 @@ namespace CatFactory.SqlServer.Tests
 
             await connection.DropExtendedPropertyIfExistsAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION);
 
-            await connection.AddExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "Id for product");
-
-            await connection.UpdateExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "Id for product (Update)");
+            await connection.AddOrUpdateExtendedPropertyAsync(table, table["ID"], SqlServerToken.MS_DESCRIPTION, "Id for product (Added or updated)");
 
             // Assert
         }
@@ -197,9 +191,7 @@ namespace CatFactory.SqlServer.Tests
 
             await connection.DropExtendedPropertyIfExistsAsync(view, SqlServerToken.MS_DESCRIPTION);
 
-            await connection.AddExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders");
-
-            await connection.UpdateExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Update)");
+            await connection.AddOrUpdateExtendedPropertyAsync(view, SqlServerToken.MS_DESCRIPTION, "Summary for orders (Added or update)");
 
             // Assert
         }
@@ -218,9 +210,7 @@ namespace CatFactory.SqlServer.Tests
 
             await connection.DropExtendedPropertyIfExistsAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION);
 
-            await connection.AddExtendedPropertyAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
-
-            await connection.UpdateExtendedPropertyAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName)");
+            await connection.AddOrUpdateExtendedPropertyAsync(view, view["CustomerName"], SqlServerToken.MS_DESCRIPTION, "Name for customer (CompanyName) (Added or updated)");
 
             // Assert
         }

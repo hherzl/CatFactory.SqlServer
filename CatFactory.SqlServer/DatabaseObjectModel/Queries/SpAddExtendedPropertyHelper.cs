@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
 using tokens = CatFactory.SqlServer.SqlServerToken;
@@ -55,5 +56,63 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
         public static async Task AddExtendedPropertyAsync(this SqlConnection connection, IView view, Column column, string name, string value)
             => await connection.SpAddExtendedPropertyAsync(ExtendedProperty.CreateLevel2(tokens.SCHEMA, view.Schema, tokens.VIEW, view.Name, tokens.COLUMN, column.Name, name, value));
+
+        public static async Task AddOrUpdateExtendedPropertyAsync(this SqlConnection connection, string name, string value)
+        {
+            var extendedProperty = (await connection.FnListExtendedPropertyAsync(name)).FirstOrDefault();
+
+            if (extendedProperty == null)
+                await connection.SpAddExtendedPropertyAsync(new ExtendedProperty(name, value));
+            else
+                await connection.SpUpdateExtendedPropertyAsync(new ExtendedProperty(name, value));
+        }
+
+        public static async Task AddOrUpdateExtendedPropertyAsync(this SqlConnection connection, ITable table, string name, string value)
+        {
+            var model = ExtendedProperty.CreateLevel1(tokens.SCHEMA, table.Schema, tokens.TABLE, table.Name, name, value);
+
+            var extendedProperty = (await connection.FnListExtendedPropertyAsync(model)).FirstOrDefault();
+
+            if (extendedProperty == null)
+                await connection.SpAddExtendedPropertyAsync(model);
+            else
+                await connection.SpUpdateExtendedPropertyAsync(model);
+        }
+
+        public static async Task AddOrUpdateExtendedPropertyAsync(this SqlConnection connection, ITable table, Column column, string name, string value)
+        {
+            var model = ExtendedProperty.CreateLevel2(tokens.SCHEMA, table.Schema, tokens.TABLE, table.Name, tokens.COLUMN, column.Name, name, value);
+
+            var extendedProperty = (await connection.FnListExtendedPropertyAsync(model)).FirstOrDefault();
+
+            if (extendedProperty == null)
+                await connection.SpAddExtendedPropertyAsync(model);
+            else
+                await connection.SpUpdateExtendedPropertyAsync(model);
+        }
+
+        public static async Task AddOrUpdateExtendedPropertyAsync(this SqlConnection connection, IView view, string name, string value)
+        {
+            var model = ExtendedProperty.CreateLevel1(tokens.SCHEMA, view.Schema, tokens.VIEW, view.Name, name, value);
+
+            var extendedProperty = (await connection.FnListExtendedPropertyAsync(model)).FirstOrDefault();
+
+            if (extendedProperty == null)
+                await connection.SpAddExtendedPropertyAsync(model);
+            else
+                await connection.SpUpdateExtendedPropertyAsync(model);
+        }
+
+        public static async Task AddOrUpdateExtendedPropertyAsync(this SqlConnection connection, IView view, Column column, string name, string value)
+        {
+            var model = ExtendedProperty.CreateLevel2(tokens.SCHEMA, view.Schema, tokens.VIEW, view.Name, tokens.COLUMN, column.Name, name, value);
+
+            var extendedProperty = (await connection.FnListExtendedPropertyAsync(model)).FirstOrDefault();
+
+            if (extendedProperty == null)
+                await connection.SpAddExtendedPropertyAsync(model);
+            else
+                await connection.SpUpdateExtendedPropertyAsync(model);
+        }
     }
 }
