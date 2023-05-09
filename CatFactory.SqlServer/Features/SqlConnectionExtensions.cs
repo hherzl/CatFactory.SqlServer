@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using CatFactory.ObjectRelationalMapping;
@@ -10,14 +9,14 @@ using CatFactory.SqlServer.DatabaseObjectModel.Queries;
 namespace CatFactory.SqlServer.Features
 {
     /// <summary>
-    /// Contains extension methods for <see cref="DbConnection"/> class
+    /// Contains extension methods for <see cref="SqlConnection"/> class
     /// </summary>
     public static class SqlConnectionExtensions
     {
         /// <summary>
         /// Gets a sequence of extended properties for database
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
         public static async Task<ICollection<ExtendedProperty>> GetExtendedProperties(this SqlConnection connection, string name)
@@ -26,7 +25,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for table
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="table">Name for table</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
@@ -36,7 +35,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for table's column
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="table">Name for table</param>
         /// <param name="column">Name for column</param>
         /// <param name="name">Name for extended property</param>
@@ -47,7 +46,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for view
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="view">Name for view</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
@@ -57,7 +56,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for view's column
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="view">Name for view</param>
         /// <param name="column">Name for column</param>
         /// <param name="name">Name for extended property</param>
@@ -68,7 +67,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for table function
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="tableFunction">Name for table function</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
@@ -78,7 +77,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for scalar function
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="scalarFunction">Name for scalar function</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
@@ -88,7 +87,7 @@ namespace CatFactory.SqlServer.Features
         /// <summary>
         /// Gets a sequence of extended properties for stored procedure
         /// </summary>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
+        /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="storedProcedure">Name for stored procedure</param>
         /// <param name="name">Name for extended property</param>
         /// <returns>A task representing the asynchronous operation</returns>
