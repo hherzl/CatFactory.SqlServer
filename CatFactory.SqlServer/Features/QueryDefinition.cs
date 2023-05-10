@@ -19,11 +19,18 @@ namespace CatFactory.SqlServer.Features
         {
         }
 
+        public QueryDefinition(string source)
+        {
+            Source = source;
+        }
+
         public List<string> Columns
         {
             get => m_columns ??= new List<string>();
             set => m_columns = value;
         }
+
+        public string Source { get; set; }
 
         public List<QueryCondition> Conditions
         {

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CatFactory.SqlServer.Tests
 {
-    public class QueryBuilderTests
+    public class QueryDefinitionTests
     {
         [Fact]
         public void SelectAllTest()
@@ -19,10 +19,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.SelectAll();
+            var queryDefinition = model.SelectAll("Student");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 4);
+            Assert.True(queryDefinition.Source == "Student");
         }
 
         [Fact]
@@ -38,10 +39,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.SelectByKey(e => e.Id, model.Id);
+            var queryDefinition = model.SelectByKey(e => e.Id, model.Id, "Teacher");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 4);
+            Assert.True(queryDefinition.Source == "Teacher");
             Assert.True(queryDefinition.Conditions.Count == 1);
         }
 
@@ -58,10 +60,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.Insert();
+            var queryDefinition = model.Insert("Student");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 4);
+            Assert.True(queryDefinition.Source == "Student");
             Assert.True(queryDefinition.Conditions.Count == 0);
         }
 
@@ -78,10 +81,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.Insert(e => e.Id);
+            var queryDefinition = model.Insert(e => e.Id, "Employee");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 4);
+            Assert.True(queryDefinition.Source == "Employee");
             Assert.True(queryDefinition.Conditions.Count == 0);
         }
 
@@ -98,10 +102,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.Update(e => e.Id, model.Id);
+            var queryDefinition = model.Update(e => e.Id, model.Id, "User");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 4);
+            Assert.True(queryDefinition.Source == "User");
             Assert.True(queryDefinition.Conditions.Count == 1);
         }
 
@@ -118,10 +123,11 @@ namespace CatFactory.SqlServer.Tests
             };
 
             // Act
-            var queryDefinition = model.Delete(e => e.Id, model.Id);
+            var queryDefinition = model.Delete(e => e.Id, model.Id, "Teacher");
 
             // Assert
             Assert.True(queryDefinition.Columns.Count == 0);
+            Assert.True(queryDefinition.Source == "Teacher");
             Assert.True(queryDefinition.Conditions.Count == 1);
         }
     }

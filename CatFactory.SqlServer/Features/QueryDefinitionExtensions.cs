@@ -45,9 +45,9 @@ namespace CatFactory.SqlServer.Features
             }
         }
 
-        public static QueryDefinition<TModel> SelectAll<TModel>(this TModel model)
+        public static QueryDefinition<TModel> SelectAll<TModel>(this TModel model, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             foreach (var property in typeof(TModel).GetProperties())
             {
@@ -57,9 +57,9 @@ namespace CatFactory.SqlServer.Features
             return queryDefinition;
         }
 
-        public static QueryDefinition<TModel> SelectByKey<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value)
+        public static QueryDefinition<TModel> SelectByKey<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             foreach (var property in typeof(TModel).GetProperties())
             {
@@ -73,9 +73,9 @@ namespace CatFactory.SqlServer.Features
             return queryDefinition;
         }
 
-        public static QueryDefinition<TModel> Insert<TModel>(this TModel model)
+        public static QueryDefinition<TModel> Insert<TModel>(this TModel model, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             foreach (var property in typeof(TModel).GetProperties())
             {
@@ -85,9 +85,9 @@ namespace CatFactory.SqlServer.Features
             return queryDefinition;
         }
 
-        public static QueryDefinition<TModel> Insert<TModel, TIdentity>(this TModel model, Expression<Func<TModel, TIdentity>> selector)
+        public static QueryDefinition<TModel> Insert<TModel, TIdentity>(this TModel model, Expression<Func<TModel, TIdentity>> selector, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             foreach (var property in typeof(TModel).GetProperties())
             {
@@ -99,9 +99,9 @@ namespace CatFactory.SqlServer.Features
             return queryDefinition;
         }
 
-        public static QueryDefinition<TModel> Update<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value)
+        public static QueryDefinition<TModel> Update<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             foreach (var property in typeof(TModel).GetProperties())
             {
@@ -115,9 +115,9 @@ namespace CatFactory.SqlServer.Features
             return queryDefinition;
         }
 
-        public static QueryDefinition<TModel> Delete<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value)
+        public static QueryDefinition<TModel> Delete<TModel, TKey>(this TModel model, Expression<Func<TModel, TKey>> selector, object value, string source = null)
         {
-            var queryDefinition = new QueryDefinition<TModel>();
+            var queryDefinition = new QueryDefinition<TModel>(source ?? typeof(TModel).Name);
 
             var key = GetPropertyName(selector);
 
