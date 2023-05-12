@@ -12,7 +12,8 @@
     <PackageReleaseNotes>
       1.0.0-beta-sun-build72 Version:
 
-      Fix issue 37: https://github.com/hherzl/CatFactory.SqlServer/issues/37 (review)
+      Fix issue 37: https://github.com/hherzl/CatFactory.SqlServer/issues/37
+      Fix issue 38: https://github.com/hherzl/CatFactory.SqlServer/issues/38
 
       Usage:
 

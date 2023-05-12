@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
@@ -18,8 +19,8 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
         /// </summary>
         /// <param name="connection">Instance of <see cref="SqlConnection"/> class</param>
         /// <param name="extendedProperty">Instance of <see cref="ExtendedProperty"/>class</param>
-        /// <returns>An enumerator of <see cref="ExtendedProperty"/></returns>
-        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, ExtendedProperty extendedProperty)
+        /// <returns>An enumerator of <see cref="FnListExtendedPropertyResult"/></returns>
+        public static async Task<ICollection<FnListExtendedPropertyResult>> FnListExtendedPropertyAsync(this SqlConnection connection, ExtendedProperty extendedProperty)
         {
             if (connection.State == ConnectionState.Closed)
                 await connection.OpenAsync();
@@ -41,24 +42,30 @@ namespace CatFactory.SqlServer.DatabaseObjectModel.Queries
 
             using var reader = await command.ExecuteReaderAsync();
 
-            var collection = new Collection<ExtendedProperty>();
+            var collection = new Collection<FnListExtendedPropertyResult>();
 
             while (await reader.ReadAsync())
             {
-                collection.Add(new ExtendedProperty(reader.GetString(2), reader.GetString(3)));
+                collection.Add(new FnListExtendedPropertyResult
+                {
+                    ObjType = reader[0] is DBNull ? null : reader.GetString(0),
+                    ObjName = reader[1] is DBNull ? null : reader.GetString(1),
+                    Name = reader.GetString(2),
+                    Value = reader.GetString(3)
+                });
             }
 
             return collection;
         }
 #pragma warning disable CS1591
 
-        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, string name)
+        public static async Task<ICollection<FnListExtendedPropertyResult>> FnListExtendedPropertyAsync(this SqlConnection connection, string name)
             => await connection.FnListExtendedPropertyAsync(new ExtendedProperty(name));
 
-        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, ITable table, string name)
+        public static async Task<ICollection<FnListExtendedPropertyResult>> FnListExtendedPropertyAsync(this SqlConnection connection, ITable table, string name)
             => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(tokens.SCHEMA, table.Schema, tokens.TABLE, table.Name, name));
 
-        public static async Task<ICollection<ExtendedProperty>> FnListExtendedPropertyAsync(this SqlConnection connection, IView view, string name)
+        public static async Task<ICollection<FnListExtendedPropertyResult>> FnListExtendedPropertyAsync(this SqlConnection connection, IView view, string name)
             => await connection.FnListExtendedPropertyAsync(ExtendedProperty.CreateLevel1(tokens.SCHEMA, view.Schema, tokens.VIEW, view.Name, name));
     }
 }
