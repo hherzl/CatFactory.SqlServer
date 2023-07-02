@@ -255,11 +255,6 @@ namespace CatFactory.SqlServer
 
                 foreach (var storedProcedure in database.StoredProcedures)
                 {
-                    foreach (var firstResultSet in await SqlServerDatabaseFactoryHelper.GetFirstResultSetForObjectAsync(storedProcedure, connection))
-                    {
-                        storedProcedure.FirstResultSetsForObject.Add(firstResultSet);
-                    }
-
                     foreach (var resultSet in await SqlServerDatabaseFactoryHelper.GetResultSetsAsync(storedProcedure, connection))
                     {
                         storedProcedure.ResultSets.Add(resultSet);

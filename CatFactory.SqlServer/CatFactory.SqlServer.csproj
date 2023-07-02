@@ -11,7 +11,7 @@
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
       1.0.0-beta-sun-build72 Version:
-
+      
       Fix issue 37: https://github.com/hherzl/CatFactory.SqlServer/issues/37
       Fix issue 38: https://github.com/hherzl/CatFactory.SqlServer/issues/38
 
@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build36" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build37" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 

@@ -139,30 +139,6 @@ namespace CatFactory.SqlServer
             };
 
         /// <summary>
-        /// Gets the first result sets for stored procedure
-        /// </summary>
-        /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
-        /// <param name="connection">Instance of <see cref="DbConnection"/> class</param>
-        /// <returns>A sequence of <see cref="FirstResultSetForObject"/> class</returns>
-        public static async Task<ICollection<FirstResultSetForObject>> GetFirstResultSetForObjectAsync(StoredProcedure storedProcedure, DbConnection connection)
-        {
-            var collection = new Collection<FirstResultSetForObject>();
-
-            foreach (var item in await connection.DmExecDescribeFirstResultSetForObjectAsync(storedProcedure.FullName))
-            {
-                collection.Add(new FirstResultSetForObject
-                {
-                    ColumnOrdinal = item.ColumnOrdinal,
-                    Name = item.Name,
-                    IsNullable = item.IsNullable,
-                    SystemTypeName = item.SystemTypeName
-                });
-            }
-
-            return collection;
-        }
-
-        /// <summary>
         /// Gets the result sets for stored procedure
         /// </summary>
         /// <param name="storedProcedure">Instance of <see cref="StoredProcedure"/> class</param>
