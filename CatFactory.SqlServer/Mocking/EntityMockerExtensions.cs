@@ -4,9 +4,7 @@ using System.Linq.Expressions;
 
 namespace CatFactory.SqlServer.Mocking
 {
-    /// <summary>
-    /// 
-    /// </summary>
+#pragma warning disable CS1591
     public static class EntityMockerExtensions
     {
         private static string GetPropertyName<TModel, TProperty>(Expression<Func<TModel, TProperty>> selector)
@@ -22,14 +20,6 @@ namespace CatFactory.SqlServer.Mocking
             return memberExpression.Member.Name;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, string>> selector, IEnumerable<string> values) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -43,14 +33,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, DateTime?>> selector, Func<DateTime> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -64,14 +46,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, decimal?>> selector, Func<decimal> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -85,14 +59,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, short?>> selector, Func<short> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -106,14 +72,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, int?>> selector, Func<int> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -127,14 +85,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, long?>> selector, Func<long> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -148,14 +98,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selector"></param>
-        /// <param name="propertyFunc"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> MockProperty<TModel>(this EntityMocker<TModel> source, Expression<Func<TModel, string>> selector, Func<string> propertyFunc) where TModel : class
         {
             var name = GetPropertyName(selector);
@@ -169,15 +111,6 @@ namespace CatFactory.SqlServer.Mocking
             return source;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="when"></param>
-        /// <param name="selector"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
         public static EntityMocker<TModel> When<TModel>(this EntityMocker<TModel> source, string when, Expression<Func<TModel, string>> selector, IEnumerable<string> values) where TModel : class
         {
             var name = GetPropertyName(selector);

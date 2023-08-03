@@ -1,100 +1,98 @@
-﻿using System.IO;
-using CatFactory.SqlServer.Tests.Helpers;
+﻿using CatFactory.SqlServer.Tests.Helpers;
 using CatFactory.SqlServer.Tests.Models;
 using CatFactory.SqlServer.Tests.Settings;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests;
+
+public class SerializationTests
 {
-    public class SerializationTests
+    [Fact]
+    public void SerializeMockDatabaseToXml()
     {
-        [Fact]
-        public void SerializeMockDatabaseToXml()
+        // Arrange
+        var database = Databases.Blogging;
+
+        // Act
+        var xml = XmlSerializerHelper.Serialize(database);
+
+        File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.xml", xml);
+
+        // Assert
+    }
+
+    [Fact]
+    public void SerializeMockDatabaseToJson()
+    {
+        // Arrange
+        var database = Databases.Blogging;
+
+        // Act
+        var json = JsonConvert.SerializeObject(database, Formatting.Indented);
+
+        File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.json", json);
+
+        // Assert
+    }
+
+    [Fact]
+    public void SerializeAdventureWorks2017DatabaseToXml()
+    {
+        // Arrange
+        var databaseFactory = new SqlServerDatabaseFactory
         {
-            // Arrange
-            var database = Databases.Blogging;
-
-            // Act
-            var xml = XmlSerializerHelper.Serialize(database);
-
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.xml", xml);
-
-            // Assert
-        }
-
-        [Fact]
-        public void SerializeMockDatabaseToJson()
-        {
-            // Arrange
-            var database = Databases.Blogging;
-
-            // Act
-            var json = JsonConvert.SerializeObject(database, Formatting.Indented);
-
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\Blogging.json", json);
-
-            // Assert
-        }
-
-        [Fact]
-        public void SerializeAdventureWorks2017DatabaseToXml()
-        {
-            // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            DatabaseImportSettings = new DatabaseImportSettings
             {
-                DatabaseImportSettings = new DatabaseImportSettings
+                ConnectionString = ConnectionStrings.AdventureWorks2017,
+                ExtendedProperties =
                 {
-                    ConnectionString = ConnectionStrings.AdventureWorks2017,
-                    ExtendedProperties =
-                    {
-                        "MS_Description"
-                    },
-                    Exclusions =
-                    {
-                        "dbo.EventLog"
-                    }
+                    "MS_Description"
+                },
+                Exclusions =
+                {
+                    "dbo.EventLog"
                 }
-            };
+            }
+        };
 
-            // Act
-            var database = databaseFactory.Import();
+        // Act
+        var database = databaseFactory.Import();
 
-            var xml = XmlSerializerHelper.Serialize(database);
+        var xml = XmlSerializerHelper.Serialize(database);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.xml", xml);
+        File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.xml", xml);
 
-            // Assert
-        }
+        // Assert
+    }
 
-        [Fact]
-        public void SerializeAdventureWorks2017DatabaseToJson()
+    [Fact]
+    public void SerializeAdventureWorks2017DatabaseToJson()
+    {
+        // Arrange
+        var databaseFactory = new SqlServerDatabaseFactory
         {
-            // Arrange
-            var databaseFactory = new SqlServerDatabaseFactory
+            DatabaseImportSettings = new DatabaseImportSettings
             {
-                DatabaseImportSettings = new DatabaseImportSettings
+                ConnectionString = ConnectionStrings.AdventureWorks2017,
+                ExtendedProperties =
                 {
-                    ConnectionString = ConnectionStrings.AdventureWorks2017,
-                    ExtendedProperties =
-                    {
-                        "MS_Description"
-                    },
-                    Exclusions =
-                    {
-                        "dbo.EventLog"
-                    }
+                    "MS_Description"
+                },
+                Exclusions =
+                {
+                    "dbo.EventLog"
                 }
-            };
+            }
+        };
 
-            // Act
-            var database = databaseFactory.Import();
+        // Act
+        var database = databaseFactory.Import();
 
-            var json = JsonConvert.SerializeObject(database, Formatting.Indented);
+        var json = JsonConvert.SerializeObject(database, Formatting.Indented);
 
-            File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.json", json);
+        File.WriteAllText(@"C:\Temp\CatFactory.SqlServer\AdventureWorks2017.json", json);
 
-            // Assert
-        }
+        // Assert
     }
 }

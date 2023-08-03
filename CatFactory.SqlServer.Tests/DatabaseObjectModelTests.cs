@@ -1,190 +1,189 @@
 ﻿using System.Data.SqlClient;
-using System.Threading.Tasks;
 using CatFactory.SqlServer.DatabaseObjectModel.Queries;
+using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests;
+
+public class DatabaseObjectModelTests
 {
-    public class DatabaseObjectModelTests
+    [Fact]
+    public async Task GetSysSchemasAsync()
     {
-        [Fact]
-        public async Task GetSysSchemasAsync()
-        {
-            // Arrange
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var schemas = await connection.GetSysSchemasAsync();
+        var schemas = await connection.GetSysSchemasAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(schemas.Count > 0);
-        }
+        Assert.True(schemas.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysTypesAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysTypesAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var types = await connection.GetSysTypesAsync();
+        var types = await connection.GetSysTypesAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(types.Count > 0);
-        }
+        Assert.True(types.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysTypesBySchemaIdAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysTypesBySchemaIdAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var types = await connection.GetSysTypesAsync(schemaId: 14);
+        var types = await connection.GetSysTypesAsync(schemaId: 14);
 
-            // Assert
+        // Assert
 
-            Assert.True(types.Count > 0);
-        }
+        Assert.True(types.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysTypesDefinedByUserAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysTypesDefinedByUserAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var types = await connection.GetSysTypesAsync(isUserDefined: true);
+        var types = await connection.GetSysTypesAsync(isUserDefined: true);
 
-            // Assert
+        // Assert
 
-            Assert.True(types.Count == 4);
-        }
+        Assert.True(types.Count == 4);
+    }
 
-        [Fact]
-        public async Task GetSysTablesAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysTablesAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var tables = await connection.GetSysTablesAsync();
+        var tables = await connection.GetSysTablesAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(tables.Count > 0);
-        }
+        Assert.True(tables.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysViewsAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysViewsAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var views = await connection.GetSysViewsAsync();
+        var views = await connection.GetSysViewsAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(views.Count > 0);
-        }
+        Assert.True(views.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysColumnsAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysColumnsAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var columns = await connection.GetSysColumnsAsync();
+        var columns = await connection.GetSysColumnsAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(columns.Count > 0);
-        }
+        Assert.True(columns.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetSysSequencesAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetSysSequencesAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=WideWorldImporters;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.WideWorldImporters);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var sequences = await connection.GetSysSequencesAsync();
+        var sequences = await connection.GetSysSequencesAsync();
 
-            // Assert
+        // Assert
 
-            Assert.True(sequences.Count > 0);
-        }
+        Assert.True(sequences.Count > 0);
+    }
 
-        [Fact]
-        public async Task GetFirstResultSetForCustOrdersOrdersStoredProcedureAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task GetFirstResultSetForCustOrdersOrdersStoredProcedureAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.Northwind);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var firstResultSet = await connection.DmExecDescribeFirstResultSetForObjectAsync("CustOrdersOrders");
+        var firstResultSet = await connection.DmExecDescribeFirstResultSetForObjectAsync("CustOrdersOrders");
 
-            // Assert
+        // Assert
 
-            Assert.True(firstResultSet.Count > 0);
-        }
+        Assert.True(firstResultSet.Count > 0);
+    }
 
-        [Fact]
-        public async Task SpHelpForTableAsync()
-        {
-            // Arrange
+    [Fact]
+    public async Task SpHelpForTableAsync()
+    {
+        // Arrange
 
-            using var connection = new SqlConnection("server=(local);database=Northwind;integrated security=yes;");
+        using var connection = new SqlConnection(ConnectionStrings.Northwind);
 
-            // Act
+        // Act
 
-            await connection.OpenAsync();
+        await connection.OpenAsync();
 
-            var spHelpResult = await connection.SpHelpAsync("Products");
+        var spHelpResult = await connection.SpHelpAsync("Products");
 
-            // Assert
+        // Assert
 
-            Assert.False(spHelpResult == null);
-        }
+        Assert.False(spHelpResult == null);
     }
 }

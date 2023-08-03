@@ -1,8 +1,7 @@
-﻿namespace CatFactory.SqlServer.Tests.Models
+﻿namespace CatFactory.SqlServer.Tests.Models;
+
+internal class Student
 {
-    internal class Student
-    {
-        public int Id { get; set; }
-        public string GivenName { get; set; }
-    }
+    public int Id { get; set; }
+    public string GivenName { get; set; }
 }

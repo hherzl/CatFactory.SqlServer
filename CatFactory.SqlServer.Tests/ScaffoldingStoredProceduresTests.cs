@@ -1,57 +1,55 @@
-﻿using System.Threading.Tasks;
-using CatFactory.SqlServer.CodeFactory;
+﻿using CatFactory.SqlServer.CodeFactory;
 using CatFactory.SqlServer.Tests.Models;
 using CatFactory.SqlServer.Tests.Settings;
 using Xunit;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests;
+
+public class ScaffoldingStoredProceduresTests
 {
-    public class ScaffoldingStoredProceduresTests
+    [Fact]
+    public async Task ScaffoldProceduresFromExistingDatabaseAsync()
     {
-        [Fact]
-        public async Task ScaffoldProceduresFromExistingDatabaseAsync()
+        // Arrange
+        var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
+
+        // Act
+        foreach (var table in database.Tables)
         {
-            // Arrange
-            var database = await SqlServerDatabaseFactory.ImportAsync(ConnectionStrings.OnlineStore);
-
-            // Act
-            foreach (var table in database.Tables)
+            var codeBuilder = new SqlStoredProcedureCodeBuilder
             {
-                var codeBuilder = new SqlStoredProcedureCodeBuilder
-                {
-                    Database = database,
-                    Table = table,
-                    OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromExistingDatabase",
-                    ForceOverwrite = true
-                };
+                Database = database,
+                Table = table,
+                OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromExistingDatabase",
+                ForceOverwrite = true
+            };
 
-                codeBuilder.CreateFile();
-            }
-
-            // Assert
+            codeBuilder.CreateFile();
         }
 
-        [Fact]
-        public void ScaffoldProceduresFromMockDatabaseTest()
+        // Assert
+    }
+
+    [Fact]
+    public void ScaffoldProceduresFromMockDatabaseTest()
+    {
+        // Arrange
+        var database = Databases.Blogging;
+
+        // Act
+        foreach (var table in database.Tables)
         {
-            // Arrange
-            var database = Databases.Blogging;
-
-            // Act
-            foreach (var table in database.Tables)
+            var codeBuilder = new SqlStoredProcedureCodeBuilder
             {
-                var codeBuilder = new SqlStoredProcedureCodeBuilder
-                {
-                    Database = database,
-                    Table = table,
-                    OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromMockingDatabase",
-                    ForceOverwrite = true
-                };
+                Database = database,
+                Table = table,
+                OutputDirectory = @"C:\Temp\CatFactory.SqlServer\StoredProceduresFromMockingDatabase",
+                ForceOverwrite = true
+            };
 
-                codeBuilder.CreateFile();
-            }
-
-            // Assert
+            codeBuilder.CreateFile();
         }
+
+        // Assert
     }
 }

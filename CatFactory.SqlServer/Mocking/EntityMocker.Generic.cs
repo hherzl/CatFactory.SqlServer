@@ -5,10 +5,7 @@ using System.Linq;
 
 namespace CatFactory.SqlServer.Mocking
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TModel"></typeparam>
+#pragma warning disable CS1591
     public class EntityMocker<TModel> where TModel : class
     {
         private static object GetDefaultValue(Type type)
@@ -17,27 +14,16 @@ namespace CatFactory.SqlServer.Mocking
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<EntitySetting> m_entitySettings;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public EntityMocker()
         {
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public List<EntitySetting> EntitySettings
         {
             get => m_entitySettings ?? (m_entitySettings = new List<EntitySetting>());
             set => m_entitySettings = value;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
         public virtual IEnumerable<TModel> CreateMocks(int count)
         {
             for (var i = 0; i < count; i++)
@@ -71,13 +57,13 @@ namespace CatFactory.SqlServer.Mocking
 
                         foreach (var childSetting in EntitySettings.Where(x => x.When == value))
                         {
-                            var chilProperty = mockType.GetProperty(childSetting.Name);
+                            var childProperty = mockType.GetProperty(childSetting.Name);
 
                             var childIndex = new Random().Next(0, childSetting.Values.Count() - 1);
 
                             var childValue = childSetting.Values.ElementAt(childIndex);
 
-                            chilProperty.SetValue(mock, childValue);
+                            childProperty.SetValue(mock, childValue);
                         }
                     }
                 }

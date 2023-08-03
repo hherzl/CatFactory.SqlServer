@@ -68,7 +68,7 @@ namespace CatFactory.SqlServer.Features
 
             var key = GetPropertyName(selector);
 
-            queryDefinition.Conditions.Add(new QueryCondition(key, ComparisonOperator.Equals, value));
+            queryDefinition.Conditions.Add(new(key, ComparisonOperator.Equals, value));
 
             return queryDefinition;
         }
@@ -110,7 +110,7 @@ namespace CatFactory.SqlServer.Features
 
             var key = GetPropertyName(selector);
 
-            queryDefinition.Conditions.Add(new QueryCondition(key, ComparisonOperator.Equals, value));
+            queryDefinition.Conditions.Add(new(key, ComparisonOperator.Equals, value));
 
             return queryDefinition;
         }
@@ -121,7 +121,7 @@ namespace CatFactory.SqlServer.Features
 
             var key = GetPropertyName(selector);
 
-            queryDefinition.Conditions.Add(new QueryCondition(key, ComparisonOperator.Equals, value));
+            queryDefinition.Conditions.Add(new(key, ComparisonOperator.Equals, value));
 
             return queryDefinition;
         }

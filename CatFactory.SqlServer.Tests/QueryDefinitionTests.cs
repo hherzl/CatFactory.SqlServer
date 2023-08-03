@@ -1,134 +1,132 @@
-﻿using System;
-using CatFactory.SqlServer.Features;
+﻿using CatFactory.SqlServer.Features;
 using Xunit;
 
-namespace CatFactory.SqlServer.Tests
+namespace CatFactory.SqlServer.Tests;
+
+public class QueryDefinitionTests
 {
-    public class QueryDefinitionTests
+    [Fact]
+    public void SelectAllTest()
     {
-        [Fact]
-        public void SelectAllTest()
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = 0,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = 0,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.SelectAll("Student");
+        // Act
+        var queryDefinition = model.SelectAll("Student");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 4);
-            Assert.True(queryDefinition.Source == "Student");
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 4);
+        Assert.True(queryDefinition.Source == "Student");
+    }
 
-        [Fact]
-        public void SelectByKeyTest()
+    [Fact]
+    public void SelectByKeyTest()
+    {
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = 0,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = 0,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.SelectByKey(e => e.Id, model.Id, "Teacher");
+        // Act
+        var queryDefinition = model.SelectByKey(e => e.Id, model.Id, "Teacher");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 4);
-            Assert.True(queryDefinition.Source == "Teacher");
-            Assert.True(queryDefinition.Conditions.Count == 1);
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 4);
+        Assert.True(queryDefinition.Source == "Teacher");
+        Assert.True(queryDefinition.Conditions.Count == 1);
+    }
 
-        [Fact]
-        public void InsertTest()
+    [Fact]
+    public void InsertTest()
+    {
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = Guid.Empty,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = Guid.Empty,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.Insert("Student");
+        // Act
+        var queryDefinition = model.Insert("Student");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 4);
-            Assert.True(queryDefinition.Source == "Student");
-            Assert.True(queryDefinition.Conditions.Count == 0);
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 4);
+        Assert.True(queryDefinition.Source == "Student");
+        Assert.True(queryDefinition.Conditions.Count == 0);
+    }
 
-        [Fact]
-        public void InsertWithIdentityTest()
+    [Fact]
+    public void InsertWithIdentityTest()
+    {
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = 0,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = 0,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.Insert(e => e.Id, "Employee");
+        // Act
+        var queryDefinition = model.Insert(e => e.Id, "Employee");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 4);
-            Assert.True(queryDefinition.Source == "Employee");
-            Assert.True(queryDefinition.Conditions.Count == 0);
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 4);
+        Assert.True(queryDefinition.Source == "Employee");
+        Assert.True(queryDefinition.Conditions.Count == 0);
+    }
 
-        [Fact]
-        public void UpdateByKeyTest()
+    [Fact]
+    public void UpdateByKeyTest()
+    {
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = 0,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = 0,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.Update(e => e.Id, model.Id, "User");
+        // Act
+        var queryDefinition = model.Update(e => e.Id, model.Id, "User");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 4);
-            Assert.True(queryDefinition.Source == "User");
-            Assert.True(queryDefinition.Conditions.Count == 1);
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 4);
+        Assert.True(queryDefinition.Source == "User");
+        Assert.True(queryDefinition.Conditions.Count == 1);
+    }
 
-        [Fact]
-        public void DeleteByKeyTest()
+    [Fact]
+    public void DeleteByKeyTest()
+    {
+        // Arrange
+        var model = new
         {
-            // Arrange
-            var model = new
-            {
-                Id = 0,
-                Name = "",
-                Email = "",
-                Phone = ""
-            };
+            Id = 0,
+            Name = "",
+            Email = "",
+            Phone = ""
+        };
 
-            // Act
-            var queryDefinition = model.Delete(e => e.Id, model.Id, "Teacher");
+        // Act
+        var queryDefinition = model.Delete(e => e.Id, model.Id, "Teacher");
 
-            // Assert
-            Assert.True(queryDefinition.Columns.Count == 0);
-            Assert.True(queryDefinition.Source == "Teacher");
-            Assert.True(queryDefinition.Conditions.Count == 1);
-        }
+        // Assert
+        Assert.True(queryDefinition.Columns.Count == 0);
+        Assert.True(queryDefinition.Source == "Teacher");
+        Assert.True(queryDefinition.Conditions.Count == 1);
     }
 }

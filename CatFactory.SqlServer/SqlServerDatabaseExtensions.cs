@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using CatFactory.SqlServer.DatabaseObjectModel;
 using CatFactory.SqlServer.Features;
-using CatFactory.SqlServer.ObjectRelationalMapping;
 
 namespace CatFactory.SqlServer
 {
@@ -11,7 +10,7 @@ namespace CatFactory.SqlServer
     {
         public static SqlServerDatabase AddDefaultTypeMapFor(this SqlServerDatabase database, Type type, string databaseType)
         {
-            database.DefaultTypeMaps.Add(new DefaultTypeMap(type, databaseType));
+            database.DefaultTypeMaps.Add(new(type, databaseType));
 
             return database;
         }
