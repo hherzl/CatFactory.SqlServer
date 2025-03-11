@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.0-beta-sun-build73</Version>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.0.0-beta-aurora-build00</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
@@ -10,9 +10,9 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
-      1.0.0-beta-sun-build72 Version:
+      1.0.0-beta-aurora-build00 Version:
       
-      Fix issue 39: https://github.com/hherzl/CatFactory.SqlServer/issues/39
+      Fix issue 40: https://github.com/hherzl/CatFactory.SqlServer/issues/40
       
       Usage:
 
@@ -21,7 +21,7 @@
       Wiki: https://github.com/hherzl/CatFactory.SqlServer/wiki
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/hherzl/CatFactory.SqlServer</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/hherzl/CatFactory.SqlServer/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,8 +29,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-sun-build37" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-aurora-build00" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
 </Project>
