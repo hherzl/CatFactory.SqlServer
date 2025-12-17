@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Version>1.0.0-beta-aurora-build00</Version>
+    <Version>1.0.0-beta-aurora-build01</Version>
     <Authors>H. Herzl</Authors>
     <Company>Herzl Corp.</Company>
     <Description>CatFactory package for SQL Server</Description>
@@ -10,10 +10,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>SQL Server Scaffolding Stored Procedures</PackageTags>
     <PackageReleaseNotes>
-      1.0.0-beta-aurora-build00 Version:
-      
-      Fix issue 40: https://github.com/hherzl/CatFactory.SqlServer/issues/40
-      
+      1.0.0-beta-aurora-build01 Version: Core package update
+
       Usage:
 
       var database = await SqlServerDatabaseFactory.ImportAsync("Your connection string!");
@@ -25,11 +23,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\net6.0\CatFactory.SqlServer.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\net8.0\CatFactory.SqlServer.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CatFactory" Version="1.0.0-beta-aurora-build00" />
+    <PackageReference Include="CatFactory" Version="1.0.0-beta-aurora-build01" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
