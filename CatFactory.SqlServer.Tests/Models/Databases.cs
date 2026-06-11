@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using CatFactory.ObjectRelationalMapping;
-using CatFactory.SqlServer.DatabaseObjectModel;
 
 namespace CatFactory.SqlServer.Tests.Models;
 
@@ -15,7 +14,7 @@ public static class Databases
                 Name = "Blogging",
                 DefaultSchema = "dbo",
                 NamingConvention = new SqlServerDatabaseNamingConvention(),
-                DatabaseTypeMaps = new SqlServerDatabaseFactory().DatabaseTypeMaps.ToList(),
+                DatabaseTypeMaps = [.. new SqlServerDatabaseFactory().DatabaseTypeMaps],
                 Tables =
                 {
                     new Table
@@ -24,11 +23,11 @@ public static class Databases
                         Name = "Blog",
                         Columns =
                         {
-                            new Column { Name = "BlogId", Type = "int" },
-                            new Column { Name = "Name", Type = "varchar", Length = 128 },
-                            new Column { Name = "Url", Type = "varchar", Length = 255 }
+                            new Column("BlogId", "int"),
+                            new Column("Name", "varchar", 128),
+                            new Column("Url", "varchar", 255)
                         },
-                        Identity = new Identity("BlogId")
+                        Identity = new("BlogId")
                     },
                     new Table
                     {
@@ -36,12 +35,12 @@ public static class Databases
                         Name = "Post",
                         Columns =
                         {
-                            new Column { Name = "PostId", Type = "int" },
-                            new Column { Name = "Title", Type = "varchar", Length = 128 },
-                            new Column { Name = "Content", Type = "varchar" },
-                            new Column { Name = "BlogId", Type = "int" }
+                            new Column("PostId", "int"),
+                            new Column("Title", "varchar", 128),
+                            new Column("Content", "varchar"),
+                            new Column("BlogId", "int")
                         },
-                        Identity = new Identity("PostId"),
+                        Identity = new("PostId"),
                         Uniques =
                         {
                             new Unique
@@ -65,11 +64,11 @@ public static class Databases
                 .LinkTables()
                 .AddColumnsForTables(new Column[]
                 {
-                    new Column { Name = "CreationUser", Type = "varchar", Length = 50 },
-                    new Column { Name = "CreationDate", Type = "datetime" },
-                    new Column { Name = "LastUpdateUser", Type = "varchar", Length = 50, Nullable = true },
-                    new Column { Name = "LastUpdateDate", Type = "datetime", Nullable = true },
-                    new Column { Name = "RowVersionID", Type = "rowversion", Nullable = true }
+                    new("CreationUser", "varchar", 50),
+                    new("CreationDate", "datetime"),
+                    new("LastUpdateUser", "varchar", 50, true),
+                    new("LastUpdateDate", "datetime", true),
+                    new("RowVersionId", "rowversion", true)
                 });
 
             foreach (var table in db.Tables)

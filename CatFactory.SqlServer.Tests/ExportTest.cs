@@ -10,29 +10,72 @@ public class ExportTest
     [Fact]
     public void ExportBloggingScript()
     {
-        // Arrange
         var database = Databases.Blogging;
 
-        // Act
         SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
-
-        // Assert
     }
 
     [Fact]
-    public void ExportCollegeScript()
+    public void ExportXavierSchoolScript()
     {
-        // Arrange
-        var database = SqlServerDatabase.CreateWithDefaults("College");
-
+        var database = SqlServerDatabase.CreateWithDefaults("XavierSchool");
         database.AddDefaultTypeMapFor(typeof(string), "nvarchar");
+        database.AddDefaultTypeMapFor(typeof(DateTime), "datetime");
+
+        var now = DateTime.Now;
+
+        var teacher = database
+            .DefineEntity(new
+            {
+                Id = 0,
+                GivenName = "",
+                MiddleName = "",
+                FamilyName = "",
+                BirthDate = now,
+                Gender = "",
+                Phone = "",
+                Email = ""
+            })
+            .SetNaming("Teacher")
+            .SetColumnFor(p => p.GivenName, 25)
+            .SetColumnFor(p => p.MiddleName, 25, true)
+            .SetColumnFor(p => p.FamilyName, 25)
+            .SetIdentity(p => p.Id)
+            .SetPrimaryKey(e => e.Id)
+            ;
+
+        var course = database
+            .DefineEntity(new
+            {
+                Id = 0,
+                TeacherId = 0,
+                Name = "",
+                Description = ""
+            })
+            .SetNaming("Course")
+            .SetColumnFor(e => e.Name, 100)
+            .SetIdentity(e => e.Id, 1000, 1000)
+            .SetPrimaryKey(e => e.Id)
+            .AddUnique(e => e.Name)
+            .AddForeignKey(e => e.TeacherId, teacher.Table)
+            ;
 
         var student = database
-            .DefineEntity(new { Id = 0, GivenName = "", MiddleName = "", FamilyName = "" })
+            .DefineEntity(new
+            {
+                Id = 0,
+                GivenName = "",
+                MiddleName = "",
+                FamilyName = "",
+                BirthDate = now,
+                Gender = "",
+                Phone = "",
+                Email = ""
+            })
             .SetNaming("Student")
-            .SetColumnFor(p => p.GivenName, 15)
-            .SetColumnFor(p => p.MiddleName, 15, true)
-            .SetColumnFor(p => p.FamilyName, 15)
+            .SetColumnFor(p => p.GivenName, 25)
+            .SetColumnFor(p => p.MiddleName, 25, true)
+            .SetColumnFor(p => p.FamilyName, 25)
             .SetIdentity(p => p.Id)
             .SetPrimaryKey(e => e.Id)
             ;
@@ -41,19 +84,6 @@ public class ExportTest
             .AddExtendedProp(p => p.GivenName, "MS_Description", "Given name")
             .AddExtendedProp(p => p.MiddleName, "MS_Description", "Middle name")
             .AddExtendedProp(p => p.FamilyName, "MS_Description", "Family name")
-            ;
-
-        student.Data.Add(new { Id = 0, GivenName = "Carlo", MiddleName = "H", FamilyName = "Herzl" });
-
-        // TODO: add sql transcriber => translate results from select to code (c#)
-
-        var course = database
-            .DefineEntity(new { Id = 0, Name = "", Description = "" })
-            .SetNaming("Course")
-            .SetColumnFor(e => e.Name, 255)
-            .SetIdentity(e => e.Id, 1000, 1000)
-            .SetPrimaryKey(e => e.Id)
-            .AddUnique(e => e.Name)
             ;
 
         var courseStudent = database
@@ -71,17 +101,12 @@ public class ExportTest
             .AddForeignKey(p => p.StudentId, student.Table)
             ;
 
-        // Act
-
         SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
-
-        // Assert
     }
 
     [Fact]
     public void ExportDefinitionForRothschildHouseEntities()
     {
-        // Arrange
         var database = SqlServerDatabase.CreateWithDefaults("RothschildHouse");
 
         database.ExtendedProperties.Add(new("MS_Description", "Database to storage RothschildHouse payments"));
@@ -169,8 +194,6 @@ public class ExportTest
             .AddExtendedProp(p => p.Amount, "MS_Description", "Transaction Amount")
             .AddExtendedProp(p => p.CreatedOn, "MS_Description", "Payment Date time")
             ;
-
-        // Act
 
         SqlServerDatabaseScriptCodeBuilder.CreateScript(database, @"C:\Temp\CatFactory.SqlServer", true, true);
     }
